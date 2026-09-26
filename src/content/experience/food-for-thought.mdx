@@ -1,17 +1,18 @@
 ---
-org: Food for Thought Foundation
-# TODO(Peter): your actual title.
-role: Engineering Intern
+org: The Food For Thought Foundation
+role: Embedded Systems Engineer Intern
 unit: Farms for Thought
-# TODO(Peter): location and start/end dates.
+location: Los Angeles, CA
+start: Dec 2025
+end: May 2026
 order: 4
-summary: Internship at a nonprofit, building the firmware for a hydroponic grow system that keeps its own nutrient and pH levels in range.
+summary: Built the closed-loop control system for a nonprofit's hydroponic grow setup, in C++ on an Arduino UNO R4.
 highlights:
-  - Wrote the Arduino firmware that runs the system's pH and EC control loop, grow lights, and pumps
-  - Brought up seven Atlas Scientific sensors and dosing pumps on a single I2C bus
-  - Found and fixed an intermittent I2C read bug that was corrupting sensor readings
-  - Checked the custom PCB against the breadboard build to confirm they matched electrically
-skills: [arduino, c-cpp, i2c, closed-loop-control, design-verification]
+  - Built a closed-loop hydroponics control system in C++ on an Arduino UNO R4, with real-time pH and EC sensing, dosing across 4 peristaltic pumps, and scheduled lighting
+  - Debugged I2C NAK errors across the 4 pump drivers with serial monitoring and a logic analyzer, then migrated the pumps to UART
+  - Verified the custom PCB netlist against the validated breadboard build
+  - Documented the sensor calibration procedures and wiring specifications
+skills: [arduino, c-cpp, closed-loop-control, i2c, uart, logic-analyzer, design-verification, technical-docs]
 theme: hydro
 rail: left
 projects: [hydroponics]
@@ -19,9 +20,6 @@ sources:
   - label: FFT 2026 firmware and README
 ---
 import Stats from '../../components/content/Stats.astro';
-import Figure from '../../components/Figure.astro';
-import Pair from '../../components/content/Pair.astro';
-import Missing from '../../components/Missing.astro';
 
 {/*
   ATTRIBUTION RULES (firm):
@@ -33,21 +31,15 @@ The Food for Thought Foundation runs Farms for Thought, and part of that is a hy
 
 <Stats
   items={[
-    { big: '7', label: 'I2C devices: pH, EC, and temperature sensors plus four dosing pumps' },
+    { big: '4', label: 'peristaltic dosing pumps, driven from pH and EC feedback' },
     { big: '10 s', label: 'between dosing cycles, each one EC first and then pH' },
-    { big: '1', label: 'config file holding every pin, address, and setpoint' },
+    { big: 'UART', label: 'where the pumps ended up after the I2C NAK errors' },
   ]}
 />
 
 I split the firmware into one module per job (pH, EC, temperature, pumps, dosing, lights, WiFi and time) with a single config header, so whoever maintains it next can change a setpoint or a pin without reading the control code.
 
-The most useful thing I did was probably the least visible one: the sensors occasionally returned garbage, and it turned out the read loops weren't stopping on the `0xFF` the I2C bus returns once a device runs out of data. That, the control loop, and the address map are all on the project page.
+The hardest part was the pump bus. The four pump drivers started throwing I2C NAK errors, where a device doesn't acknowledge its address. I chased it with the serial monitor and a logic analyzer on the bus, and in the end moved the pumps off I2C onto UART. I also wrote up the sensor calibration procedures and the wiring specs, so the next person can recalibrate a probe or rewire a pump without guessing.
 
-<Pair>
-  <Figure caption="The grow system" ratio="4 / 3" />
-  <Figure caption="Breadboard setup" ratio="4 / 3" />
-</Pair>
+The control loop, the code, and the bus story are on the project page.
 
-<Missing>
-Dates, location, team size, and the photos. Anything about who the system serves (a school, a community garden) would make this page a lot stronger.
-</Missing>

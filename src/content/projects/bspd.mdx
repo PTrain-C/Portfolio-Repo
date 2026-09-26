@@ -1,7 +1,8 @@
 ---
 title: BSPD board
 fullName: Brake System Plausibility Device, USC Racing SCR26
-summary: An all-analog safety board for USC Racing's SCR26 car. If the driver is on the throttle and hard on the brakes at the same time, or a pedal sensor drops out, it opens the shutdown circuit.
+summary: A 2-layer, all-analog safety board for USC Racing's SCR26 car. If the driver is on the throttle and hard on the brakes at the same time, or a pedal sensor drops out, it opens the shutdown circuit.
+period: Sep 2025 to May 2026
 order: 1
 status: draft
 theme: track
@@ -11,14 +12,15 @@ cover: img/bspd/cover.webp
 rail: right
 experience: usc-racing
 art: pcb
-# TODO(Peter): solo or team? If team, list the other roles under `others`.
-team: unknown
+team: team
 mine:
-  - Schematic capture
-  - KiCAD layout
+  - The whole PCB layout in KiCAD (46.7 x 52.8 mm, 2 layers, 44 nets)
   - Design rule check (DRC)
   - Fabrication output
-others: []
+  - Schematic, as a collaboration with the electrical team
+others:
+  - part: Schematic, worked out together
+    by: USC Racing electrical team
 outcome: Design and fabrication files only. The board was never installed or brought up.
 skills: [kicad, schematic-capture, pcb-layout, drc, fab-output, op-amps, comparator-logic]
 links:
@@ -30,6 +32,7 @@ sources:
   - label: KiCAD layout and 3D renders of the SCR26 BSPD
 ---
 import Chain from '../../components/content/Chain.astro';
+import Stats from '../../components/content/Stats.astro';
 import Tabs from '../../components/content/Tabs.astro';
 import Pair from '../../components/content/Pair.astro';
 import Figure from '../../components/Figure.astro';
@@ -37,17 +40,17 @@ import Missing from '../../components/Missing.astro';
 
 {/*
   ATTRIBUTION RULES (firm, regardless of what else gets filled in):
-  - Peter's claims stop at design and layout: schematic, KiCAD layout, DRC, fab output.
+  - The layout was all Peter's. The schematic was a collaboration: say "we" for circuit design.
   - No bring-up, validation, or inspection results. The board was never installed.
 */}
 
 ## What it is
 
-Formula SAE cars have to carry a Brake System Plausibility Device. It watches the throttle and brake pedal sensors, and if the two say something that shouldn't happen together (full-ish throttle while braking hard), it cuts the car's shutdown circuit. It also has to catch a pedal sensor that has come unplugged.
+Formula SAE cars have to carry a Brake System Plausibility Device, and the electronic throttle control (ETC) rules spell out what it has to do. It watches the throttle and brake pedal sensors, and if the two say something that shouldn't happen together (full-ish throttle while braking hard), it cuts the car's shutdown circuit. It also has to catch a pedal sensor that has come unplugged.
 
 <Figure src="img/racing/track.webp" ratio="1340 / 800" frame="print" tilt={-1} caption="USC Racing's car on track. The BSPD sits between the pedal sensors and the car's shutdown circuit." alt="USC Racing's Formula SAE car, number 109, driving past a traffic cone" />
 
-This is the one I did for SCR26. It's all op-amps, RC timers and diodes, no microcontroller, so there is no code to crash. Five LEDs on the edge of the board (Throttle, Brake, B-Disc, T-Disc, Output) show which condition tripped.
+This is SCR26's. We worked out the schematic together on the electrical team, and the PCB layout was all mine. It's all op-amps, RC timers and diodes, no microcontroller, so there is no code to crash. Five LEDs on the edge of the board (Throttle, Brake, B-Disc, T-Disc, Output) show which condition tripped.
 
 ## How the logic works
 
@@ -79,7 +82,15 @@ The second path catches a disconnected sensor. Both pedal sensors are ratiometri
 
 ## The board
 
-Everything comes in and goes out through one 12-pin connector: 12 V and ground, throttle and brake in, throttle and brake back out to the ECU, and the two sides of the shutdown loop. A small regulator (Q1) makes 5 V for the logic. The three MCP6004 quad op-amps sit down the middle, with the timing caps and diodes next to the stage that uses them, and the test points and trimpots along the right edge where you can get a probe on them.
+<Stats
+  items={[
+    { big: '46.7 x 52.8', label: 'millimeters, the whole board' },
+    { big: '2', label: 'copper layers' },
+    { big: '44', label: 'nets routed' },
+  ]}
+/>
+
+I did the layout from start to finish. Everything comes in and goes out through one 12-pin connector: 12 V and ground, throttle and brake in, throttle and brake back out to the ECU, and the two sides of the shutdown loop. A small regulator (Q1) makes 5 V for the logic. The three MCP6004 quad op-amps sit down the middle, with the timing caps and diodes next to the stage that uses them, and the test points and trimpots along the right edge where you can get a probe on them.
 
 <Tabs
   tone="dark"
@@ -92,7 +103,7 @@ Everything comes in and goes out through one 12-pin connector: 12 V and ground, 
 />
 
 <Missing>
-A line on the layout choices you'd want to defend in an interview (why the relay went on the bottom, how you set up the ground pour, board size limits), and whether this was solo or with other people on the electrical team.
+A line or two on the layout choices you'd defend in an interview: why the relay went on the bottom, how you handled ground, what set the board size.
 </Missing>
 
 ## Where it ended up

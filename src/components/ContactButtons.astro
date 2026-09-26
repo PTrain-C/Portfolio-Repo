@@ -1,5 +1,5 @@
 ---
-import { contact } from '../config';
+import { contact, href } from '../config';
 
 interface Props {
   // 'dark' for use on the board (dark) areas, 'light' for linen areas.
@@ -9,32 +9,28 @@ interface Props {
 }
 const { on = 'dark', github = true } = Astro.props;
 
+// "Email me" opens the contact page (form plus the address); the others go
+// straight to the profile. Links that aren't set yet are left out.
 const items = [
-  { label: 'Email me', url: contact.email, primary: true },
-  { label: 'LinkedIn', url: contact.linkedin },
-  ...(github ? [{ label: 'GitHub', url: contact.github }] : []),
-];
+  { label: 'Email me', url: href('/contact'), primary: true, external: false },
+  { label: 'LinkedIn', url: contact.linkedin, external: true },
+  ...(github ? [{ label: 'GitHub', url: contact.github, external: true }] : []),
+].filter((i) => i.url);
 const primary = on === 'dark' ? 'gold' : 'solid';
 const secondary = on === 'dark' ? 'ghost-dark' : '';
 ---
 
 <div class="row">
   {
-    items.map((i) =>
-      i.url ? (
-        <a class:list={['btn', i.primary ? primary : secondary]} href={i.url}>
-          {i.label}
-        </a>
-      ) : (
-        <span
-          class:list={['btn', i.primary ? primary : secondary]}
-          aria-disabled="true"
-          title="Link not added yet (src/config.ts)"
-        >
-          {i.label}
-        </span>
-      ),
-    )
+    items.map((i) => (
+      <a
+        class:list={['btn', i.primary ? primary : secondary]}
+        href={i.url!}
+        {...(i.external ? { target: '_blank', rel: 'noopener' } : {})}
+      >
+        {i.label}
+      </a>
+    ))
   }
 </div>
 

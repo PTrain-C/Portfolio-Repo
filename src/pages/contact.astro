@@ -1,0 +1,388 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import { contact, site, href } from '../config';
+import { getExperience } from '../lib/content';
+
+const current = (await getExperience()).find((e) => e.data.current);
+// Without JavaScript the form does a normal POST and FormSubmit sends the
+// visitor back here with ?sent=1.
+const plainEndpoint = contact.formEndpoint.replace('/ajax/', '/');
+const back = new URL(href('/contact?sent=1'), Astro.site).toString();
+const mailto = `mailto:${contact.email}?subject=${encodeURIComponent('Hello from your portfolio')}`;
+---
+
+<Base title="Contact" description={`Send ${site.name} a message, or grab the email address and LinkedIn.`}>
+  <PageHero seed={31}>
+    <h1>Get in touch</h1>
+    <p class="lede">
+      Send a message here and it lands in my inbox, or email me directly. Either way I'll get back to you.
+    </p>
+  </PageHero>
+
+  <section class="wrap body">
+    <div class="form-col">
+      <form
+        class="card form"
+        method="POST"
+        action={plainEndpoint}
+        data-contact-form
+        data-endpoint={contact.formEndpoint}
+        data-mailto={contact.email}
+      >
+        <h2 class="display">Send a message</h2>
+        <div class="row2">
+          <label>
+            <span>Your name</span>
+            <input name="name" type="text" autocomplete="name" required maxlength="120" />
+          </label>
+          <label>
+            <span>Your email</span>
+            <input name="email" type="email" autocomplete="email" required maxlength="200" />
+          </label>
+        </div>
+        <div class="row2">
+          <label>
+            <span>Company or school <em>optional</em></span>
+            <input name="organization" type="text" autocomplete="organization" maxlength="160" />
+          </label>
+          <label>
+            <span>About</span>
+            <select name="topic">
+              <option>Internship or co-op</option>
+              <option>Full-time role</option>
+              <option>A project on this site</option>
+              <option>Something else</option>
+            </select>
+          </label>
+        </div>
+        <label>
+          <span>Message</span>
+          <textarea name="message" rows="7" required maxlength="5000"></textarea>
+        </label>
+
+        <input type="hidden" name="_subject" value={`Portfolio message for ${site.name}`} data-subject />
+        <input type="hidden" name="_template" value="table" />
+        <input type="hidden" name="_captcha" value="false" />
+        <input type="hidden" name="_next" value={back} />
+        <input type="text" name="_honey" class="honey" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+        <div class="actions">
+          <button class="btn solid" type="submit" data-submit>Send message</button>
+          <p class="small quiet status" role="status" aria-live="polite" data-status></p>
+        </div>
+      </form>
+
+      <div class="card sent" hidden data-sent>
+        <h2 class="display">Thanks, it's sent.</h2>
+        <p>Your message is on its way to my inbox. I'll reply to the email address you gave.</p>
+        <p><a href={href('/projects')}>Keep looking around the projects</a></p>
+      </div>
+    </div>
+
+    <aside class="side">
+      <div class="card email-card">
+        <p class="kicker small">Email</p>
+        <p class="address">{contact.email}</p>
+        <div class="email-actions">
+          <button class="btn" type="button" data-copy={contact.email}>Copy address</button>
+          <a class="btn" href={mailto}>Open in mail app</a>
+        </div>
+      </div>
+
+      <a class="card link-card" href={contact.linkedin} target="_blank" rel="noopener">
+        <span>
+          <span class="kicker small">LinkedIn</span>
+          <span class="handle">in/peter-mai-connolly</span>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
+      </a>
+
+      {
+        contact.github && (
+          <a class="card link-card" href={contact.github} target="_blank" rel="noopener">
+            <span>
+              <span class="kicker small">GitHub</span>
+              <span class="handle">{contact.github.replace(/^https?:\/\/(www\.)?/, '')}</span>
+            </span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
+          </a>
+        )
+      }
+
+      <dl class="where">
+        <div>
+          <dt>School</dt>
+          <dd>USC, Los Angeles</dd>
+        </div>
+        {
+          current && (
+            <div>
+              <dt>Right now</dt>
+              <dd>
+                {current.data.org}, {current.data.location}
+                {current.data.end && <>, through {current.data.end}</>}
+              </dd>
+            </div>
+          )
+        }
+      </dl>
+    </aside>
+  </section>
+</Base>
+
+<script>
+  function showSent() {
+    const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+    const sent = document.querySelector<HTMLElement>('[data-sent]');
+    if (!form || !sent) return;
+    form.hidden = true;
+    sent.hidden = false;
+  }
+  function init() {
+    if (new URLSearchParams(location.search).get('sent') === '1') showSent();
+  }
+  init();
+  document.addEventListener('astro:page-load', init);
+
+  document.addEventListener('submit', async (e) => {
+    const form = (e.target as HTMLElement).closest<HTMLFormElement>('[data-contact-form]');
+    if (!form) return;
+    e.preventDefault();
+    const status = form.querySelector<HTMLElement>('[data-status]')!;
+    const button = form.querySelector<HTMLButtonElement>('[data-submit]')!;
+    const data = new FormData(form);
+    if (data.get('_honey')) return;
+    const name = String(data.get('name') ?? '').trim();
+    form.querySelector<HTMLInputElement>('[data-subject]')!.value = `Portfolio message from ${name}`;
+    data.set('_subject', `Portfolio message from ${name}`);
+
+    button.disabled = true;
+    status.textContent = 'Sending...';
+    try {
+      const res = await fetch(form.dataset.endpoint!, {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: data,
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok || body.success === 'false' || body.success === false) throw new Error(body.message);
+      form.reset();
+      showSent();
+    } catch {
+      const subject = encodeURIComponent(`Portfolio message from ${name}`);
+      const text = encodeURIComponent(String(data.get('message') ?? ''));
+      status.innerHTML = '';
+      status.append('That didn’t go through. ');
+      const a = document.createElement('a');
+      a.href = `mailto:${form.dataset.mailto}?subject=${subject}&body=${text}`;
+      a.textContent = 'Send it from your mail app instead';
+      status.append(a, '.');
+      button.disabled = false;
+    }
+  });
+
+  document.addEventListener('click', async (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-copy]');
+    if (!btn) return;
+    try {
+      await navigator.clipboard.writeText(btn.dataset.copy!);
+      btn.textContent = 'Copied';
+    } catch {
+      btn.textContent = 'Select and copy above';
+    }
+    setTimeout(() => (btn.textContent = 'Copy address'), 2000);
+  });
+</script>
+
+<style>
+  .body {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    gap: 3rem;
+    align-items: start;
+    padding-top: 4rem;
+    padding-bottom: 2rem;
+  }
+  .card {
+    border-radius: 1.25rem;
+    background: var(--linen-2);
+    padding: 1.6rem 1.75rem;
+  }
+  .form {
+    display: grid;
+    gap: 1.1rem;
+    border-top: 3px solid var(--gold);
+  }
+  .form h2,
+  .sent h2 {
+    font-size: 2.2rem;
+    margin-bottom: 0.2rem;
+  }
+  .row2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.1rem;
+  }
+  label {
+    display: grid;
+    gap: 0.35rem;
+  }
+  label > span {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--bark);
+  }
+  label em {
+    font-style: normal;
+    font-weight: 400;
+    color: var(--bark-3);
+  }
+  input,
+  select,
+  textarea {
+    font: inherit;
+    font-size: 0.98rem;
+    color: var(--bark);
+    background: var(--linen);
+    border: 1.5px solid var(--line);
+    border-radius: 0.7rem;
+    padding: 0.65rem 0.8rem;
+    width: 100%;
+    transition: border-color 0.2s;
+  }
+  textarea {
+    resize: vertical;
+    min-height: 9rem;
+  }
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+    border-color: var(--pine);
+  }
+  .honey {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+  }
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .actions button {
+    cursor: pointer;
+  }
+  .actions button:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+  .status {
+    margin: 0;
+  }
+  .sent {
+    border-top: 3px solid var(--gold);
+  }
+  .sent p {
+    color: var(--bark-2);
+  }
+
+  .side {
+    display: grid;
+    gap: 1rem;
+  }
+  .email-card {
+    background: var(--mask);
+    color: var(--silk);
+  }
+  .kicker {
+    display: block;
+    margin: 0;
+    color: var(--gold);
+  }
+  .address {
+    margin: 0.4rem 0 1.1rem;
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+    line-height: 1.2;
+    word-break: break-all;
+    user-select: all;
+  }
+  .email-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  .email-actions .btn {
+    color: var(--silk);
+    border-color: color-mix(in oklab, var(--silk) 35%, transparent);
+    cursor: pointer;
+    font-size: 0.88rem;
+    padding: 0.65rem 1.1rem;
+  }
+  .email-actions .btn:hover {
+    color: var(--gold);
+    border-color: var(--gold);
+  }
+  .link-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    color: var(--bark);
+    text-decoration: none;
+    border: 1.5px solid transparent;
+    transition:
+      border-color 0.2s,
+      transform 0.2s var(--ease);
+  }
+  .link-card:hover {
+    color: var(--bark);
+    border-color: var(--pine);
+    transform: translateY(-2px);
+  }
+  .link-card .kicker {
+    color: var(--pine);
+  }
+  .handle {
+    display: block;
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin-top: 0.15rem;
+  }
+  .link-card svg {
+    width: 1.4rem;
+    height: 1.4rem;
+    fill: none;
+    stroke: var(--pine);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .where {
+    margin: 0.5rem 0 0;
+    padding: 0 0.4rem;
+    display: grid;
+    gap: 0.8rem;
+  }
+  .where dt {
+    font-size: 0.8rem;
+    color: var(--bark-3);
+  }
+  .where dd {
+    margin: 0.1rem 0 0;
+    color: var(--bark);
+  }
+  @media (max-width: 56rem) {
+    .body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .row2 {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

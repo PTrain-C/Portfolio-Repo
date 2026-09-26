@@ -53,20 +53,20 @@ Components for MDX bodies live in `src/components/content/`: `Chain` (clickable 
 
 ## Still needed
 
-- [ ] LinkedIn, GitHub, email (`src/config.ts`)
 - [ ] Headshot
-- [ ] Real bio and the "Hiring for an EE role?" blurb
+- [ ] GitHub link, if you want one shown (`src/config.ts`)
 - [ ] Hobbies for the interests section
-- [ ] QEE, USC Racing, and Food for Thought dates and exact titles
-- [ ] BSPD: solo or team
-- [ ] Circuit Sensei: your role, teammates, skills, demo screenshots
-- [ ] Poke the Poker: confirm the split with Christopher, demo screenshots
-- [ ] Food for Thought: confirm firmware authorship, photos
-- [ ] Racing car photos (`public/img/racing/`)
-- [ ] Coursework list
+- [ ] Circuit Sensei and Poke the Poker demo screenshots
+- [ ] Food For Thought photos
+- [ ] Poke the Poker: confirm the split with Christopher
+- [ ] BSPD: a line on the layout choices
+
+## Contact form
+
+`/contact` posts to FormSubmit (`contact.formEndpoint` in `src/config.ts`), which forwards each message to the email in `contact.email`. The first message ever sent triggers a one-time activation email from FormSubmit to that inbox; click the link in it once and every message after that is delivered. If the form fails, the page offers a mailto link with the message filled in.
 
 ## Deliberately left off
 
-- Security clearance (resume only)
+- Security clearance and phone number (resume only)
 - QRNG/FPGA project (not until there's real progress)
 - Any resume page or PDF

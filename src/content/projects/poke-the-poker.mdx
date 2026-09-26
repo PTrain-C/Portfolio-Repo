@@ -2,7 +2,7 @@
 title: Poke the Poker
 fullName: Real-time poker analyzer, EE 250 final project
 summary: A Raspberry Pi that listens to a poker table. It times every player's decision with a sound sensor, turns that into a confidence score, and works out who is pushing whom out of the hand.
-period: Dec 2025
+period: Aug 2025 to Dec 2025
 order: 4
 status: draft
 theme: felt
@@ -21,7 +21,7 @@ others:
   - part: Co-built everything listed under my part
     by: Christopher Kim
 outcome: Working system, demoed and documented for the class.
-skills: [raspberry-pi, python, spi, adc, mqtt, gpio, data-analysis]
+skills: [raspberry-pi, python, data-acquisition, spi, adc, mqtt, gpio, data-analysis]
 sources:
   - label: EE 250 final project documentation (Dec 7, 2025), with block diagram and limitations
   - label: poke_the_poker.py, the RPi program (excerpted below with line numbers)
@@ -31,7 +31,6 @@ import Chain from '../../components/content/Chain.astro';
 import Excerpt from '../../components/content/Excerpt.astro';
 import Figure from '../../components/Figure.astro';
 import Pair from '../../components/content/Pair.astro';
-import Missing from '../../components/Missing.astro';
 
 {/*
   RULES (firm):
@@ -92,6 +91,3 @@ Influence is the more interesting number. Every time someone acts without foldin
 
 We were upfront in the write-up about using ChatGPT: getting Mosquitto running on the Windows laptop, researching scoring models, and debugging the scoring logic and the output matrix.
 
-<Missing>
-Screenshots from the demo video (a turn being detected, the end-of-game table, and one of the plots) would go here.
-</Missing>

@@ -1,7 +1,8 @@
 ---
 title: Hydroponics controller
 fullName: Farms for Thought, Food for Thought Foundation
-summary: Arduino firmware that keeps a hydroponic grow system's nutrients and pH in range on its own, running seven Atlas Scientific sensors and dosing pumps off one I2C bus.
+summary: A closed-loop controller on an Arduino UNO R4 that keeps a hydroponic grow system's nutrients and pH in range on its own, dosing from 4 peristaltic pumps.
+period: Dec 2025 to May 2026
 order: 5
 status: draft
 theme: hydro
@@ -10,24 +11,22 @@ rail: right
 experience: food-for-thought
 art: compare
 team: team
-# TODO(Peter): confirm the firmware is yours, and who else was on the team.
 mine:
-  - Wrote the Arduino control firmware (pH, EC, pumps, lights)
-  - Tracked down and fixed the I2C read bug in the sensor drivers
-  - Checked the custom PCB against the breadboard setup
+  - Built the closed-loop control system in C++ on the Arduino UNO R4 (pH, EC, pumps, lights)
+  - Debugged the I2C NAK errors on the 4 pump drivers and moved the pumps to UART
+  - Verified the custom PCB netlist against the breadboard build
+  - Documented sensor calibration and wiring
 others:
   - part: PCB design and layout
     by: Another team member
 outcome: Firmware running on the breadboard system. The custom PCB was checked against the breadboard but not fabricated or brought up.
-skills: [arduino, c-cpp, i2c, closed-loop-control, design-verification]
+skills: [arduino, c-cpp, closed-loop-control, i2c, uart, logic-analyzer, design-verification, technical-docs]
 sources:
   - label: FFT 2026 firmware (farmsforthoughtcode_fft_2026.ino and the pH, EC, pump, dosing, lights, and WiFi modules)
   - label: FFT 2026 README (file map, I2C addresses, dosing behavior, Atlas EZO notes)
 ---
 import Chain from '../../components/content/Chain.astro';
 import Excerpt from '../../components/content/Excerpt.astro';
-import Missing from '../../components/Missing.astro';
-import Figure from '../../components/Figure.astro';
 
 {/*
   ATTRIBUTION RULES (firm):
@@ -38,7 +37,7 @@ import Figure from '../../components/Figure.astro';
 
 ## What it is
 
-A hydroponic system for the Food for Thought Foundation's Farms for Thought program. An Arduino reads pH and electrical conductivity (EC, which tracks how much nutrient is in the water), and when either drifts out of range it doses small amounts from four peristaltic pumps until it's back. It also runs the grow lights on a schedule, keeps the water and air pumps on, and reads a float switch.
+A hydroponic system for the Food For Thought Foundation's Farms for Thought program. An Arduino UNO R4 reads pH and electrical conductivity (EC, which tracks how much nutrient is in the water), and when either drifts out of range it doses small amounts from four peristaltic pumps until it's back. It also runs the grow lights on a schedule, keeps the water and air pumps on, and reads a float switch.
 
 ## The control loop
 
@@ -66,9 +65,9 @@ Small pulses with a mixing wait between them are the whole strategy: dose a litt
   note="The EC half of the cycle. The pH half below it has the same shape with its own target and pumps."
 />
 
-## Seven devices on one bus
+## The bus
 
-Every sensor and pump is an Atlas Scientific EZO board on I2C, so the whole system is two wires plus ground.
+Every sensor and pump is an Atlas Scientific EZO board. In the version of the firmware shown here, all seven sat on one I2C bus:
 
 | Device | Address | Job |
 | --- | --- | --- |
@@ -82,9 +81,11 @@ Every sensor and pump is an Atlas Scientific EZO board on I2C, so the whole syst
 
 A couple of EZO quirks that cost time and are written into the README now: the pumps only accept a lowercase `d,<ml>` dose command over I2C (uppercase comes back as an error), and volumes can have at most two decimal places, so `d,0.20` works and `d,0.200` doesn't.
 
-## The bug worth telling
+## Moving the pumps to UART
 
-Readings were occasionally garbage, with no pattern to it. The driver loops read bytes until the EZO's end-of-data byte, `0x00`. But once a device has nothing left to send, the I2C bus itself hands back `0xFF`, and the loop was happily copying those into the buffer. It only showed up now and then, which is what made it hard to find. The fix is one condition, applied to the pH, EC, and temperature drivers:
+Seven devices on one bus worked until it didn't. The four pump drivers started throwing NAK errors: the master sends a pump's address and nothing acknowledges it. I watched it two ways, in the serial monitor from the Arduino's side and with a logic analyzer on SDA and SCL to see what was really on the wire. In the end I migrated the pump communication off I2C and onto UART.
+
+The sensor side had its own bug along the way. Readings were occasionally garbage, with no pattern. The driver loops read bytes until the EZO's end-of-data byte, `0x00`, but once a device has nothing left to send, the I2C bus itself hands back `0xFF`, and the loop was copying those into the buffer. We fixed it with one condition in the pH, EC, and temperature drivers:
 
 <Excerpt
   file="fftf/ec_fft.cpp"
@@ -95,8 +96,7 @@ Readings were occasionally garbage, with no pattern to it. The driver loops read
 
 ## The PCB
 
-The circuit was first built on a breadboard. Someone else on the team designed a custom PCB for it, and my job there was to check it against the breadboard setup and confirm the two were electrically the same. The board was not fabricated or brought up beyond that comparison.
+The circuit was first built and validated on a breadboard. Someone else on the team designed a custom PCB for it, and my job there was to check the PCB's netlist against the breadboard build and confirm the two were electrically the same. The board was not fabricated or brought up beyond that comparison.
 
-<Missing>
-Photos of the grow system and the breadboard setup are on the way.
-</Missing>
+I also documented the sensor calibration procedures and the wiring specifications, so the setup can be recalibrated and rewired without me there.
+

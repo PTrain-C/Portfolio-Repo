@@ -33,6 +33,9 @@ const path = (a: number) => {
 };
 
 const ALPHA0 = 0;
+// The design target from the report and resume: Q = 8.5.
+const Q_DESIGN = 8.5;
+const ALPHA_DESIGN = 1 - 1 / (4 * Q_DESIGN);
 const strings = [
   { n: 'E2', f: 82.41 },
   { n: 'A2', f: 110 },
@@ -86,7 +89,11 @@ const fmt = (n: number) => n.toFixed(1);
       <span>
         Feedback fraction <em>&alpha;</em> = <output data-out="alpha">{ALPHA0.toFixed(2)}</output>
       </span>
-      <input type="range" min="0" max="0.95" step="0.01" value={ALPHA0} data-notch-alpha />
+      <input type="range" min="0" max="0.98" step="any" value={ALPHA0} data-notch-alpha />
+      <span class="presets">
+        <button type="button" data-notch-set="0">Passive (&alpha; = 0)</button>
+        <button type="button" data-notch-set={ALPHA_DESIGN.toFixed(4)}>Our design (Q = 8.5)</button>
+      </span>
     </label>
     <dl>
       <div>
@@ -149,6 +156,13 @@ const fmt = (n: number) => n.toFixed(1);
   document.addEventListener('input', (e) => {
     const t = e.target as HTMLInputElement;
     if (t.matches?.('[data-notch-alpha]')) update(t);
+  });
+  document.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-notch-set]');
+    if (!b) return;
+    const input = b.closest('[data-notch]')!.querySelector<HTMLInputElement>('[data-notch-alpha]')!;
+    input.value = b.dataset.notchSet!;
+    update(input);
   });
 </script>
 
@@ -231,6 +245,25 @@ const fmt = (n: number) => n.toFixed(1);
   input[type='range'] {
     width: 100%;
     accent-color: var(--accent);
+  }
+  .presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .presets button {
+    font: inherit;
+    font-size: 0.78rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--accent) 50%, transparent);
+    background: transparent;
+    color: var(--accent);
+    cursor: pointer;
+  }
+  .presets button:hover {
+    background: var(--accent);
+    color: var(--scene-deep);
   }
   dl {
     display: flex;

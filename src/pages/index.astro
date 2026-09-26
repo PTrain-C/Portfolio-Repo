@@ -66,22 +66,8 @@ const facts = [
         </p>
         <div class="ctas rise" style="--d:4">
           <a class="btn gold" href={href('/projects')}>See projects</a>
-          {
-            contact.email ? (
-              <a class="btn ghost-dark" href={contact.email}>Email me</a>
-            ) : (
-              <a class="btn ghost-dark" href="#contact">Email me</a>
-            )
-          }
-          {
-            contact.linkedin ? (
-              <a class="btn ghost-dark" href={contact.linkedin}>LinkedIn</a>
-            ) : (
-              <span class="btn ghost-dark" aria-disabled="true" title="Link not added yet (src/config.ts)">
-                LinkedIn
-              </span>
-            )
-          }
+          <a class="btn ghost-dark" href={href('/contact')}>Email me</a>
+          <a class="btn ghost-dark" href={contact.linkedin} target="_blank" rel="noopener">LinkedIn</a>
         </div>
       </div>
       <div class="pad rise" style="--d:2">

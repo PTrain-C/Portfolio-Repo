@@ -1,11 +1,12 @@
 ---
-// Contact band + footer, on every page (the nav's "Contact" jumps here).
+// Contact band + footer, on every page except the contact page itself.
 import VlsiField from './art/VlsiField.astro';
 import ContactButtons from './ContactButtons.astro';
 import { site, href } from '../config';
 import { getExperience } from '../lib/content';
 
 const current = (await getExperience()).find((e) => e.data.current);
+const onContact = /\/contact(\.html)?\/?$/.test(Astro.url.pathname);
 const year = new Date().getFullYear();
 const pages = [
   { label: 'Home', path: '/' },
@@ -13,13 +14,14 @@ const pages = [
   { label: 'Experience', path: '/experience' },
   { label: 'Skills', path: '/skills' },
   { label: 'Coursework', path: '/coursework' },
+  { label: 'Contact', path: '/contact' },
 ];
 ---
 
-<footer id="contact">
+<footer id="contact" class:list={{ slim: onContact }}>
   <VlsiField opacity={0.11} />
   <div class="wrap inner">
-    <div class="cta">
+    {!onContact && <div class="cta">
       <h2 class="display">Let's talk.</h2>
       {/* TODO(Peter): adjust the kinds of roles you're looking for. */}
       <p>
@@ -27,7 +29,7 @@ const pages = [
         Email is the fastest way to reach me.
       </p>
       <ContactButtons />
-    </div>
+    </div>}
 
     <div class="bar">
       <p class="status">
@@ -72,6 +74,12 @@ const pages = [
     position: relative;
     padding-top: 6rem;
     padding-bottom: 2rem;
+  }
+  .slim {
+    margin-top: 5rem;
+  }
+  .slim .inner {
+    padding-top: 1rem;
   }
   .cta {
     max-width: 44rem;

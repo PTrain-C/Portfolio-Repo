@@ -1,40 +1,41 @@
 ---
-org: Draper Laboratory
-role: Microelectronics Integration & Test
+org: Draper
+role: Microelectronics Integration & Test Intern
 unit: Space Systems
 location: Cambridge, MA
 start: Sep 2026
 end: Dec 2026
 current: true
 order: 1
-summary: Integration and test on NASA Class B space systems hardware.
+summary: Acceptance testing on flight hardware for a Space Systems program built to NASA Class B risk classification.
 highlights:
-  - Oversee acceptance testing across multiple unit batches of already-assembled hardware
-  - Run units through vibration testing and thermal cycling
+  - Oversee acceptance testing across multiple production batches of assembled PCB and microcontroller flight hardware, logging results against acceptance criteria and flagging units outside specification
+  - Run performance test scripts through vibration testing and temperature cycling at the hot and cold limits
+  - Execute charge and discharge testing, following flight hardware handling procedures
   - Work to NASA Class B risk classification requirements
-skills: [acceptance-testing, vibration-testing, thermal-cycling, nasa-class-b]
+skills: [acceptance-testing, vibration-testing, thermal-cycling, charge-discharge, flight-hardware, test-scripts, nasa-class-b]
 theme: space
 rail: top
 ---
 import Chain from '../../components/content/Chain.astro';
 import ThermalProfile from '../../components/content/ThermalProfile.astro';
-import Missing from '../../components/Missing.astro';
 
-{/* Keep this generic: no program specifics beyond "space systems hardware". */}
+{/* Keep this generic: no program specifics beyond "Space Systems program" and "flight hardware". */}
 
-I'm in the Space Systems business area at Draper, working on hardware built to NASA Class B risk classification. The hardware arrives already assembled. My job is overseeing acceptance testing across multiple unit batches, which includes vibration testing and thermal cycling.
+I'm on the Microelectronics Integration & Test team at Draper, working on flight hardware for a Space Systems program built to NASA Class B risk classification. The hardware, assembled PCBs and microcontroller boards, comes in in production batches. My job is overseeing their acceptance testing.
 
 ## What acceptance testing is for
 
 Acceptance tests aren't about proving a design works; that was qualification. They're about proving that this particular unit, from this particular batch, was built right and will survive the ride. Every unit goes through them, which is why it's batch work.
 
 <Chain
-  label="The general shape of an acceptance flow"
+  label="What goes into accepting a batch"
   steps={[
-    { tag: 'in', title: 'Assembled unit arrives', text: 'Hardware shows up built. Integration and test starts from there.' },
-    { tag: 'shake', title: 'Vibration', text: 'Shakes the unit the way launch will, to shake out anything that was built wrong: a weak joint, a loose fastener, a part that moves.' },
-    { tag: 'heat', title: 'Thermal cycling', text: 'Takes the unit hot and cold, over and over. Repeated expansion and contraction is what finds marginal solder joints and parts.' },
-    { tag: 'out', title: 'Batch accepted', text: 'Units that pass are accepted, and anything that fails gets looked at before the batch moves on.' },
+    { tag: 'scripts', title: 'Performance tests', text: 'Test scripts exercise each unit so there is a measured baseline, and the same scripts run again under stress.' },
+    { tag: 'shake', title: 'Vibration', text: 'Shakes the unit the way launch will, to find anything that was built wrong: a weak joint, a loose fastener, a part that moves.' },
+    { tag: 'heat', title: 'Temperature cycling', text: 'Takes the unit to its hot and cold limits, over and over, with the performance tests run along the way.' },
+    { tag: 'power', title: 'Charge and discharge', text: 'Charge and discharge testing on the flight hardware, done under the flight hardware handling procedures.' },
+    { tag: 'log', title: 'Log and flag', text: 'Every result is logged against the acceptance criteria, and any unit outside specification gets flagged.' },
   ]}
 />
 
@@ -42,8 +43,4 @@ Acceptance tests aren't about proving a design works; that was qualification. Th
 
 ## Class B, briefly
 
-NASA sorts missions into risk classes A through D under NPR 8705.4. Class B is one step below A: high priority work with a low tolerance for risk, which shows up as tighter requirements on parts, workmanship, and testing than a Class C or D mission would carry.
-
-<Missing>
-Anything else worth saying about the day-to-day, what you've learned, or the team, kept generic.
-</Missing>
+NASA sorts missions into risk classes A through D under NPR 8705.4. Class B is one step below A: high priority work with a low tolerance for risk, which shows up as tighter requirements on parts, workmanship, handling, and testing than a Class C or D mission would carry.

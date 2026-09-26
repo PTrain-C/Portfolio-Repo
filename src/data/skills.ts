@@ -53,6 +53,8 @@ export const categories: SkillCategory[] = [
       { id: 'design-verification', name: 'Design verification' },
       { id: 'oscilloscope', name: 'Oscilloscope measurement' },
       { id: 'breadboarding', name: 'Breadboard prototyping' },
+      { id: 'logic-analyzer', name: 'Logic analyzer debugging' },
+      { id: 'test-circuits', name: 'Test circuit design' },
     ],
   },
   {
@@ -65,6 +67,9 @@ export const categories: SkillCategory[] = [
       { id: 'vibration-testing', name: 'Vibration testing' },
       { id: 'thermal-cycling', name: 'Thermal cycling' },
       { id: 'nasa-class-b', name: 'NASA Class B hardware' },
+      { id: 'charge-discharge', name: 'Charge and discharge testing' },
+      { id: 'flight-hardware', name: 'Flight hardware handling' },
+      { id: 'test-scripts', name: 'Test scripting and automation' },
     ],
   },
   {
@@ -78,6 +83,9 @@ export const categories: SkillCategory[] = [
       { id: 'swap-c', name: 'SWAP-C analysis' },
       { id: 'matlab-sim', name: 'MATLAB simulation testing' },
       { id: 'mil-std-681f', name: 'MIL-STD-681F' },
+      { id: 'harness-docs', name: 'Wire harness documentation' },
+      { id: 'technical-docs', name: 'Technical documentation' },
+      { id: 'data-validation', name: 'Test data validation' },
     ],
   },
   {
@@ -90,7 +98,7 @@ export const categories: SkillCategory[] = [
       { id: 'c-cpp', name: 'C/C++', featured: true },
       { id: 'data-analysis', name: 'Data analysis' },
       { id: 'matlab', name: 'MATLAB', featured: true },
-      { id: 'systemverilog', name: 'SystemVerilog', note: 'self-study, HDLBits' },
+      { id: 'systemverilog', name: 'Verilog/SystemVerilog', note: 'self-study, HDLBits and Verilator' },
     ],
   },
   {
@@ -109,6 +117,7 @@ export const categories: SkillCategory[] = [
       { id: 'can', name: 'CAN' },
       { id: 'gpio', name: 'GPIO' },
       { id: 'adc', name: 'ADC' },
+      { id: 'data-acquisition', name: 'Data acquisition' },
     ],
   },
   {
@@ -129,6 +138,7 @@ export const categories: SkillCategory[] = [
     skills: [
       { id: 'team-lead', name: 'Team leadership', featured: true },
       { id: 'event-organizing', name: 'Event organizing' },
+      { id: 'pitching', name: 'Scoping and pitching' },
     ],
   },
 ];

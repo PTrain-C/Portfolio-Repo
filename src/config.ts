@@ -11,11 +11,15 @@ export const site = {
   headshot: null as string | null,
 };
 
-// TODO(Peter): real URLs. Email uses the form 'mailto:you@example.com'.
 export const contact = {
-  email: null as string | null,
-  linkedin: null as string | null,
+  email: 'peter.mai.connolly@gmail.com',
+  linkedin: 'https://www.linkedin.com/in/peter-mai-connolly',
+  // TODO(Peter): GitHub profile URL, if you want it shown.
   github: null as string | null,
+  // The contact form posts here. FormSubmit forwards each message to `email`.
+  // The very first submission sends Peter a one-time activation email; click
+  // the link in it and every message after that is delivered.
+  formEndpoint: 'https://formsubmit.co/ajax/peter.mai.connolly@gmail.com',
 };
 
 // Shown on the home page. The first four come from the brief's focus areas;

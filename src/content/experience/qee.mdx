@@ -1,33 +1,44 @@
 ---
-org: Quantum Engineering Ethics (QEE)
-role: Programming Chair / Events Lead
+org: Quantum Engineering at USC (QEE)
+role: Founding Member & Conference Organizer
 unit: USC
 location: Los Angeles, CA
-# TODO(Peter): start/end dates for this role.
+start: Jan 2025
+end: Present
+current: true
 order: 5
-summary: Co-organizing Qompute at USC, a 140+ person quantum computing event with IBM Quantum as a partner.
+summary: Founding member of USC's quantum engineering group, and an organizer of Q³ Qompute @ USC, Southern California's first quantum computing conference and hackathon.
 highlights:
-  - Co-organize Qompute at USC, part of the Q³ Initiative with the University of Maryland
-  - 2026 event had 140+ participants from 15+ countries
-  - $15K+ in sponsorships, with IBM Quantum as a partner
-  - Ran as an IBM Qiskit Fall Fest Partner Plus event
-skills: [event-organizing]
+  - Organized Q³ Qompute @ USC, Southern California's first quantum computing conference and hackathon
+  - Reached 140+ participants from 15+ countries, with $15K+ in sponsorships and IBM Quantum as a challenge partner
+  - Coordinated the keynote speakers, a networking expo, and a cross-disciplinary panel on quantum computing, ethics, and policy
+  - Designed a pre-event workshop track for students without formal quantum training
+skills: [event-organizing, quantum-fundamentals]
 theme: quantum
 rail: top
 ---
 import Stats from '../../components/content/Stats.astro';
-import Missing from '../../components/Missing.astro';
+import Chain from '../../components/content/Chain.astro';
 
-I co-organize Qompute at USC, which is part of the Q³ Initiative with the University of Maryland. It ran as an IBM Qiskit Fall Fest Partner Plus event, with IBM Quantum as a partner.
+I'm a founding member of QEE, USC's quantum engineering group. The biggest thing we've done is Q³ Qompute @ USC, Southern California's first quantum computing conference and hackathon. It's part of the Q³ Initiative with the University of Maryland, and it ran as an IBM Qiskit Fall Fest Partner Plus event, with IBM Quantum as the challenge partner.
 
 <Stats
   items={[
-    { big: '140+', label: 'participants at Qompute 2026' },
+    { big: '140+', label: 'participants' },
     { big: '15+', label: 'countries represented' },
     { big: '$15K+', label: 'in sponsorships' },
   ]}
 />
 
-<Missing>
-Dates for the role, what the programming chair owns, and which parts of the event were yours.
-</Missing>
+## The event
+
+<Chain
+  label="What I organized"
+  steps={[
+    { tag: 'before', title: 'Workshop track', text: 'A set of pre-event workshops for students without formal quantum training, so the hackathon wasn’t just for people already in the field.' },
+    { tag: 'stage', title: 'Keynotes', text: 'Coordinating the keynote speakers.' },
+    { tag: 'panel', title: 'Cross-disciplinary panel', text: 'A panel that brought quantum computing together with ethics and policy.' },
+    { tag: 'floor', title: 'Networking expo', text: 'A networking expo alongside the talks.' },
+    { tag: 'build', title: 'Hackathon', text: 'The hackathon itself, with IBM Quantum as the challenge partner.' },
+  ]}
+/>

@@ -12,12 +12,17 @@ cover: img/circuit-sensei/overlay-step3.webp
 rail: left
 art: gpio
 team: team
-# TODO(Peter): what you built, and who the teammates were and what they owned.
-mine: []
-others: []
+mine:
+  - The original idea
+  - Scoping what it would do in one weekend
+  - Planning the pitch
+  - Documentation
+  - Designing the test circuits and doing the electrical testing
+others:
+  - part: The agent loop, vision checks, overlays, and web app, built as a team
+    by: Teammates
 outcome: Working prototype demoed at LA Hacks, with a live demo site and open-source repo.
-# TODO(Peter): add skill ids for the parts you built (e.g. python, arduino, uart).
-skills: []
+skills: [test-circuits, breadboarding, arduino, technical-docs, pitching]
 links:
   - label: Live demo
     url: https://circuit-sensei.vercel.app/
@@ -32,19 +37,18 @@ sources:
 ---
 import Chain from '../../components/content/Chain.astro';
 import Figure from '../../components/Figure.astro';
-import Missing from '../../components/Missing.astro';
 
 ## What it is
 
 Learning to breadboard is mostly learning where things go, and a wiring mistake on a first circuit can kill a part before you know what you did. Circuit Sensei sits next to you like a lab TA. You tell it what you want to build and what parts you have. It plans the build as a list of placements with breadboard coordinates like `A10`, draws each step over the live webcam image, checks your work with Gemini Vision before moving on, and once everything is placed it drives an Arduino over USB to actually test the circuit.
 
-<Missing>
-What you personally built for this (agent loop, vision check, Arduino tester, frontend, pitch) and who else was on the team.
-</Missing>
+## My part
+
+The idea was mine, and so was deciding what it had to do by the end of the weekend and what could wait. I planned how we'd pitch it and wrote the documentation. On the hardware side I came up with the circuits it walks you through and tests, and did the electrical testing on real parts. The software was a team effort, so anything below about how it's built is "we".
 
 ## Five states
 
-The agent is a small state machine, not a free-form chat, so it can't skip ahead of the hardware. Build steps go through Instruct and Verify; test steps go to the Arduino. Plans can interleave the two.
+We built the agent as a small state machine, not a free-form chat, so it can't skip ahead of the hardware. Build steps go through Instruct and Verify; test steps go to the Arduino. Plans can interleave the two.
 
 <Chain
   loop
@@ -61,6 +65,18 @@ The agent is a small state machine, not a free-form chat, so it can't skip ahead
 
 <Figure src="img/circuit-sensei/overlay-step3.webp" ratio="1600 / 1098" caption="An overlay the app generated for step 3 of a voltage divider build: wire D9 to B10, A0 to C20, and GND to C30." alt="Arduino Uno and breadboard with colored arrows from Arduino pins D9, A0, and GND to breadboard holes B10, C20, and C30" />
 
+## The test circuits
+
+The circuits had to be simple enough for someone's first build, and each one had to leave something the Arduino could actually measure. Otherwise "test it for real" would just be the camera again.
+
+| Circuit | How the Arduino checks it |
+| --- | --- |
+| LED with a current-limiting resistor | Drives the LED from D9 and reads the voltage back on A0 |
+| Voltage divider | Reads the midpoint on A0 and compares it to the expected voltage within a tolerance |
+| Push button | Reads a digital pin to confirm the button changes state |
+
+The voltage divider in the picture above is the same build: D9, A0, and ground wired into the breadboard at B10, C20, and C30.
+
 ## How it's built
 
 | Layer | What it does |
@@ -73,8 +89,5 @@ The agent is a small state machine, not a free-form chat, so it can't skip ahead
 | ElevenLabs | Reads the agent's replies out loud |
 | pytest | Tests for the state machine, the tools, and the Arduino tester |
 
-It also has a mock mode that runs end to end with no webcam, no API keys, and no Arduino. The idea is that a classroom can try it before it has any hardware.
+We also gave it a mock mode that runs end to end with no webcam, no API keys, and no Arduino. The idea is that a classroom can try it before it has any hardware.
 
-<Missing>
-Screenshots from the demo video: the workbench UI with the camera feed, a Verify step passing, and an Arduino test result.
-</Missing>

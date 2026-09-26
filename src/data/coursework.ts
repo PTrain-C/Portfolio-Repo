@@ -1,37 +1,55 @@
-// TODO(Peter): replace every placeholder with real courses. Set
-// `placeholder: false` (or just delete the key) once an entry is real.
+// Coursework from Peter's resume. `code` only where it's confirmed; `project`
+// links a class to the project that came out of it; `note` for anything
+// planned or outside a regular class.
 
-export type Course = { code: string; name: string; placeholder?: boolean };
+export type Course = { name: string; code?: string; project?: string; note?: string };
+
+export const degree = {
+  school: 'University of Southern California',
+  title: 'B.S. Electrical and Computer Engineering',
+  dates: 'Aug 2024 to May 2028',
+  gpa: '3.54',
+};
 
 export const coursework: { group: string; blurb: string; courses: Course[] }[] = [
   {
     group: 'Circuits & Devices',
-    blurb: 'Analog, mixed-signal, and device physics.',
+    blurb: 'Analog circuits and the physics under them.',
     courses: [
-      { code: 'EE ___', name: 'Course name', placeholder: true },
-      { code: 'EE ___', name: 'Course name', placeholder: true },
-      { code: 'EE ___', name: 'Course name', placeholder: true },
+      { code: 'EE 202L', name: 'Linear Circuits', project: 'notch-filter' },
+      { name: 'Semiconductor Devices' },
+      { name: 'Physical Electronics' },
+      { code: 'EE 477', name: 'MOS VLSI Circuit Design', note: 'Planned, Spring 2027' },
     ],
   },
   {
-    group: 'Signals & Systems',
-    blurb: 'Linear systems, filtering, communications.',
+    group: 'Signals & Embedded',
+    blurb: 'Signals, microcontrollers, and connected hardware.',
     courses: [
-      { code: 'EE ___', name: 'Course name', placeholder: true },
-      { code: 'EE ___', name: 'Course name', placeholder: true },
+      { name: 'Signals and Systems' },
+      { name: 'Embedded Systems' },
+      { code: 'EE 250', name: 'Internet of Things', project: 'poke-the-poker' },
     ],
   },
   {
-    group: 'Digital & Computer Engineering',
-    blurb: 'Logic design, architecture, embedded.',
+    group: 'Math & Physics',
+    blurb: 'The foundations.',
     courses: [
-      { code: 'EE ___', name: 'Course name', placeholder: true },
-      { code: 'EE ___', name: 'Course name', placeholder: true },
+      { name: 'Applied Linear Algebra' },
+      { name: 'Differential Equations' },
+      { name: 'Physics: Electricity & Magnetism' },
+      { name: 'Physics: Optics & Modern Physics' },
     ],
   },
   {
-    group: 'Quantum',
-    blurb: 'Quantum information and hardware.',
-    courses: [{ code: 'EE ___', name: 'Course name', placeholder: true }],
+    group: 'Outside class',
+    blurb: 'Learning on my own time.',
+    courses: [
+      {
+        name: 'IBM Quantum Qiskit Global Summer School',
+        note: '2026. Quantum circuits, error correction, hardware-software interfaces',
+      },
+      { name: 'Digital logic self-study (HDLBits)', note: 'Jun 2026 to now. Verilog, simulated in Verilator' },
+    ],
   },
 ];

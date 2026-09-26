@@ -1,6 +1,6 @@
 ---
-// Floating pill navigation, fixed at the top on every page. "Contact" jumps
-// to the contact footer, which is on every page.
+// Floating pill navigation, fixed at the top on every page. "Contact" opens
+// the contact page.
 import { site, href } from '../config';
 
 const nav = [
@@ -41,7 +41,7 @@ const isActive = (path: string) => {
       }
     </ul>
     <span class="div" aria-hidden="true"></span>
-    <a class="contact" href="#contact">Contact</a>
+    <a class="contact" href={href('/contact')} aria-current={isActive('/contact') ? 'page' : undefined}>Contact</a>
   </nav>
 </header>
 

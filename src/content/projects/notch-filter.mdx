@@ -1,7 +1,7 @@
 ---
 title: Corrupted Chord
 fullName: Active notch filter in a cigar-box guitar, EE 202L final project
-summary: An active twin-T notch filter, built into a cigar-box electric guitar, that cuts the 196 Hz fundamental of the open G string and leaves the strings next to it alone.
+summary: An active twin-T notch filter, built into a cigar-box electric guitar, that cuts the 196 Hz fundamental of the open G string at Q = 8.5 and leaves the strings next to it alone.
 period: Aug 2025 to Dec 2025
 order: 3
 status: draft
@@ -14,7 +14,7 @@ art: bode
 team: team
 mine:
   - Hand-soldering the filter PCB
-  - Bench testing on the scope
+  - Bench testing and measurements on the oscilloscope and DMM
   - Wiring the blue box (9 V battery, filter board, and jacks)
   - Transfer function derivation, with John
   - Component selection, with John
@@ -24,7 +24,7 @@ others:
     by: John Peng
   - part: Hot-plate soldering and the woodwork
     by: John Peng
-outcome: Built into the guitar and tuned on the bench. Over 20 dB of attenuation at the notch in LTSpice.
+outcome: Built into the guitar and tuned on the bench. Designed for Q = 8.5 at 196 Hz, with over 20 dB of attenuation at the notch in LTSpice.
 # KiCAD is left out on purpose: the schematic and layout were John's.
 skills: [nodal-analysis, transfer-functions, filter-design, op-amps, component-selection, soldering, bench-tuning, oscilloscope, breadboarding]
 sources:
@@ -67,7 +67,15 @@ $$
 Q = \frac{1}{4(1-\alpha)}
 $$
 
-The constant term didn't change, so $\omega_0$ stays at $1/RC$ and the notch doesn't move. Only $Q$ goes up, by a factor of $1/(1-\alpha)$. Drag the slider to see what that does to the six strings.
+The constant term didn't change, so $\omega_0$ stays at $1/RC$ and the notch doesn't move. Only $Q$ goes up, by a factor of $1/(1-\alpha)$.
+
+We designed for $Q = 8.5$, which means feeding back almost all of the output:
+
+$$
+\alpha = 1 - \frac{1}{4Q} = 1 - \frac{1}{34} \approx 0.97
+$$
+
+Drag the slider to see what that does to the six strings, or jump straight to our design.
 
 <NotchExplorer />
 
@@ -84,7 +92,7 @@ Two things cost us time. Some values were mislabeled in KiCAD, so matching parts
 
 ## Tuning on the bench
 
-In simulation the design gave more than 20 dB of attenuation at the notch. On the real board, some of the lower frequencies weren't being cut as much as they should have been. The potentiometers were slightly off the target values, so we nudged them up until the response lined up with the design. After that the filter and gain stages did what they were supposed to.
+In simulation the design gave more than 20 dB of attenuation at the notch. On the bench I recorded measurements on the oscilloscope and a DMM. On the real board, some of the lower frequencies weren't being cut as much as they should have been. The potentiometers were slightly off the target values, so we nudged them up until the response lined up with the design. After that the filter and gain stages did what they were supposed to.
 
 <Figure src="img/notch/scope.webp" ratio="1080 / 484" caption="Bench testing on the Keysight InfiniiVision scope, channels 1 and 2." alt="Oscilloscope showing a yellow sine trace on channel 1 and a smaller green trace on channel 2" />
 
