@@ -1,0 +1,94 @@
+---
+import { site, href } from '../config';
+
+const nav = [
+  { label: 'Experience', path: '/experience' },
+  { label: 'Projects', path: '/projects' },
+  { label: 'Coursework', path: '/coursework' },
+];
+
+const current = Astro.url.pathname.replace(/\/$/, '');
+const isActive = (path: string) => {
+  const target = href(path);
+  return current === target || current.startsWith(`${target}/`);
+};
+---
+
+<header class="wrap">
+  <a class="home" href={href('/')} aria-label="Home">
+    <span class="dot" aria-hidden="true"></span>
+    <span>{site.name}</span>
+  </a>
+  <nav aria-label="Main">
+    <ul>
+      {
+        nav.map((item, i) => (
+          <li>
+            <a href={href(item.path)} aria-current={isActive(item.path) ? 'page' : undefined}>
+              <span class="n">0{i + 1}</span>
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</header>
+
+<style>
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 1.25rem;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+  }
+  .home {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px var(--accent-dim);
+  }
+  ul {
+    display: flex;
+    gap: clamp(0.75rem, 3vw, 2rem);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  nav a {
+    text-decoration: none;
+    color: var(--ink-2);
+  }
+  nav a[aria-current='page'] {
+    color: var(--ink);
+  }
+  nav a[aria-current='page'] .n {
+    color: var(--accent);
+  }
+  .n {
+    color: var(--ink-3);
+    margin-right: 0.4em;
+  }
+  @media (max-width: 34rem) {
+    header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .n {
+      display: none;
+    }
+  }
+</style>

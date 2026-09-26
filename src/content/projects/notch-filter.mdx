@@ -1,0 +1,48 @@
+---
+title: Notch filter
+summary: A notch filter with more than 20 dB of attenuation at the notch in LTSpice simulation.
+period: Aug 2025 to Dec 2025
+order: 2
+status: draft
+team: team
+mine:
+  - Transfer function derivation (nodal analysis)
+  - Component selection
+  - Hand-soldering
+  - Bench tuning
+others:
+  # TODO(Peter): name John here, or keep it as "A collaborator".
+  - part: KiCAD schematic and layout
+    by: A collaborator
+outcome: Built and bench-tuned. Over 20 dB of attenuation at the notch in LTSpice.
+tags: [Analog, Nodal analysis, LTSpice, KiCAD]
+---
+import Missing from '../../components/Missing.astro';
+import Figure from '../../components/Figure.astro';
+
+{/*
+  ATTRIBUTION RULES (firm):
+  - Peter: transfer function (nodal analysis), component selection, hand-soldering, bench tuning.
+  - Collaborator: KiCAD schematic and layout. Never attribute schematic/layout to Peter.
+  - The >20 dB figure is from LTSpice. Do not describe it as a bench measurement.
+*/}
+
+## What it is
+
+<Missing>
+What the filter was for (what system it fed into) and the target notch frequency.
+</Missing>
+
+## How it came together
+
+I derived the transfer function with nodal analysis and used it to pick component values. A collaborator did the KiCAD schematic and board layout. Once the board was in hand, I hand-soldered it and tuned it on the bench.
+
+## Results
+
+In LTSpice, the design gives more than 20 dB of attenuation at the notch.
+
+<Missing>
+Target frequency, and any bench numbers you want to show (only if actually measured).
+</Missing>
+
+<Figure caption="Bench setup" />

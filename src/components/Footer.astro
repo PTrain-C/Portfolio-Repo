@@ -1,0 +1,27 @@
+---
+import { site } from '../config';
+import Links from './Links.astro';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="wrap">
+  <p class="label">{site.name} · {year}</p>
+  <Links compact />
+</footer>
+
+<style>
+  footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 8rem;
+    padding-block: 2rem;
+    border-top: 1px solid var(--line);
+  }
+  p {
+    margin: 0;
+  }
+</style>

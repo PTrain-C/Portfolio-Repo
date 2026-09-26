@@ -1,0 +1,93 @@
+---
+import Base from '../layouts/Base.astro';
+import SectionHead from '../components/SectionHead.astro';
+import { coursework } from '../data/coursework';
+
+const hasPlaceholders = coursework.some((g) => g.courses.some((c) => c.placeholder));
+---
+
+<Base title="Coursework" description="Relevant coursework at USC.">
+  <section class="wrap page">
+    <SectionHead index="03" title="Coursework" as="h1" />
+    {hasPlaceholders && <p class="badge note">course list pending</p>}
+
+    <div class="groups">
+      {
+        coursework.map((g, i) => (
+          <section class="group" data-reveal style={`--i:${i}`}>
+            <p class="label">
+              <span class="accent">{String(i + 1).padStart(2, '0')}</span>
+            </p>
+            <h2>{g.group}</h2>
+            <p class="blurb muted">{g.blurb}</p>
+            <ul>
+              {g.courses.map((c) => (
+                <li class:list={{ placeholder: c.placeholder }}>
+                  <span class="code">{c.code}</span>
+                  <span>{c.name}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page {
+    padding-top: clamp(3rem, 7vw, 5rem);
+  }
+  .note {
+    display: inline-block;
+    margin: -1rem 0 2.5rem;
+  }
+  .groups {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    border-top: 1px solid var(--line);
+    border-left: 1px solid var(--line);
+  }
+  .group {
+    padding: 1.75rem 1.5rem 2rem;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .group .label {
+    margin: 0 0 2.5rem;
+  }
+  h2 {
+    font-size: 1.45rem;
+    margin: 0;
+  }
+  .blurb {
+    font-size: 0.9rem;
+    margin: 0.4rem 0 1.5rem;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.7rem;
+  }
+  li {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+  }
+  .code {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--accent);
+    padding-top: 0.15rem;
+  }
+  .placeholder {
+    color: var(--ink-3);
+  }
+  .placeholder .code {
+    color: var(--ink-3);
+  }
+</style>

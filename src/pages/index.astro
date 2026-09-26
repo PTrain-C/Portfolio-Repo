@@ -1,0 +1,193 @@
+---
+import Base from '../layouts/Base.astro';
+import Avatar from '../components/Avatar.astro';
+import Trace from '../components/Trace.astro';
+import SectionHead from '../components/SectionHead.astro';
+import ProjectList from '../components/ProjectList.astro';
+import SkillsGrid from '../components/SkillsGrid.astro';
+import Links from '../components/Links.astro';
+import { site, href } from '../config';
+import { getProjects, getExperience } from '../lib/content';
+
+const projects = await getProjects();
+const [current] = await getExperience();
+---
+
+<Base>
+  <section class="hero wrap">
+    <div class="meta label" data-reveal>
+      <span>Electrical Engineering</span>
+      <span>USC</span>
+      <span>Los Angeles</span>
+    </div>
+
+    <div class="grid">
+      <div class="lead">
+        <h1 class="display name" data-reveal>{site.name}<span class="accent">.</span></h1>
+        <p class="identity" data-reveal style="--i:1">{site.identity}</p>
+      </div>
+      <div class="portrait" data-reveal style="--i:2">
+        <Avatar />
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap trace-wrap"><Trace /></div>
+
+  <section class="wrap about">
+    <div class="bio" data-reveal>
+      {/* TODO(Peter): rewrite this in your own words. Placeholder only. */}
+      <span class="badge">placeholder bio</span>
+      <p>
+        I'm an electrical engineering student at USC. Most of my time goes to circuits: working out
+        what a design should do on paper, laying out the board, and then seeing what it does on the
+        bench. Right now I'm doing integration and test on space hardware. Outside of class I help
+        run Qompute, USC's quantum computing event.
+      </p>
+    </div>
+
+    {
+      current && (
+        <a class="now" href={href('/experience')} data-reveal style="--i:1">
+          <span class="label">
+            <span class="pulse" aria-hidden="true" />
+            Currently
+          </span>
+          <span class="now-org">{current.data.org}</span>
+          <span class="muted">{current.data.role}</span>
+          <span class="label">
+            {current.data.start} → {current.data.end}
+          </span>
+        </a>
+      )
+    }
+  </section>
+
+  <section class="wrap block">
+    <SectionHead index="01" title="Projects" />
+    <ProjectList projects={projects} />
+    <p class="more"><a href={href('/projects')} class="mono">All projects →</a></p>
+  </section>
+
+  <section class="wrap block">
+    <SectionHead index="02" title="Toolchain" />
+    <SkillsGrid />
+  </section>
+
+  <section class="wrap block contact">
+    <SectionHead index="03" title="Contact" />
+    <p class="big" data-reveal>Best way to reach me is email.</p>
+    <div data-reveal style="--i:1"><Links /></div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    padding-top: clamp(2.5rem, 8vw, 6rem);
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    margin-bottom: clamp(1.5rem, 4vw, 3rem);
+  }
+  .meta span + span::before {
+    content: '/';
+    margin-right: 1.5rem;
+    color: var(--line-strong);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr minmax(9rem, 16rem);
+    gap: clamp(1.5rem, 5vw, 4rem);
+    align-items: end;
+  }
+  .name {
+    font-size: clamp(4.5rem, 17vw, 13.5rem);
+  }
+  .identity {
+    margin: clamp(1.5rem, 3vw, 2.5rem) 0 0;
+    max-width: 34rem;
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    line-height: 1.4;
+    color: var(--ink-2);
+  }
+  .trace-wrap {
+    margin-block: clamp(3rem, 7vw, 5rem);
+  }
+  .about {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: start;
+  }
+  .bio p {
+    margin: 0.9rem 0 0;
+    font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+    line-height: 1.6;
+  }
+  .now {
+    display: grid;
+    gap: 0.4rem;
+    padding: 1.25rem;
+    border: 1px solid var(--line);
+    background: var(--bg-raised);
+    text-decoration: none;
+    transition: border-color 0.2s;
+  }
+  .now:hover {
+    border-color: var(--accent);
+    color: inherit;
+  }
+  .now-org {
+    font-family: var(--font-display);
+    font-variation-settings: 'wdth' 112;
+    font-weight: 750;
+    font-size: 1.4rem;
+    line-height: 1.15;
+  }
+  .pulse {
+    display: inline-block;
+    width: 0.45rem;
+    height: 0.45rem;
+    margin-right: 0.4rem;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    50% {
+      opacity: 0.25;
+    }
+  }
+  .block {
+    margin-top: clamp(5rem, 10vw, 8rem);
+  }
+  .more {
+    margin: 1.5rem 0 0;
+    text-align: right;
+  }
+  .more a {
+    font-size: 0.8rem;
+    text-decoration: none;
+  }
+  .big {
+    font-family: var(--font-display);
+    font-variation-settings: 'wdth' 118;
+    font-weight: 700;
+    font-size: clamp(1.6rem, 4vw, 3rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin: 0 0 1.5rem;
+  }
+  @media (max-width: 48rem) {
+    .grid,
+    .about {
+      grid-template-columns: 1fr;
+    }
+    .portrait {
+      max-width: 12rem;
+      grid-row: 1;
+    }
+  }
+</style>

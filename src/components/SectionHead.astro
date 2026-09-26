@@ -1,0 +1,42 @@
+---
+interface Props {
+  index: string;
+  title: string;
+  as?: 'h1' | 'h2';
+}
+const { index, title, as: Tag = 'h2' } = Astro.props;
+---
+
+<div class="head" data-reveal>
+  <span class="label"><span class="accent">§{index}</span></span>
+  <Tag>{title}</Tag>
+  <span class="rule" aria-hidden="true"></span>
+</div>
+
+<style>
+  .head {
+    display: grid;
+    grid-template-columns: 4rem auto 1fr;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+  .head > :global(h1),
+  .head > :global(h2) {
+    margin: 0;
+    font-size: clamp(1.6rem, 3.6vw, 2.6rem);
+  }
+  .rule {
+    height: 1px;
+    background: var(--line);
+    align-self: center;
+  }
+  @media (max-width: 34rem) {
+    .head {
+      grid-template-columns: auto 1fr;
+    }
+    .rule {
+      display: none;
+    }
+  }
+</style>

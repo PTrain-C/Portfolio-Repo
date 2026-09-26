@@ -1,0 +1,30 @@
+---
+import Base from '../../layouts/Base.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import ProjectList from '../../components/ProjectList.astro';
+import { getProjects } from '../../lib/content';
+
+const projects = await getProjects();
+---
+
+<Base title="Projects" description="Circuit, PCB, and hardware projects.">
+  <section class="wrap page">
+    <SectionHead index="02" title="Projects" as="h1" />
+    <p class="intro" data-reveal>
+      Every project page lists the whole project, then says exactly which parts were mine and which
+      were someone else's.
+    </p>
+    <ProjectList projects={projects} />
+  </section>
+</Base>
+
+<style>
+  .page {
+    padding-top: clamp(3rem, 7vw, 5rem);
+  }
+  .intro {
+    max-width: 38rem;
+    color: var(--ink-2);
+    margin: -1rem 0 3rem;
+  }
+</style>
