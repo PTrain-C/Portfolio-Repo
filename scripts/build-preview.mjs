@@ -48,7 +48,7 @@ for (const file of files) {
 
 writeFileSync(
   join(out, 'index.html'),
-  `<title>Peter's Portfolio</title>
+  `<title>Peter Connolly Portfolio</title>
 <style>
   body { background: #1e3d31; color: #f1efe6; font: 16px system-ui, sans-serif; }
   main { padding: 3rem 1.25rem; text-align: center; }
