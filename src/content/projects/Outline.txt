@@ -1,0 +1,53 @@
+Poke the Poker
+--------------
+
+Requirements Checklist:
+Two or more physical nodes - rpi and laptop MQTT
+Data collection - physical sound sensor
+		  either the provided one with a physical buffer to filter noise 
+		  or we buy a less sensitive one 
+		  or we find a software solution for this
+
+Data Processing - 
+each player gets a confidence value after game end
+	each round a players confidence level is based on time to make decision
+	these confidence levels are then averaged out to get total confidence
+we need more data processing, goal is to try getting correlation between current player's choice and previous player's choice
+	if player 4 raises, and player 1 folds. we can determine correlation between that
+	if player 1 already folded, 2 and 3 check, 4 raises, 2 folds. then 2 would be correlated to 4, not 1 (since they are already out of the game)
+	gonna do pairwise, check chat
+
+Node-to-node communication - 
+start of program, rpi expects player count (integer) from laptop
+rpi loops until either player count = 0/1 or laptop sends "end" message
+rpi sends confidence level for each player (either as percentage or data to graph)
+
+Visualization - 
+
+5 & 2
+if (5 > 2)
+then ignore player 2s sound
+
+need to clarify with TA/CP:
+	What counts as data processing and is ours good enough?
+	How much node-to-node? 
+	Is our control enough for the 5th requirement? Starting player count and end game message.
+
+-----------------
+Windows MQTT:
+
+need to run
+
+$env:Path += ";C:\Program Files\mosquitto"
+mosquitto_pub -h test.mosquitto.org -p 1883 -t pmconnol/poker/control -m "3"
+
+to get it to work, windows has a problem with the path, this is where its stored on my laptop
+
+run on rpi
+sudo systemctl enable mosquitto.service
+
+-----------------
+
+improvements:
+	see if we can streamline the matrix
+	mini ML to see who has best hand based on confidence(?)
