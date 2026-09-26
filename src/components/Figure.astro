@@ -1,6 +1,8 @@
 ---
-// Photo slot. Without `src` it renders an empty, labelled frame so layout can
-// be judged before real photos exist.
+// Photo slot. Without `src` it renders an empty frame so layout can be judged
+// before real photos exist. `src` is a path inside /public.
+import { href } from '../config';
+
 interface Props {
   src?: string;
   alt?: string;
@@ -12,49 +14,34 @@ const { src, alt = '', caption } = Astro.props;
 <figure>
   {
     src ? (
-      <img src={src} alt={alt} loading="lazy" />
+      <img src={href(`/${src}`)} alt={alt} loading="lazy" />
     ) : (
-      <div class="empty" role="img" aria-label={`Photo placeholder: ${caption ?? 'image'}`}>
-        <span>photo pending</span>
+      <div class="empty" role="img" aria-label={`Photo coming soon: ${caption ?? 'image'}`}>
+        <span class="small">Photo coming soon</span>
       </div>
     )
   }
-  {caption && <figcaption>{caption}</figcaption>}
+  {caption && <figcaption class="small quiet">{caption}</figcaption>}
 </figure>
 
 <style>
   figure {
-    margin: 2.5rem 0;
+    margin: 2.25rem 0;
   }
   img,
   .empty {
     width: 100%;
     aspect-ratio: 16 / 10;
     object-fit: cover;
-    border: 1px solid var(--line);
+    border-radius: var(--radius);
   }
   .empty {
     display: grid;
     place-items: center;
-    background:
-      linear-gradient(var(--line) 1px, transparent 1px) 0 0 / 24px 24px,
-      linear-gradient(90deg, var(--line) 1px, transparent 1px) 0 0 / 24px 24px,
-      var(--bg-raised);
-  }
-  .empty span {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--ink-3);
-    background: var(--bg);
-    padding: 0.4em 0.7em;
-    border: 1px dashed var(--line-strong);
+    background: linear-gradient(135deg, var(--surface), var(--surface-2));
+    color: var(--bark-3);
   }
   figcaption {
     margin-top: 0.6rem;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    color: var(--ink-3);
   }
 </style>

@@ -1,64 +1,75 @@
 ---
+// Headshot in an arched window with a lamp glow behind it. This is the one
+// decorative moment on the site; keep everything around it quiet.
 import { site, href } from '../config';
 ---
 
-<div class="avatar">
-  {
-    site.headshot ? (
-      <img src={href(`/${site.headshot}`)} alt={`Photo of ${site.name}`} width="320" height="400" />
-    ) : (
-      <div class="initials" role="img" aria-label="Headshot placeholder">
-        <span>{site.initials}</span>
-      </div>
-    )
-  }
-  <span class="corner tl" aria-hidden="true"></span>
-  <span class="corner br" aria-hidden="true"></span>
+<div class="window">
+  <div class="glow" aria-hidden="true"></div>
+  <div class="frame">
+    {
+      site.headshot ? (
+        <img src={href(`/${site.headshot}`)} alt={`Photo of ${site.name}`} width="400" height="520" />
+      ) : (
+        <div class="empty" role="img" aria-label="Headshot coming soon">
+          <span class="serif">{site.initials}</span>
+          <span class="small">Headshot coming soon</span>
+        </div>
+      )
+    }
+  </div>
 </div>
 
 <style>
-  .avatar {
+  .window {
     position: relative;
     width: 100%;
-    aspect-ratio: 4 / 5;
-    padding: 0.5rem;
+    max-width: 22rem;
+    aspect-ratio: 4 / 5.2;
   }
-  img,
-  .initials {
+  .glow {
+    position: absolute;
+    inset: -18% -22% -10%;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in oklab, var(--honey) 55%, transparent),
+      color-mix(in oklab, var(--honey) 18%, transparent) 55%,
+      transparent
+    );
+    animation: lamp 1.6s ease-out both;
+  }
+  .frame {
+    position: relative;
+    height: 100%;
+    border-radius: 999px 999px var(--radius-lg) var(--radius-lg);
+    overflow: hidden;
+    border: 0.6rem solid var(--pine);
+    background: var(--surface);
+  }
+  img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: grayscale(0.2);
   }
-  .initials {
+  .empty {
+    height: 100%;
     display: grid;
-    place-items: center;
-    background: var(--bg-raised);
-    border: 1px solid var(--line);
+    place-content: center;
+    justify-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(var(--surface), var(--surface-2));
+    color: var(--bark-3);
   }
-  .initials span {
-    font-family: var(--font-display);
-    font-variation-settings: 'wdth' 125;
-    font-weight: 850;
-    font-size: clamp(4rem, 10vw, 7rem);
-    color: var(--line-strong);
+  .empty .serif {
+    font-size: 6rem;
+    color: var(--pine);
+    opacity: 0.25;
+    line-height: 1;
   }
-  /* Crop marks */
-  .corner {
-    position: absolute;
-    width: 1rem;
-    height: 1rem;
-    border-color: var(--accent);
-    border-style: solid;
-  }
-  .tl {
-    top: 0;
-    left: 0;
-    border-width: 1px 0 0 1px;
-  }
-  .br {
-    bottom: 0;
-    right: 0;
-    border-width: 0 1px 1px 0;
+  @keyframes lamp {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
   }
 </style>

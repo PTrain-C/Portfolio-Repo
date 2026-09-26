@@ -1,193 +1,357 @@
 ---
 import Base from '../layouts/Base.astro';
 import Avatar from '../components/Avatar.astro';
-import Trace from '../components/Trace.astro';
-import SectionHead from '../components/SectionHead.astro';
-import ProjectList from '../components/ProjectList.astro';
-import SkillsGrid from '../components/SkillsGrid.astro';
-import Links from '../components/Links.astro';
-import { site, href } from '../config';
+import ContactButtons from '../components/ContactButtons.astro';
+import { site, interests, href } from '../config';
+import { categories } from '../data/skills';
 import { getProjects, getExperience } from '../lib/content';
 
 const projects = await getProjects();
-const [current] = await getExperience();
+const experience = await getExperience();
+const current = experience.find((e) => e.data.current);
+
+const keySkills = categories
+  .map((c) => ({ category: c, skills: c.skills.filter((s) => s.featured) }))
+  .filter((g) => g.skills.length > 0);
 ---
 
 <Base>
   <section class="hero wrap">
-    <div class="meta label" data-reveal>
-      <span>Electrical Engineering</span>
-      <span>USC</span>
-      <span>Los Angeles</span>
-    </div>
-
-    <div class="grid">
-      <div class="lead">
-        <h1 class="display name" data-reveal>{site.name}<span class="accent">.</span></h1>
-        <p class="identity" data-reveal style="--i:1">{site.identity}</p>
-      </div>
-      <div class="portrait" data-reveal style="--i:2">
-        <Avatar />
-      </div>
-    </div>
-  </section>
-
-  <div class="wrap trace-wrap"><Trace /></div>
-
-  <section class="wrap about">
-    <div class="bio" data-reveal>
-      {/* TODO(Peter): rewrite this in your own words. Placeholder only. */}
-      <span class="badge">placeholder bio</span>
-      <p>
-        I'm an electrical engineering student at USC. Most of my time goes to circuits: working out
-        what a design should do on paper, laying out the board, and then seeing what it does on the
-        bench. Right now I'm doing integration and test on space hardware. Outside of class I help
-        run Qompute, USC's quantum computing event.
+    <div class="intro">
+      <h1>Hi, I'm {site.name}.</h1>
+      <p class="lede">
+        I'm an electrical engineering student at USC. I spend most of my time on analog and
+        mixed-signal circuits, PCB design, and quantum hardware.
       </p>
+      {/* TODO(Peter): rewrite this paragraph in your own words. */}
+      <p class="bio">
+        I like the whole path of a circuit: working out what it should do on paper, laying out the
+        board, and then seeing what it actually does on the bench. Outside of class I help run
+        Qompute, USC's quantum computing event.
+      </p>
+      <ContactButtons />
     </div>
 
-    {
-      current && (
-        <a class="now" href={href('/experience')} data-reveal style="--i:1">
-          <span class="label">
-            <span class="pulse" aria-hidden="true" />
-            Currently
-          </span>
-          <span class="now-org">{current.data.org}</span>
-          <span class="muted">{current.data.role}</span>
-          <span class="label">
-            {current.data.start} → {current.data.end}
-          </span>
-        </a>
-      )
-    }
+    <div class="portrait">
+      <Avatar />
+      {
+        current && (
+          <a class="now" href={href(`/experience/${current.id}`)}>
+            <span class="small quiet">Right now</span>
+            <span class="serif now-role">{current.data.role}</span>
+            <span class="small">at {current.data.org}</span>
+          </a>
+        )
+      }
+    </div>
   </section>
 
-  <section class="wrap block">
-    <SectionHead index="01" title="Projects" />
-    <ProjectList projects={projects} />
-    <p class="more"><a href={href('/projects')} class="mono">All projects →</a></p>
+  <section class="wrap section">
+    <div class="head">
+      <h2>Key skills</h2>
+      <a href={href('/skills')}>See every skill and where I used it</a>
+    </div>
+    <div class="skill-grid">
+      {
+        keySkills.map((g) => (
+          <div class="skill-cat" data-tone={g.category.tone}>
+            <h3>{g.category.name}</h3>
+            <ul class="pills">
+              {g.skills.map((s) => (
+                <li>
+                  <a class="pill" data-tone={g.category.tone} href={href(`/skills#${s.id}`)}>
+                    {s.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
   </section>
 
-  <section class="wrap block">
-    <SectionHead index="02" title="Toolchain" />
-    <SkillsGrid />
+  <section class="wrap section work">
+    <div>
+      <div class="head">
+        <h2>Experience</h2>
+        <a href={href('/experience')}>All experience</a>
+      </div>
+      <ol class="mini-timeline">
+        {
+          experience.map((e) => (
+            <li>
+              <a href={href(`/experience/${e.id}`)}>
+                <span class="serif org">{e.data.org}</span>
+                <span class="role">{e.data.role}</span>
+                <span class="small quiet">
+                  {e.data.start
+                    ? e.data.start === e.data.end
+                      ? e.data.start
+                      : `${e.data.start} to ${e.data.end}`
+                    : 'Dates to come'}
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+
+    <div>
+      <div class="head">
+        <h2>Projects</h2>
+        <a href={href('/projects')}>All projects</a>
+      </div>
+      <ul class="mini-projects">
+        {
+          projects.map((p) => (
+            <li>
+              <a href={href(`/projects/${p.id}`)}>
+                <span class="serif org">{p.data.title}</span>
+                <span class="small quiet">{p.data.summary}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
   </section>
 
-  <section class="wrap block contact">
-    <SectionHead index="03" title="Contact" />
-    <p class="big" data-reveal>Best way to reach me is email.</p>
-    <div data-reveal style="--i:1"><Links /></div>
+  <section class="wrap section">
+    <div class="head">
+      <h2>What I'm into</h2>
+    </div>
+    <ul class="interests">
+      {
+        interests.map((i) => (
+          <li class:list={{ placeholder: i.placeholder }}>
+            <h3>{i.title}</h3>
+            <p>{i.text}</p>
+            {i.placeholder && <span class="todo">Still to write</span>}
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="wrap section" id="contact">
+    <div class="contact">
+      <div>
+        {/* TODO(Peter): adjust the kinds of roles you're looking for. */}
+        <h2>Hiring for an EE role? I'd like to hear about it.</h2>
+        <p>
+          I'm looking for internships and co-ops in analog and mixed-signal design, PCB design,
+          hardware test, and quantum hardware. Email is the fastest way to reach me.
+        </p>
+      </div>
+      <ContactButtons inverted />
+    </div>
   </section>
 </Base>
 
 <style>
   .hero {
-    padding-top: clamp(2.5rem, 8vw, 6rem);
-  }
-  .meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1.5rem;
-    margin-bottom: clamp(1.5rem, 4vw, 3rem);
-  }
-  .meta span + span::before {
-    content: '/';
-    margin-right: 1.5rem;
-    color: var(--line-strong);
-  }
-  .grid {
     display: grid;
-    grid-template-columns: 1fr minmax(9rem, 16rem);
-    gap: clamp(1.5rem, 5vw, 4rem);
-    align-items: end;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    padding-top: 3.5rem;
   }
-  .name {
-    font-size: clamp(4.5rem, 17vw, 13.5rem);
+  .hero h1 {
+    font-size: clamp(3.2rem, 6.5vw, 5.4rem);
+    line-height: 1;
+    margin-bottom: 1.75rem;
   }
-  .identity {
-    margin: clamp(1.5rem, 3vw, 2.5rem) 0 0;
-    max-width: 34rem;
-    font-size: clamp(1.1rem, 2vw, 1.4rem);
-    line-height: 1.4;
-    color: var(--ink-2);
+  .bio {
+    max-width: 38rem;
+    color: var(--bark-2);
+    margin: 0 0 2rem;
   }
-  .trace-wrap {
-    margin-block: clamp(3rem, 7vw, 5rem);
-  }
-  .about {
+  .portrait {
+    position: relative;
     display: grid;
-    grid-template-columns: 1.6fr 1fr;
-    gap: clamp(2rem, 5vw, 4rem);
-    align-items: start;
-  }
-  .bio p {
-    margin: 0.9rem 0 0;
-    font-size: clamp(1.05rem, 1.6vw, 1.25rem);
-    line-height: 1.6;
+    justify-items: center;
   }
   .now {
+    position: absolute;
+    left: -1.5rem;
+    bottom: 1.5rem;
     display: grid;
-    gap: 0.4rem;
-    padding: 1.25rem;
-    border: 1px solid var(--line);
-    background: var(--bg-raised);
+    gap: 0.1rem;
+    max-width: 15rem;
+    padding: 0.9rem 1.1rem;
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: 0 10px 30px -12px rgb(43 38 32 / 0.35);
     text-decoration: none;
-    transition: border-color 0.2s;
+    color: var(--bark);
+    transform: rotate(-2deg);
   }
   .now:hover {
-    border-color: var(--accent);
-    color: inherit;
+    color: var(--pine);
   }
-  .now-org {
-    font-family: var(--font-display);
-    font-variation-settings: 'wdth' 112;
-    font-weight: 750;
-    font-size: 1.4rem;
-    line-height: 1.15;
+  .now-role {
+    font-size: 1.1rem;
+    line-height: 1.2;
   }
-  .pulse {
-    display: inline-block;
-    width: 0.45rem;
-    height: 0.45rem;
-    margin-right: 0.4rem;
+
+  .section {
+    margin-top: 6.5rem;
+  }
+  .head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+  }
+  .head a {
+    font-weight: 650;
+  }
+
+  .skill-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+  }
+  .skill-cat {
+    padding: 1.4rem 1.5rem 1.6rem;
+    border-radius: var(--radius);
+    background: var(--surface);
+    border-top: 4px solid var(--tone);
+  }
+  .skill-cat h3 {
+    font-size: 1.15rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .work {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+  }
+  .mini-timeline,
+  .mini-projects {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .mini-timeline {
+    border-left: 2px solid var(--line);
+  }
+  .mini-timeline li {
+    position: relative;
+  }
+  .mini-timeline li::before {
+    content: '';
+    position: absolute;
+    left: -0.45rem;
+    top: 1.35rem;
+    width: 0.8rem;
+    height: 0.8rem;
     border-radius: 50%;
-    background: var(--accent);
-    animation: pulse 2.4s ease-in-out infinite;
+    background: var(--linen);
+    border: 2px solid var(--pine);
   }
-  @keyframes pulse {
-    50% {
-      opacity: 0.25;
-    }
+  .mini-timeline li:first-child::before {
+    background: var(--honey);
+    border-color: var(--honey);
   }
-  .block {
-    margin-top: clamp(5rem, 10vw, 8rem);
-  }
-  .more {
-    margin: 1.5rem 0 0;
-    text-align: right;
-  }
-  .more a {
-    font-size: 0.8rem;
+  .mini-timeline a,
+  .mini-projects a {
+    display: grid;
+    gap: 0.1rem;
+    padding: 0.9rem 1.25rem;
+    margin-left: 0.75rem;
+    border-radius: var(--radius);
     text-decoration: none;
+    color: var(--bark);
   }
-  .big {
-    font-family: var(--font-display);
-    font-variation-settings: 'wdth' 118;
-    font-weight: 700;
-    font-size: clamp(1.6rem, 4vw, 3rem);
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    margin: 0 0 1.5rem;
+  .mini-projects a {
+    margin-left: 0;
   }
-  @media (max-width: 48rem) {
-    .grid,
-    .about {
+  .mini-timeline a:hover,
+  .mini-projects a:hover {
+    background: var(--surface);
+  }
+  .mini-timeline a:hover .org,
+  .mini-projects a:hover .org {
+    color: var(--pine);
+  }
+  .org {
+    font-size: 1.25rem;
+  }
+  .role {
+    color: var(--bark-2);
+  }
+
+  .interests {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2rem;
+  }
+  .interests li {
+    border-top: 2px solid var(--honey);
+    padding-top: 1rem;
+  }
+  .interests .placeholder {
+    border-top-style: dashed;
+  }
+  .interests h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.4rem;
+  }
+  .interests p {
+    margin: 0 0 0.6rem;
+    color: var(--bark-2);
+    font-size: 0.95rem;
+  }
+
+  .contact {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 3rem;
+    align-items: center;
+    padding: 3.5rem 3.5rem;
+    border-radius: var(--radius-lg);
+    background: var(--pine);
+    color: var(--linen);
+  }
+  .contact h2 {
+    color: var(--linen);
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    margin-bottom: 1rem;
+  }
+  .contact p {
+    margin: 0;
+    color: color-mix(in oklab, var(--linen) 82%, transparent);
+    max-width: 34rem;
+  }
+
+  @media (max-width: 60rem) {
+    .hero,
+    .work,
+    .contact {
       grid-template-columns: 1fr;
     }
+    .skill-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .interests {
+      grid-template-columns: repeat(2, 1fr);
+    }
     .portrait {
-      max-width: 12rem;
-      grid-row: 1;
+      max-width: 20rem;
+    }
+    .now {
+      left: 0;
+    }
+    .contact {
+      padding: 2rem;
     }
   }
 </style>

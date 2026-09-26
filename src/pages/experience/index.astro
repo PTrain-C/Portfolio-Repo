@@ -1,0 +1,188 @@
+---
+import Base from '../../layouts/Base.astro';
+import SkillPills from '../../components/SkillPills.astro';
+import { href } from '../../config';
+import { getExperience, getCredentials } from '../../lib/content';
+
+const experience = await getExperience();
+const credentials = await getCredentials();
+
+const dates = (start?: string, end?: string) =>
+  !start ? 'Dates to come' : start === end ? start : `${start} to ${end}`;
+---
+
+<Base title="Experience" description="Engineering roles and leadership.">
+  <section class="wrap page">
+    <h1>Experience</h1>
+    <p class="lede">
+      Most recent first. Open any role for the details and the skills it used.
+    </p>
+
+    <ol class="timeline">
+      {
+        experience.map((e) => (
+          <li class:list={{ current: e.data.current }}>
+            <p class="when small">
+              {dates(e.data.start, e.data.end)}
+              {e.data.location && <span class="quiet"><br />{e.data.location}</span>}
+            </p>
+            <div class="entry">
+              {e.data.current && <span class="now small">Current</span>}
+              <h2>
+                <a href={href(`/experience/${e.id}`)}>{e.data.org}</a>
+              </h2>
+              <p class="role">
+                {e.data.role}
+                {e.data.unit && <span class="quiet">, {e.data.unit}</span>}
+              </p>
+              <p class="summary">{e.data.summary}</p>
+              <SkillPills ids={e.data.skills} />
+              <a class="more" href={href(`/experience/${e.id}`)}>
+                More about {e.data.org}
+              </a>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+    {
+      credentials.length > 0 && (
+        <section class="creds">
+          <h2>Credentials</h2>
+          <ul>
+            {credentials.map((c) => (
+              <li>
+                <div>
+                  <h3>{c.data.title}</h3>
+                  <p class="quiet">
+                    {c.data.issuer}, {c.data.date}
+                  </p>
+                </div>
+                <SkillPills ids={c.data.skills} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </section>
+</Base>
+
+<style>
+  .page {
+    padding-top: 3rem;
+  }
+  .lede {
+    margin: 1rem 0 3.5rem;
+  }
+  .timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .timeline > li {
+    display: grid;
+    grid-template-columns: 11rem 1fr;
+    gap: 2.5rem;
+  }
+  .when {
+    margin: 0;
+    padding-top: 0.6rem;
+    text-align: right;
+    font-weight: 650;
+    color: var(--bark-2);
+  }
+  .entry {
+    position: relative;
+    padding: 0 0 3.5rem 2.5rem;
+    border-left: 2px solid var(--line);
+  }
+  .entry::before {
+    content: '';
+    position: absolute;
+    left: -0.6rem;
+    top: 0.75rem;
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+    background: var(--linen);
+    border: 3px solid var(--pine);
+  }
+  .current .entry::before {
+    background: var(--honey);
+    border-color: var(--honey);
+    box-shadow: 0 0 0 6px color-mix(in oklab, var(--honey) 30%, transparent);
+  }
+  .timeline > li:last-child .entry {
+    border-left-color: transparent;
+  }
+  .now {
+    display: inline-block;
+    margin-bottom: 0.4rem;
+    padding: 0.1rem 0.6rem;
+    border-radius: 999px;
+    background: var(--honey-soft);
+    color: var(--bark);
+    font-weight: 700;
+  }
+  h2 a {
+    color: var(--bark);
+    text-decoration: none;
+  }
+  h2 a:hover {
+    color: var(--pine);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+  .role {
+    margin: 0.3rem 0 0;
+    font-size: 1.1rem;
+    font-weight: 650;
+  }
+  .summary {
+    color: var(--bark-2);
+    margin: 0.75rem 0 1rem;
+    max-width: 40rem;
+  }
+  .more {
+    display: inline-block;
+    margin-top: 1rem;
+    font-weight: 700;
+  }
+  .creds {
+    margin-top: 3rem;
+    padding: 2rem 2.25rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+  .creds h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .creds ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .creds li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .creds p {
+    margin: 0.2rem 0 0;
+  }
+  @media (max-width: 48rem) {
+    .timeline > li {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+    .when {
+      text-align: left;
+      padding-left: 2.5rem;
+    }
+  }
+</style>

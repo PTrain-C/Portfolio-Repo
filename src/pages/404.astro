@@ -3,20 +3,19 @@ import Base from '../layouts/Base.astro';
 import { href } from '../config';
 ---
 
-<Base title="Not found">
+<Base title="Page not found">
   <section class="wrap page">
-    <p class="label accent">Error 404 / open circuit</p>
-    <h1 class="display">Nothing<br />here.</h1>
-    <p><a class="mono" href={href('/')}>← Back home</a></p>
+    <h1>This page doesn't exist.</h1>
+    <p class="lede">The link may be old, or the page may have moved.</p>
+    <p><a class="btn primary" href={href('/')}>Go to the home page</a></p>
   </section>
 </Base>
 
 <style>
   .page {
-    padding-top: clamp(4rem, 10vw, 8rem);
+    padding-top: 6rem;
   }
-  h1 {
-    font-size: clamp(3.5rem, 13vw, 10rem);
-    margin: 1.5rem 0 2.5rem;
+  .lede {
+    margin: 1rem 0 2rem;
   }
 </style>

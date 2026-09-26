@@ -1,0 +1,152 @@
+---
+import { render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import DetailLayout from '../../components/DetailLayout.astro';
+import SkillPills from '../../components/SkillPills.astro';
+import { getExperience } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const experience = await getExperience();
+  return experience.map((e, i) => ({
+    params: { slug: e.id },
+    props: { entry: e, prev: experience[i - 1], next: experience[i + 1] },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'experience'>;
+  prev?: CollectionEntry<'experience'>;
+  next?: CollectionEntry<'experience'>;
+}
+
+const { entry, prev, next } = Astro.props;
+const { data } = entry;
+const { Content } = await render(entry);
+
+const dates = !data.start
+  ? null
+  : data.start === data.end
+    ? data.start
+    : `${data.start} to ${data.end}`;
+const neighbor = (e?: CollectionEntry<'experience'>) =>
+  e && { label: e.data.org, path: `/experience/${e.id}` };
+---
+
+<Base title={`${data.role}, ${data.org}`} description={data.summary}>
+  <DetailLayout
+    backLabel="experience"
+    backPath="/experience"
+    prev={neighbor(prev)}
+    next={neighbor(next)}
+  >
+    <Fragment slot="header">
+      {data.current && <span class="now small">Current role</span>}
+      <h1>{data.org}</h1>
+      <p class="role">
+        {data.role}
+        {data.unit && <span class="quiet">, {data.unit}</span>}
+      </p>
+      <p class="lede">{data.summary}</p>
+    </Fragment>
+
+    {
+      data.highlights.length > 0 && (
+        <section class="highlights">
+          <h2>What I did</h2>
+          <ul>
+            {data.highlights.map((h) => (
+              <li>{h}</li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <div class="prose">
+      <h2>The details</h2>
+      <Content />
+    </div>
+
+    <Fragment slot="side">
+      <div>
+        <h2 class="side-h">At a glance</h2>
+        <dl class="facts">
+          <dt>When</dt>
+          <dd>{dates ?? <span class="todo">Dates to come</span>}</dd>
+          {data.location && (
+            <>
+              <dt>Where</dt>
+              <dd>{data.location}</dd>
+            </>
+          )}
+          {data.unit && (
+            <>
+              <dt>Team or program</dt>
+              <dd>{data.unit}</dd>
+            </>
+          )}
+        </dl>
+      </div>
+      <div>
+        <h2 class="side-h">Skills I used</h2>
+        <SkillPills ids={data.skills} grouped />
+      </div>
+    </Fragment>
+  </DetailLayout>
+</Base>
+
+<style>
+  .now {
+    display: inline-block;
+    margin-bottom: 0.75rem;
+    padding: 0.1rem 0.65rem;
+    border-radius: 999px;
+    background: var(--honey-soft);
+    font-weight: 700;
+  }
+  .role {
+    margin: 0.6rem 0 0;
+    font-size: 1.25rem;
+    font-weight: 650;
+  }
+  .lede {
+    margin: 1.25rem 0 0;
+  }
+  .highlights {
+    margin-bottom: 3rem;
+    padding: 1.75rem 2rem;
+    border-radius: var(--radius-lg);
+    background: color-mix(in oklab, var(--pine) 7%, var(--linen));
+  }
+  .highlights h2,
+  .prose h2 {
+    font-size: 1.5rem;
+    margin: 0 0 1rem;
+  }
+  .highlights ul {
+    margin: 0;
+    padding-left: 1.2rem;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .highlights li::marker {
+    color: var(--pine);
+  }
+  .side-h {
+    font-size: 1.05rem;
+    margin-bottom: 0.75rem;
+  }
+  .facts {
+    margin: 0;
+    display: grid;
+    gap: 0.15rem;
+  }
+  .facts dt {
+    font-size: 0.85rem;
+    color: var(--bark-3);
+  }
+  .facts dd {
+    margin: 0 0 0.6rem;
+  }
+</style>

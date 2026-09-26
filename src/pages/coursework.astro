@@ -1,6 +1,5 @@
 ---
 import Base from '../layouts/Base.astro';
-import SectionHead from '../components/SectionHead.astro';
 import { coursework } from '../data/coursework';
 
 const hasPlaceholders = coursework.some((g) => g.courses.some((c) => c.placeholder));
@@ -8,18 +7,16 @@ const hasPlaceholders = coursework.some((g) => g.courses.some((c) => c.placehold
 
 <Base title="Coursework" description="Relevant coursework at USC.">
   <section class="wrap page">
-    <SectionHead index="03" title="Coursework" as="h1" />
-    {hasPlaceholders && <p class="badge note">course list pending</p>}
+    <h1>Coursework</h1>
+    <p class="lede">Classes at USC, grouped by area.</p>
+    {hasPlaceholders && <p class="todo">Course list to come</p>}
 
     <div class="groups">
       {
-        coursework.map((g, i) => (
-          <section class="group" data-reveal style={`--i:${i}`}>
-            <p class="label">
-              <span class="accent">{String(i + 1).padStart(2, '0')}</span>
-            </p>
+        coursework.map((g) => (
+          <section class="group">
             <h2>{g.group}</h2>
-            <p class="blurb muted">{g.blurb}</p>
+            <p class="quiet small">{g.blurb}</p>
             <ul>
               {g.courses.map((c) => (
                 <li class:list={{ placeholder: c.placeholder }}>
@@ -37,57 +34,51 @@ const hasPlaceholders = coursework.some((g) => g.courses.some((c) => c.placehold
 
 <style>
   .page {
-    padding-top: clamp(3rem, 7vw, 5rem);
+    padding-top: 3rem;
   }
-  .note {
-    display: inline-block;
-    margin: -1rem 0 2.5rem;
+  .lede {
+    margin: 1rem 0 1rem;
   }
   .groups {
+    margin-top: 2.5rem;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-    border-top: 1px solid var(--line);
-    border-left: 1px solid var(--line);
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
   }
   .group {
-    padding: 1.75rem 1.5rem 2rem;
-    border-right: 1px solid var(--line);
-    border-bottom: 1px solid var(--line);
-  }
-  .group .label {
-    margin: 0 0 2.5rem;
+    padding: 1.75rem 2rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
   }
   h2 {
     font-size: 1.45rem;
-    margin: 0;
   }
-  .blurb {
-    font-size: 0.9rem;
-    margin: 0.4rem 0 1.5rem;
+  .group > p {
+    margin: 0.35rem 0 1.25rem;
   }
   ul {
     list-style: none;
     margin: 0;
     padding: 0;
     display: grid;
-    gap: 0.7rem;
+    gap: 0.6rem;
   }
   li {
     display: grid;
-    grid-template-columns: 4.5rem 1fr;
+    grid-template-columns: 5rem 1fr;
     gap: 0.75rem;
-    font-size: 0.95rem;
   }
   .code {
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--accent);
-    padding-top: 0.15rem;
+    font-weight: 700;
+    color: var(--pine);
   }
-  .placeholder {
-    color: var(--ink-3);
-  }
+  .placeholder,
   .placeholder .code {
-    color: var(--ink-3);
+    color: var(--bark-3);
+  }
+  @media (max-width: 48rem) {
+    .groups {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

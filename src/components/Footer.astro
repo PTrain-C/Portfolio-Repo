@@ -1,27 +1,90 @@
 ---
-import { site } from '../config';
-import Links from './Links.astro';
+import { site, contact, href } from '../config';
 
 const year = new Date().getFullYear();
+const pages = [
+  { label: 'Projects', path: '/projects' },
+  { label: 'Experience', path: '/experience' },
+  { label: 'Skills', path: '/skills' },
+  { label: 'Coursework', path: '/coursework' },
+];
+const elsewhere = [
+  { label: 'LinkedIn', url: contact.linkedin },
+  { label: 'GitHub', url: contact.github },
+  { label: 'Email', url: contact.email },
+];
 ---
 
-<footer class="wrap">
-  <p class="label">{site.name} · {year}</p>
-  <Links compact />
+<footer>
+  <div class="wrap inner">
+    <div>
+      <p class="serif name">{site.name}</p>
+      <p class="quiet small">{site.identity}</p>
+    </div>
+    <nav aria-label="Footer">
+      <ul>
+        {
+          pages.map((p) => (
+            <li>
+              <a href={href(p.path)}>{p.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+      <ul>
+        {
+          elsewhere.map((l) => (
+            <li>
+              {l.url ? <a href={l.url}>{l.label}</a> : <span class="quiet">{l.label} (link to come)</span>}
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+  <p class="wrap quiet small copy">© {year} {site.name}</p>
 </footer>
 
 <style>
   footer {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-top: 8rem;
-    padding-block: 2rem;
-    border-top: 1px solid var(--line);
+    margin-top: 7rem;
+    padding-block: 3rem 2rem;
+    background: var(--surface-2);
   }
-  p {
+  .inner {
+    display: flex;
+    justify-content: space-between;
+    gap: 3rem;
+    flex-wrap: wrap;
+  }
+  .name {
+    font-size: 1.5rem;
+    margin: 0 0 0.25rem;
+  }
+  .inner p {
     margin: 0;
+    max-width: 26rem;
+  }
+  nav {
+    display: flex;
+    gap: 4rem;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.4rem;
+  }
+  a {
+    color: var(--bark);
+    text-decoration: none;
+  }
+  a:hover {
+    color: var(--pine);
+    text-decoration: underline;
+  }
+  .copy {
+    margin-top: 2.5rem;
   }
 </style>

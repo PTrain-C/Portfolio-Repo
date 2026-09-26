@@ -3,38 +3,26 @@
 interface Props {
   label?: string;
 }
-const { label = 'Needs content from Peter' } = Astro.props;
+const { label = 'Still to write' } = Astro.props;
 ---
 
 <aside class="missing" role="note">
-  <span class="head">{label}</span>
+  <span class="todo">{label}</span>
   <div class="body"><slot /></div>
 </aside>
 
 <style>
   .missing {
-    margin: 1.25rem 0 1.75rem;
-    padding: 0.9rem 1rem;
-    border: 1px dashed var(--accent);
-    background: repeating-linear-gradient(
-      -45deg,
-      transparent 0 8px,
-      color-mix(in oklab, var(--accent) 5%, transparent) 8px 9px
-    );
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    line-height: 1.55;
-  }
-  .head {
-    display: block;
-    color: var(--accent);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 0.68rem;
-    margin-bottom: 0.35rem;
+    margin: 1rem 0 1.75rem;
+    padding: 1rem 1.2rem;
+    border-radius: var(--radius);
+    border: 1.5px dashed color-mix(in oklab, var(--tone-honey) 55%, transparent);
+    background: color-mix(in oklab, var(--honey) 8%, var(--surface));
   }
   .body {
-    color: var(--ink-2);
+    margin-top: 0.5rem;
+    color: var(--bark-2);
+    font-size: 0.95rem;
   }
   .body :global(p) {
     margin: 0;

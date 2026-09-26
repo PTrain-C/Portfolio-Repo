@@ -1,0 +1,60 @@
+---
+// Skill ids rendered as pills that link to that skill on the Skills page.
+// `grouped` shows one row per category with the category name above it.
+import { groupSkills } from '../data/skills';
+import { href } from '../config';
+
+interface Props {
+  ids: string[];
+  grouped?: boolean;
+}
+const { ids, grouped = false } = Astro.props;
+const groups = groupSkills(ids);
+---
+
+{
+  grouped ? (
+    <div class="groups">
+      {groups.map((g) => (
+        <div>
+          <p class="cat small" data-tone={g.category.tone}>
+            {g.category.name}
+          </p>
+          <ul class="pills">
+            {g.skills.map((s) => (
+              <li>
+                <a class="pill" data-tone={g.category.tone} href={href(`/skills#${s.id}`)}>
+                  {s.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <ul class="pills">
+      {groups.flatMap((g) =>
+        g.skills.map((s) => (
+          <li>
+            <a class="pill" data-tone={g.category.tone} href={href(`/skills#${s.id}`)}>
+              {s.name}
+            </a>
+          </li>
+        )),
+      )}
+    </ul>
+  )
+}
+
+<style>
+  .groups {
+    display: grid;
+    gap: 1rem;
+  }
+  .cat {
+    margin: 0 0 0.4rem;
+    font-weight: 700;
+    color: var(--tone);
+  }
+</style>

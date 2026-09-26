@@ -19,12 +19,13 @@ const projects = defineCollection({
     // Exactly what Peter did. Keep these literal; never widen them.
     mine: z.array(z.string()).default([]),
     // Parts owned by someone else. `by` can be a name or a generic role.
-    others: z
-      .array(z.object({ part: z.string(), by: z.string() }))
-      .default([]),
+    others: z.array(z.object({ part: z.string(), by: z.string() })).default([]),
     // Where the project ended up (e.g. "Design and fab only").
     outcome: z.string().optional(),
-    tags: z.array(z.string()).default([]),
+    // Skill ids from src/data/skills.ts. Only skills Peter used himself.
+    skills: z.array(z.string()).default([]),
+    // Image in /public, e.g. 'projects/notch-filter.jpg'.
+    cover: z.string().optional(),
   }),
 });
 
@@ -35,11 +36,15 @@ const experience = defineCollection({
     role: z.string(),
     unit: z.string().optional(),
     location: z.string().optional(),
-    // Leave out if not confirmed yet; the page shows a "dates pending" marker.
+    // Leave out if not confirmed yet; the page shows "Dates to come".
     start: z.string().optional(),
     end: z.string().optional(),
+    current: z.boolean().default(false),
     order: z.number(),
-    tags: z.array(z.string()).default([]),
+    summary: z.string(),
+    highlights: z.array(z.string()).default([]),
+    // Skill ids from src/data/skills.ts.
+    skills: z.array(z.string()).default([]),
   }),
 });
 
@@ -50,6 +55,7 @@ const credentials = defineCollection({
     issuer: z.string(),
     date: z.coerce.string(),
     order: z.number().default(99),
+    skills: z.array(z.string()).default([]),
   }),
 });
 

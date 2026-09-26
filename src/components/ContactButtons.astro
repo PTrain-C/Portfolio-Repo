@@ -1,0 +1,56 @@
+---
+import { contact } from '../config';
+
+interface Props {
+  inverted?: boolean;
+}
+const { inverted = false } = Astro.props;
+
+const items = [
+  { label: 'Email me', url: contact.email, primary: true },
+  { label: 'LinkedIn', url: contact.linkedin },
+  { label: 'GitHub', url: contact.github },
+];
+---
+
+<div class:list={['row', { inverted }]}>
+  {
+    items.map((i) =>
+      i.url ? (
+        <a class:list={['btn', { primary: i.primary }]} href={i.url}>
+          {i.label}
+        </a>
+      ) : (
+        <span class="btn" aria-disabled="true" title="Link not added yet (src/config.ts)">
+          {i.label}
+        </span>
+      ),
+    )
+  }
+</div>
+
+<style>
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .inverted .btn {
+    border-color: var(--linen);
+    color: var(--linen);
+  }
+  .inverted .btn.primary {
+    background: var(--honey);
+    border-color: var(--honey);
+    color: var(--pine-deep);
+  }
+  .inverted .btn:hover {
+    background: var(--linen);
+    color: var(--pine-deep);
+  }
+  .inverted .btn[aria-disabled='true'] {
+    border-color: color-mix(in oklab, var(--linen) 55%, transparent);
+    color: color-mix(in oklab, var(--linen) 70%, transparent);
+    background: transparent;
+  }
+</style>

@@ -2,220 +2,150 @@
 import { render } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import { href } from '../../config';
+import DetailLayout from '../../components/DetailLayout.astro';
+import SkillPills from '../../components/SkillPills.astro';
 import { getProjects } from '../../lib/content';
 
 export async function getStaticPaths() {
   const projects = await getProjects();
   return projects.map((p, i) => ({
     params: { slug: p.id },
-    props: { project: p, index: i, next: projects[(i + 1) % projects.length] },
+    props: { project: p, prev: projects[i - 1], next: projects[i + 1] },
   }));
 }
 
 interface Props {
   project: CollectionEntry<'projects'>;
-  index: number;
-  next: CollectionEntry<'projects'>;
+  prev?: CollectionEntry<'projects'>;
+  next?: CollectionEntry<'projects'>;
 }
 
-const { project, index, next } = Astro.props;
+const { project, prev, next } = Astro.props;
 const { data } = project;
 const { Content } = await render(project);
 
-const teamLabel = { solo: 'Solo', team: 'Team project', unknown: 'Team size pending' }[data.team];
+const teamLabel = { solo: 'Solo project', team: 'Team project', unknown: 'Team size to come' }[
+  data.team
+];
+const neighbor = (p?: CollectionEntry<'projects'>) =>
+  p && { label: p.data.title, path: `/projects/${p.id}` };
 ---
 
 <Base title={data.title} description={data.summary}>
-  <article class="wrap page">
-    <a class="back mono" href={href('/projects')}>← Projects</a>
+  <DetailLayout backLabel="projects" backPath="/projects" prev={neighbor(prev)} next={neighbor(next)}>
+    <Fragment slot="header">
+      <h1>{data.title}</h1>
+      {data.fullName && <p class="quiet full">{data.fullName}</p>}
+      <p class="lede">{data.summary}</p>
+    </Fragment>
 
-    <header>
-      <p class="label" data-reveal>
-        <span class="accent">P{String(index + 1).padStart(2, '0')}</span>
-        {data.period && <span> / {data.period}</span>}
-        <span> / {teamLabel}</span>
-        {data.status === 'draft' && <span class="badge">draft</span>}
-      </p>
-      <h1 class="display" data-reveal style="--i:1">{data.title}</h1>
-      {data.fullName && <p class="full muted">{data.fullName}</p>}
-      <p class="summary" data-reveal style="--i:2">{data.summary}</p>
-      <ul class="tags" data-reveal style="--i:3">
-        {data.tags.map((t) => <li class="tag">{t}</li>)}
-      </ul>
-    </header>
+    <div class="prose">
+      <Content />
+    </div>
 
-    <section class="ownership" aria-label="Who did what" data-reveal>
-      <div class="col mine">
-        <p class="label"><span class="accent">■</span> My part</p>
-        {
-          data.mine.length ? (
-            <ul>
-              {data.mine.map((m) => (
-                <li>{m}</li>
-              ))}
-            </ul>
-          ) : (
-            <p class="badge">role pending</p>
-          )
-        }
+    <Fragment slot="side">
+      <div>
+        <h2 class="side-h">At a glance</h2>
+        <dl class="facts">
+          {data.period && (
+            <>
+              <dt>When</dt>
+              <dd>{data.period}</dd>
+            </>
+          )}
+          <dt>Team</dt>
+          <dd>{teamLabel}</dd>
+          {data.outcome && (
+            <>
+              <dt>Where it ended up</dt>
+              <dd>{data.outcome}</dd>
+            </>
+          )}
+        </dl>
       </div>
-      <div class="col others">
-        <p class="label">□ Others</p>
-        {
-          data.others.length ? (
+
+      <div class="mine">
+        <h2 class="side-h">My part</h2>
+        {data.mine.length ? (
+          <ul>
+            {data.mine.map((m) => (
+              <li>{m}</li>
+            ))}
+          </ul>
+        ) : (
+          <span class="todo">Still to write</span>
+        )}
+      </div>
+
+      {data.team !== 'solo' && (
+        <div class="others">
+          <h2 class="side-h">Teammates' parts</h2>
+          {data.others.length ? (
             <ul>
               {data.others.map((o) => (
                 <li>
                   {o.part}
-                  <span class="by">{o.by}</span>
+                  <span class="small quiet by">{o.by}</span>
                 </li>
               ))}
             </ul>
-          ) : data.team === 'solo' ? (
-            <p class="muted small">Solo project.</p>
           ) : (
-            <p class="badge">pending</p>
-          )
-        }
+            <span class="todo">Still to write</span>
+          )}
+        </div>
+      )}
+
+      <div>
+        <h2 class="side-h">Skills I used</h2>
+        {data.skills.length ? <SkillPills ids={data.skills} grouped /> : <span class="todo">Still to write</span>}
       </div>
-      {
-        data.outcome && (
-          <div class="col outcome">
-            <p class="label">Status</p>
-            <p>{data.outcome}</p>
-          </div>
-        )
-      }
-    </section>
-
-    <div class="prose body">
-      <Content />
-    </div>
-
-    {
-      next && next.id !== project.id && (
-        <a class="next" href={href(`/projects/${next.id}`)}>
-          <span class="label">Next project</span>
-          <span class="next-title">{next.data.title} →</span>
-        </a>
-      )
-    }
-  </article>
+    </Fragment>
+  </DetailLayout>
 </Base>
 
 <style>
-  .page {
-    padding-top: clamp(2rem, 5vw, 3.5rem);
-  }
-  .back {
-    font-size: 0.8rem;
-    text-decoration: none;
-    color: var(--ink-3);
-  }
-  header {
-    margin: clamp(2rem, 6vw, 4rem) 0 3rem;
-  }
-  header .label {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
-    margin: 0 0 1.25rem;
-  }
-  h1 {
-    font-size: clamp(3rem, 11vw, 8.5rem);
-  }
   .full {
-    margin: 1rem 0 0;
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
+    margin: 0.5rem 0 0;
   }
-  .summary {
-    max-width: 40rem;
-    font-size: clamp(1.1rem, 2vw, 1.35rem);
-    line-height: 1.45;
-    color: var(--ink-2);
-    margin: 1.75rem 0 1.5rem;
+  .lede {
+    margin: 1.25rem 0 0;
   }
-  .ownership {
+  .side-h {
+    font-size: 1.05rem;
+    margin-bottom: 0.75rem;
+  }
+  .facts {
+    margin: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-    border: 1px solid var(--line);
+    gap: 0.15rem;
   }
-  .col {
-    padding: 1.5rem;
+  .facts dt {
+    font-size: 0.85rem;
+    color: var(--bark-3);
   }
-  .col + .col {
-    border-left: 1px solid var(--line);
+  .facts dd {
+    margin: 0 0 0.6rem;
   }
-  .col .label {
-    margin: 0 0 1rem;
-  }
-  .col ul {
+  .mine ul,
+  .others ul {
     list-style: none;
     margin: 0;
     padding: 0;
     display: grid;
-    gap: 0.6rem;
-  }
-  .mine {
-    background: var(--accent-dim);
+    gap: 0.5rem;
   }
   .mine li {
-    padding-left: 1rem;
-    border-left: 2px solid var(--accent);
+    padding-left: 0.85rem;
+    border-left: 3px solid var(--pine);
     line-height: 1.35;
   }
   .others li {
-    padding-left: 1rem;
-    border-left: 2px solid var(--line-strong);
-    color: var(--ink-2);
+    padding-left: 0.85rem;
+    border-left: 3px solid var(--line);
+    color: var(--bark-2);
     line-height: 1.35;
   }
   .by {
     display: block;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    color: var(--ink-3);
-    margin-top: 0.2rem;
-  }
-  .outcome p:last-child {
-    margin: 0;
-    color: var(--ink-2);
-    line-height: 1.45;
-  }
-  .small {
-    margin: 0;
-    font-size: 0.9rem;
-  }
-  .col .badge {
-    display: inline-block;
-    margin: 0;
-  }
-  .body {
-    margin-top: 1rem;
-  }
-  .next {
-    display: grid;
-    gap: 0.5rem;
-    margin-top: 6rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--line);
-    text-decoration: none;
-  }
-  .next-title {
-    font-family: var(--font-display);
-    font-variation-settings: 'wdth' 120;
-    font-weight: 800;
-    font-size: clamp(1.8rem, 5vw, 3.5rem);
-    letter-spacing: -0.02em;
-    line-height: 1;
-  }
-  @media (max-width: 46rem) {
-    .col + .col {
-      border-left: 0;
-      border-top: 1px solid var(--line);
-    }
   }
 </style>

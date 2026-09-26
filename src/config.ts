@@ -8,22 +8,46 @@ export const site = {
   identity:
     'EE student at USC, focused on analog/mixed-signal circuits, PCB design, and quantum hardware.',
   // TODO(Peter): drop a headshot in /public (e.g. /public/headshot.jpg) and set
-  // this to 'headshot.jpg'. Until then the initials avatar is shown.
+  // this to 'headshot.jpg'. Until then a placeholder is shown.
   headshot: null as string | null,
 };
 
-export const links: { label: string; href: string | null }[] = [
-  // TODO(Peter): real URLs.
-  { label: 'LinkedIn', href: null },
-  { label: 'GitHub', href: null },
-  // TODO(Peter): use the form 'mailto:you@example.com'.
-  { label: 'Email', href: null },
+// TODO(Peter): real URLs. Email uses the form 'mailto:you@example.com'.
+export const contact = {
+  email: null as string | null,
+  linkedin: null as string | null,
+  github: null as string | null,
+};
+
+// Shown on the home page. The first four come from the brief's focus areas;
+// the last is a placeholder for things outside engineering.
+export const interests: { title: string; text: string; placeholder?: boolean }[] = [
+  {
+    title: 'Analog & mixed-signal',
+    text: 'Circuits where the math on paper has to meet the behavior on the bench.',
+  },
+  {
+    title: 'PCB design',
+    text: 'Turning a schematic into a board someone can actually build.',
+  },
+  {
+    title: 'Quantum hardware',
+    text: 'The physical side of quantum computing, and the community around it.',
+  },
+  {
+    title: 'Space systems',
+    text: 'Hardware that has to survive vibration, heat, and cold before it ever flies.',
+  },
+  {
+    title: 'Outside of engineering',
+    text: 'Hobbies and interests go here.',
+    placeholder: true,
+  },
 ];
 
-// Draft content (status: draft) is always visible in `npm run dev`.
-// Production builds hide it unless SHOW_DRAFTS=true is set.
-export const showDrafts =
-  import.meta.env.DEV || process.env.SHOW_DRAFTS === 'true';
+// Draft content (status: draft) is shown everywhere for now. Set
+// HIDE_DRAFTS=true at build time to leave drafts out.
+export const showDrafts = process.env.HIDE_DRAFTS !== 'true';
 
 /** Prefix an internal path with the configured base (e.g. /Portfolio-Repo). */
 export function href(path = '/'): string {

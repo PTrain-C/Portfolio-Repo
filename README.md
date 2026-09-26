@@ -6,9 +6,9 @@ Peter's personal site. Astro, fully static, deploys to GitHub Pages.
 
 ```sh
 npm install
-npm run dev        # http://localhost:4321/Portfolio-Repo/ (drafts visible)
-npm run build      # production build, drafts hidden
-SHOW_DRAFTS=true npm run build   # production build including drafts
+npm run dev        # http://localhost:4321/Portfolio-Repo/
+npm run build      # production build into dist/
+HIDE_DRAFTS=true npm run build   # leave out anything marked status: draft
 ```
 
 ## Where content lives
@@ -17,9 +17,10 @@ SHOW_DRAFTS=true npm run build   # production build including drafts
 | --- | --- |
 | Name, identity line, headshot, links | `src/config.ts` |
 | Projects (one file each) | `src/content/projects/*.mdx` |
-| Experience (one file each) | `src/content/experience/*.md` |
+| Experience (one file each) | `src/content/experience/*.mdx` |
 | Credentials | `src/content/credentials/*.md` |
-| Skills | `src/data/skills.ts` |
+| Skill categories (and which are "key skills" on Home) | `src/data/skills.ts` |
+| Interests | `src/config.ts` |
 | Coursework | `src/data/coursework.ts` |
 | Home bio | `src/pages/index.astro` |
 
@@ -30,7 +31,10 @@ Add a new `.mdx` file in `src/content/projects/`. Frontmatter:
 - `mine`: exactly what Peter did. Keep it literal.
 - `others`: `{ part, by }` for anything someone else owned. `by` can be a role ("A collaborator") instead of a name.
 - `outcome`: where the project ended up (e.g. "Design and fabrication only").
-- `status: draft` keeps it out of production builds. Switch to `published` when it's ready.
+- `skills`: skill ids from `src/data/skills.ts`. These show as pills on the page and link to the Skills page, which lists every place each skill was used. An unknown id fails the build.
+- `status: draft` marks it unfinished. Drafts are shown unless you build with `HIDE_DRAFTS=true`.
+
+Experience entries work the same way, with `summary`, `highlights`, and `skills`.
 
 Use `<Missing>...</Missing>` for gaps and `<Figure src="..." caption="..." />` for photos (put images in `public/`).
 
@@ -42,7 +46,8 @@ Use `<Missing>...</Missing>` for gaps and `<Figure src="..." caption="..." />` f
 
 - [ ] Full name, LinkedIn, GitHub, email (`src/config.ts`)
 - [ ] Headshot
-- [ ] Real bio (current one is a placeholder)
+- [ ] Real bio and the "Hiring for an EE role?" blurb (both placeholders)
+- [ ] Hobbies for the interests section
 - [ ] QEE role dates
 - [ ] BSPD: what it stands for, what it does, solo or team, photos
 - [ ] Notch filter: what it fed into, target frequency, bench photos, name John or keep "a collaborator"
