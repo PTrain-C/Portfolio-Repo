@@ -1,0 +1,61 @@
+---
+// Illustration of a thermal cycling profile: ramps between a hot and a cold
+// plateau with dwells. Shape only; no real limits or durations are shown.
+const W = 680;
+const H = 200;
+const cycle = (x: number) =>
+  `L${x + 40} 40 L${x + 110} 40 L${x + 170} 160 L${x + 240} 160`;
+let d = 'M20 100 L60 100';
+for (let i = 0; i < 2; i++) d += ' ' + cycle(60 + i * 240);
+d += ' L600 100 L660 100';
+---
+
+<figure class="thermal">
+  <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Illustration of a thermal cycle: hot dwell, ramp, cold dwell, repeated">
+    <line x1="20" x2="660" y1="100" y2="100" class="amb" />
+    <text x="664" y="104" class="t">ambient</text>
+    <text x="16" y="44" class="t end">hot</text>
+    <text x="16" y="164" class="t end">cold</text>
+    <path d={d} class="curve" />
+    <text x="135" y="30" class="t mid">dwell</text>
+    <text x="235" y="118" class="t mid">ramp</text>
+    <text x="275" y="182" class="t mid">dwell</text>
+  </svg>
+  <figcaption class="small quiet">Shape of a thermal cycle, for illustration only. Actual limits, rates, and cycle counts are program specific and left off.</figcaption>
+</figure>
+
+<style>
+  .thermal {
+    margin: 2rem 0 2.5rem;
+  }
+  svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    overflow: visible;
+  }
+  .amb {
+    stroke: var(--line);
+    stroke-dasharray: 4 6;
+  }
+  .curve {
+    fill: none;
+    stroke: var(--ink-accent);
+    stroke-width: 3;
+    stroke-linejoin: round;
+  }
+  .t {
+    font-family: var(--mono);
+    font-size: 12px;
+    fill: var(--bark-3);
+  }
+  .end {
+    text-anchor: end;
+  }
+  .mid {
+    text-anchor: middle;
+  }
+  figcaption {
+    margin-top: 0.5rem;
+  }
+</style>

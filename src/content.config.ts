@@ -4,6 +4,13 @@ import { z } from 'astro/zod';
 
 const status = z.enum(['draft', 'published']).default('draft');
 
+// Each entry picks a theme: it sets the hero scene and the page's accent color.
+export const themes = ['board', 'track', 'cigar', 'felt', 'hydro', 'bench', 'space', 'naval', 'quantum'] as const;
+const theme = z.enum(themes).default('board');
+const links = z.array(z.object({ label: z.string(), url: z.string() })).default([]);
+// Documents a page's claims are drawn from, listed at the bottom of the page.
+const sources = z.array(z.object({ label: z.string(), file: z.string().optional() })).default([]);
+
 // One file per project. Adding a project is adding a file here, nothing else.
 const projects = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/projects' }),
@@ -28,6 +35,17 @@ const projects = defineCollection({
     cover: z.string().optional(),
     // Generated cover art used when there is no photo.
     art: z.enum(['pcb', 'bode', 'compare', 'gpio']).default('pcb'),
+    theme,
+    // Image for the top of the project page, if different from `cover`.
+    heroImage: z.string().optional(),
+    // How the top of the page is arranged.
+    hero: z.enum(['split', 'poster', 'tall', 'scene']).default('split'),
+    // Where the "my part / skills" rail sits.
+    rail: z.enum(['right', 'left', 'top']).default('right'),
+    // Experience entry this project belongs to, if any.
+    experience: z.string().optional(),
+    links,
+    sources,
   }),
 });
 
@@ -47,6 +65,13 @@ const experience = defineCollection({
     highlights: z.array(z.string()).default([]),
     // Skill ids from src/data/skills.ts.
     skills: z.array(z.string()).default([]),
+    theme,
+    heroImage: z.string().optional(),
+    rail: z.enum(['right', 'left', 'top']).default('right'),
+    // Project pages that came out of this role.
+    projects: z.array(z.string()).default([]),
+    links,
+    sources,
   }),
 });
 

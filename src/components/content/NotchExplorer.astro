@@ -1,0 +1,263 @@
+---
+// Interactive plot of the bootstrapped twin-T notch from the EE 202L report:
+//   H(s) = (s^2 + w0^2) / (s^2 + s*w0/Q + w0^2),  Q = 1 / (4(1 - alpha))
+// Dragging alpha (the positive-feedback fraction) shows the notch narrowing
+// around 196 Hz while the neighboring open strings pass through. This is the
+// ideal model from the derivation, not a measurement.
+const F0 = 196;
+const FMIN = 60;
+const FMAX = 700;
+const W = 680;
+const H = 300;
+const PAD = { l: 44, r: 14, t: 40, b: 34 };
+const DB_MIN = -40;
+
+const xOf = (f: number) =>
+  PAD.l + ((Math.log10(f) - Math.log10(FMIN)) / (Math.log10(FMAX) - Math.log10(FMIN))) * (W - PAD.l - PAD.r);
+const yOf = (db: number) => PAD.t + (Math.max(db, DB_MIN) / DB_MIN) * (H - PAD.t - PAD.b);
+const qOf = (a: number) => 1 / (4 * (1 - a));
+const gainDb = (f: number, q: number) => {
+  const x = f / F0;
+  const num = Math.abs(1 - x * x);
+  const den = Math.sqrt((1 - x * x) ** 2 + (x / q) ** 2);
+  return 20 * Math.log10(Math.max(num / den, 1e-6));
+};
+const path = (a: number) => {
+  const q = qOf(a);
+  let d = '';
+  for (let i = 0; i <= 240; i++) {
+    const f = FMIN * Math.pow(FMAX / FMIN, i / 240);
+    d += `${i ? 'L' : 'M'}${xOf(f).toFixed(1)} ${yOf(gainDb(f, q)).toFixed(1)}`;
+  }
+  return d;
+};
+
+const ALPHA0 = 0;
+const strings = [
+  { n: 'E2', f: 82.41 },
+  { n: 'A2', f: 110 },
+  { n: 'D3', f: 146.83 },
+  { n: 'G3', f: 196 },
+  { n: 'B3', f: 246.94 },
+  { n: 'E4', f: 329.63 },
+];
+const gridF = [60, 100, 200, 300, 500];
+const gridDb = [0, -10, -20, -30, -40];
+const fmt = (n: number) => n.toFixed(1);
+---
+
+<figure class="notch" data-notch data-f0={F0} data-fmin={FMIN} data-fmax={FMAX} data-w={W} data-h={H} data-pad={JSON.stringify(PAD)}>
+  <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Magnitude response of the notch filter model">
+    {
+      gridDb.map((db) => (
+        <g>
+          <line x1={PAD.l} x2={W - PAD.r} y1={yOf(db)} y2={yOf(db)} class="grid" />
+          <text x={PAD.l - 8} y={yOf(db) + 4} class="axis end">
+            {db}
+          </text>
+        </g>
+      ))
+    }
+    {
+      gridF.map((f) => (
+        <text x={xOf(f)} y={H - 10} class="axis mid">
+          {f}
+        </text>
+      ))
+    }
+    <text x={W - PAD.r} y={H - 10} class="axis end unit">700 Hz</text>
+    <text x={PAD.l - 8} y={PAD.t - 16} class="axis end unit">dB</text>
+    <line x1={PAD.l} x2={W - PAD.r} y1={yOf(-3)} y2={yOf(-3)} class="minus3" />
+    {
+      strings.map((s) => (
+        <g class:list={['string', { target: s.n === 'G3' }]}>
+          <line x1={xOf(s.f)} x2={xOf(s.f)} y1={PAD.t - 6} y2={H - PAD.b} />
+          <text x={xOf(s.f)} y={PAD.t - 12} class="mid">
+            {s.n}
+          </text>
+        </g>
+      ))
+    }
+    <path d={path(ALPHA0)} class="curve" data-curve />
+  </svg>
+
+  <div class="controls">
+    <label>
+      <span>
+        Feedback fraction <em>&alpha;</em> = <output data-out="alpha">{ALPHA0.toFixed(2)}</output>
+      </span>
+      <input type="range" min="0" max="0.95" step="0.01" value={ALPHA0} data-notch-alpha />
+    </label>
+    <dl>
+      <div>
+        <dt>Q</dt>
+        <dd data-out="q">{qOf(ALPHA0).toFixed(2)}</dd>
+      </div>
+      <div>
+        <dt>Stopband width</dt>
+        <dd><span data-out="bw">{(F0 / qOf(ALPHA0)).toFixed(0)}</span> Hz</dd>
+      </div>
+      <div>
+        <dt>D3 (147 Hz)</dt>
+        <dd><span data-out="d3">{fmt(gainDb(146.83, qOf(ALPHA0)))}</span> dB</dd>
+      </div>
+      <div>
+        <dt>B3 (247 Hz)</dt>
+        <dd><span data-out="b3">{fmt(gainDb(246.94, qOf(ALPHA0)))}</span> dB</dd>
+      </div>
+    </dl>
+  </div>
+  <figcaption class="small quiet">
+    Ideal model from the derivation above, not a bench measurement. At &alpha; = 0 the passive twin-T also
+    eats the neighboring strings; feeding back part of the output narrows the notch without moving it.
+  </figcaption>
+</figure>
+
+<script>
+  function update(input: HTMLInputElement) {
+    const root = input.closest<HTMLElement>('[data-notch]')!;
+    const f0 = Number(root.dataset.f0);
+    const fmin = Number(root.dataset.fmin);
+    const fmax = Number(root.dataset.fmax);
+    const w = Number(root.dataset.w);
+    const h = Number(root.dataset.h);
+    const pad = JSON.parse(root.dataset.pad!);
+    const a = Number(input.value);
+    const q = 1 / (4 * (1 - a));
+    const gain = (f: number) => {
+      const x = f / f0;
+      const num = Math.abs(1 - x * x);
+      const den = Math.sqrt((1 - x * x) ** 2 + (x / q) ** 2);
+      return 20 * Math.log10(Math.max(num / den, 1e-6));
+    };
+    const xOf = (f: number) =>
+      pad.l + ((Math.log10(f) - Math.log10(fmin)) / (Math.log10(fmax) - Math.log10(fmin))) * (w - pad.l - pad.r);
+    const yOf = (db: number) => pad.t + (Math.max(db, -40) / -40) * (h - pad.t - pad.b);
+    let d = '';
+    for (let i = 0; i <= 240; i++) {
+      const f = fmin * Math.pow(fmax / fmin, i / 240);
+      d += `${i ? 'L' : 'M'}${xOf(f).toFixed(1)} ${yOf(gain(f)).toFixed(1)}`;
+    }
+    root.querySelector('[data-curve]')!.setAttribute('d', d);
+    const set = (k: string, v: string) => (root.querySelector(`[data-out="${k}"]`)!.textContent = v);
+    set('alpha', a.toFixed(2));
+    set('q', q.toFixed(2));
+    set('bw', (f0 / q).toFixed(0));
+    set('d3', gain(146.83).toFixed(1));
+    set('b3', gain(246.94).toFixed(1));
+  }
+  document.addEventListener('input', (e) => {
+    const t = e.target as HTMLInputElement;
+    if (t.matches?.('[data-notch-alpha]')) update(t);
+  });
+</script>
+
+<style>
+  .notch {
+    margin: 2.25rem 0 2.75rem;
+    padding: 1.4rem 1.4rem 1.1rem;
+    border-radius: 1.1rem;
+    background: var(--scene);
+    color: var(--silk);
+  }
+  svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .grid {
+    stroke: var(--silk);
+    stroke-opacity: 0.1;
+  }
+  .axis {
+    font-family: var(--mono);
+    font-size: 11px;
+    fill: var(--silk-2);
+  }
+  .end {
+    text-anchor: end;
+  }
+  .mid {
+    text-anchor: middle;
+  }
+  .unit {
+    fill-opacity: 0.7;
+  }
+  .minus3 {
+    stroke: var(--accent);
+    stroke-opacity: 0.35;
+    stroke-dasharray: 3 5;
+  }
+  .string line {
+    stroke: var(--silk);
+    stroke-opacity: 0.18;
+    stroke-dasharray: 2 4;
+  }
+  .string text {
+    font-family: var(--mono);
+    font-size: 11px;
+    fill: var(--silk-2);
+  }
+  .string.target line {
+    stroke: var(--accent);
+    stroke-opacity: 0.6;
+  }
+  .string.target text {
+    fill: var(--accent);
+  }
+  .curve {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+  }
+  .controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem 2rem;
+    align-items: end;
+    margin-top: 0.8rem;
+  }
+  label {
+    display: grid;
+    gap: 0.45rem;
+    font-size: 0.9rem;
+    color: var(--silk-2);
+  }
+  output {
+    font-family: var(--mono);
+    color: var(--silk);
+  }
+  input[type='range'] {
+    width: 100%;
+    accent-color: var(--accent);
+  }
+  dl {
+    display: flex;
+    gap: 1.4rem;
+    margin: 0;
+  }
+  dt {
+    font-size: 0.72rem;
+    color: var(--silk-2);
+  }
+  dd {
+    margin: 0.1rem 0 0;
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    color: var(--silk);
+    white-space: nowrap;
+  }
+  figcaption {
+    margin-top: 0.9rem;
+    color: var(--silk-2);
+  }
+  @media (max-width: 44rem) {
+    .controls {
+      grid-template-columns: 1fr;
+    }
+    dl {
+      flex-wrap: wrap;
+    }
+  }
+</style>

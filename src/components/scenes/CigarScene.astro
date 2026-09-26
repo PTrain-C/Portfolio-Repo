@@ -1,0 +1,87 @@
+---
+// Cigar-box guitar: wood grain across the whole band, six strings running
+// diagonally on the right, and the open G string (the one the notch filter
+// targets) vibrating.
+import { rng } from '../../lib/art';
+
+const rand = rng(196);
+const grain = Array.from({ length: 16 }, (_, i) => {
+  const y = 20 + i * 46 + rand() * 20;
+  const a = 6 + rand() * 14;
+  const k = 180 + rand() * 220;
+  let d = `M-20 ${y.toFixed(1)}`;
+  for (let x = 0; x <= 1640; x += 40) d += ` L${x} ${(y + Math.sin(x / k + i) * a).toFixed(1)}`;
+  return { d, o: (0.05 + rand() * 0.07).toFixed(3) };
+});
+
+const strings = ['E2', 'A2', 'D3', 'G3', 'B3', 'E4'];
+// Strings run from (x0, y) to (x1, y + 120); the G string gets a standing wave.
+const x0 = 1010;
+const x1 = 1640;
+const wave = (amp: number) => {
+  let d = '';
+  for (let i = 0; i <= 40; i++) {
+    const t = i / 40;
+    const x = x0 + (x1 - x0) * t;
+    const y = 50 * t + Math.sin(Math.PI * t) * amp;
+    d += `${i ? ' L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`;
+  }
+  return d;
+};
+---
+
+<svg class="scene" viewBox="0 0 1600 720" preserveAspectRatio="xMaxYMid slice" aria-hidden="true">
+  {grain.map((g) => <path d={g.d} fill="none" stroke="var(--accent)" stroke-opacity={g.o} stroke-width="2" />)}
+
+  <g transform="translate(0 120)">
+    <!-- nut / bridge -->
+    <path d="M1024 -24 L1004 214" stroke="var(--accent-soft)" stroke-opacity="0.5" stroke-width="10" stroke-linecap="round" />
+    {
+      strings.map((name, i) => (
+        <g transform={`translate(0 ${i * 36})`}>
+          {name === 'G3' ? (
+            <>
+              <path class="g-glow" d={wave(0)} fill="none" stroke="var(--accent)" stroke-width="8" stroke-opacity="0.25">
+                <animate attributeName="d" dur="0.24s" repeatCount="indefinite" values={`${wave(9)};${wave(-9)};${wave(9)}`} />
+              </path>
+              <path d={wave(0)} fill="none" stroke="var(--accent)" stroke-width="2.5">
+                <animate attributeName="d" dur="0.24s" repeatCount="indefinite" values={`${wave(9)};${wave(-9)};${wave(9)}`} />
+              </path>
+            </>
+          ) : (
+            <path d={wave(0)} fill="none" stroke="var(--silk)" stroke-opacity="0.35" stroke-width={2.6 - i * 0.3} />
+          )}
+          <text x="990" y="5" class:list={['lbl', { on: name === 'G3' }]}>{name}</text>
+        </g>
+      ))
+    }
+    <text x="1560" y="-30" class="note" text-anchor="end">open G, 196 Hz</text>
+  </g>
+</svg>
+
+<style>
+  .scene {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .lbl {
+    font-family: var(--mono);
+    font-size: 15px;
+    fill: var(--silk);
+    fill-opacity: 0.45;
+    text-anchor: end;
+  }
+  .lbl.on {
+    fill: var(--accent);
+    fill-opacity: 1;
+  }
+  .note {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 34px;
+    fill: var(--accent);
+  }
+</style>

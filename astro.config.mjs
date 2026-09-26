@@ -1,6 +1,8 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 
 // GitHub Pages serves this repo at https://ptrain-c.github.io/Portfolio-Repo/.
 // If the site moves to a custom domain, Vercel, or Netlify, set `site` to the
@@ -16,4 +18,9 @@ export default defineConfig({
   outDir: preview ? './dist-preview' : './dist',
   build: { format: preview ? 'file' : 'directory' },
   integrations: [mdx()],
+  markdown: {
+    remarkPlugins: [remarkMath],
+    rehypePlugins: [[rehypeKatex, { output: 'html' }]],
+    shikiConfig: { theme: 'github-dark-dimmed' },
+  },
 });

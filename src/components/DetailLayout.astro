@@ -1,7 +1,7 @@
 ---
 // Body of project and experience pages (the PageHero sits above it): long
-// form content on the left, an "at a glance" rail on the right, and links to
-// the previous and next entries.
+// form content plus an "at a glance" rail, and links to the previous and next
+// entries. `rail` puts the rail on the right, the left, or as a strip on top.
 import { href } from '../config';
 
 interface Neighbor {
@@ -11,19 +11,21 @@ interface Neighbor {
 interface Props {
   prev?: Neighbor;
   next?: Neighbor;
+  rail?: 'right' | 'left' | 'top';
 }
-const { prev, next } = Astro.props;
+const { prev, next, rail = 'right' } = Astro.props;
 ---
 
-<div class="wrap body">
+<div class:list={['wrap', 'body', `rail-${rail}`]}>
   <div class="columns">
-    <div class="main">
-      <slot />
-    </div>
     <aside class="side">
       <slot name="side" />
     </aside>
+    <div class="main">
+      <slot />
+    </div>
   </div>
+  <slot name="after" />
   {
     (prev || next) && (
       <nav class="pager" aria-label="More">
@@ -52,17 +54,51 @@ const { prev, next } = Astro.props;
   }
   .columns {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 20rem;
     gap: 5rem;
     align-items: start;
   }
-  .side {
+  .rail-right .columns {
+    grid-template-columns: minmax(0, 1fr) 20rem;
+  }
+  .rail-right .side {
+    grid-column: 2;
+    grid-row: 1;
+    padding-left: 2rem;
+    border-left: 2px solid var(--accent);
+  }
+  .rail-right .main {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .rail-left .columns {
+    grid-template-columns: 17rem minmax(0, 1fr);
+  }
+  .rail-left .side {
+    padding-right: 2rem;
+    border-right: 2px solid var(--accent);
+  }
+  .rail-right .side,
+  .rail-left .side {
     position: sticky;
     top: 6.5rem;
     display: grid;
     gap: 2rem;
-    padding-left: 2rem;
-    border-left: 2px solid var(--gold);
+  }
+  .rail-top .columns {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3.5rem;
+  }
+  .rail-top .side {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
+    gap: 2rem 3rem;
+    padding: 1.75rem 2rem;
+    border-radius: 1.25rem;
+    background: var(--linen-2);
+    border-top: 3px solid var(--accent);
+  }
+  .rail-top .main :global(.prose) {
+    max-width: 46rem;
   }
   .side :global(h2) {
     font-size: 0.95rem;
@@ -84,7 +120,7 @@ const { prev, next } = Astro.props;
     text-decoration: none;
   }
   .pager a:hover {
-    color: var(--pine);
+    color: var(--ink-accent);
   }
   .pager .display {
     font-size: 2.2rem;
@@ -93,13 +129,22 @@ const { prev, next } = Astro.props;
     text-align: right;
   }
   @media (max-width: 60rem) {
-    .columns {
-      grid-template-columns: 1fr;
+    .rail-right .columns,
+    .rail-left .columns {
+      grid-template-columns: minmax(0, 1fr);
       gap: 2.5rem;
     }
-    .side {
+    .rail-right .side,
+    .rail-left .side {
       position: static;
-      order: -1;
+      grid-column: auto;
+      grid-row: auto;
+      border: 0;
+      padding: 0;
+    }
+    .rail-right .main {
+      grid-column: auto;
+      grid-row: auto;
     }
   }
 </style>

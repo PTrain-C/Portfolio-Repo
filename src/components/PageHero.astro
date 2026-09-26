@@ -1,25 +1,41 @@
 ---
-// Dark board band at the top of every inner page. Default slot is the title
-// block; the optional "aside" slot sits on the right (e.g. project art).
-import BoardField from './art/BoardField.astro';
+// Dark band at the top of every inner page. The background is the page's
+// theme scene. `layout` arranges the title block against the optional image:
+//   split  - text left, framed image right
+//   poster - image fills the right side and fades into the band
+//   tall   - portrait image that hangs below the band into the page
+//   scene  - no image; the scene itself is the picture
+import Scene from './scenes/Scene.astro';
 import { href } from '../config';
 
 interface Props {
   back?: { label: string; path: string };
   seed?: number;
+  theme?: string;
+  layout?: 'split' | 'poster' | 'tall' | 'scene';
+  image?: string;
+  imageAlt?: string;
 }
-const { back, seed = 3 } = Astro.props;
-const hasAside = Astro.slots.has('aside');
+const { back, seed = 3, theme = 'board', layout = 'split', image, imageAlt = '' } = Astro.props;
+const hasAside = Astro.slots.has('aside') || !!image;
+const mode = layout === 'scene' || !hasAside ? 'scene' : layout;
 ---
 
-<section class="page-hero">
-  <BoardField seed={seed} opacity={0.16} />
-  <div class:list={['wrap', 'inner', { split: hasAside }]}>
-    <div class="text">
+<section class:list={['page-hero', `mode-${mode}`]} data-theme={theme}>
+  {mode === 'poster' && image && <img class="poster" src={href(`/${image}`)} alt={imageAlt} />}
+  {mode !== 'poster' && <Scene theme={theme} seed={seed} />}
+  <div class="wrap inner">
+    <div class="text rise">
       {back && <a class="back small" href={href(back.path)}>Back to {back.label}</a>}
       <slot />
     </div>
-    {hasAside && <div class="aside"><slot name="aside" /></div>}
+    {
+      (mode === 'split' || mode === 'tall') && (
+        <div class="aside rise" style="--d:2">
+          {image ? <img src={href(`/${image}`)} alt={imageAlt} /> : <slot name="aside" />}
+        </div>
+      )
+    }
   </div>
 </section>
 
@@ -27,7 +43,7 @@ const hasAside = Astro.slots.has('aside');
   .page-hero {
     position: relative;
     overflow: hidden;
-    background: var(--mask);
+    background: var(--scene);
     color: var(--silk);
   }
   .inner {
@@ -35,19 +51,90 @@ const hasAside = Astro.slots.has('aside');
     padding-top: 8rem;
     padding-bottom: 3.5rem;
   }
-  .split {
+  .mode-split .inner,
+  .mode-tall .inner {
     display: grid;
     grid-template-columns: 1.1fr 1fr;
     gap: 4rem;
     align-items: end;
   }
+  .mode-scene .inner {
+    min-height: 34rem;
+    display: flex;
+    align-items: flex-end;
+  }
+  .mode-scene .text {
+    max-width: 38rem;
+  }
+  .mode-scene::after,
+  .mode-split::after {
+    /* Keep the left side readable over busy scenes. */
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, var(--scene) 30%, transparent 70%);
+    pointer-events: none;
+  }
+  .mode-scene .inner,
+  .mode-split .inner,
+  .mode-tall .inner {
+    z-index: 1;
+  }
+
+  .mode-poster .inner {
+    min-height: 36rem;
+    display: flex;
+    align-items: flex-end;
+  }
+  .mode-poster .text {
+    position: relative;
+    max-width: 33rem;
+  }
+  .mode-poster::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, var(--scene) 38%, color-mix(in oklab, var(--scene) 55%, transparent) 55%, transparent 80%);
+    pointer-events: none;
+  }
+  .mode-poster .inner {
+    z-index: 1;
+  }
+  .poster {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 58%;
+    object-fit: cover;
+    object-position: center;
+    mask-image: linear-gradient(90deg, transparent, #000 38%);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 38%);
+  }
+
+  .mode-tall {
+    overflow: visible;
+    margin-bottom: 9rem;
+  }
+  .mode-tall .aside {
+    justify-self: end;
+    width: min(100%, 26rem);
+    aspect-ratio: 4 / 5;
+    margin-bottom: -12.5rem;
+    transform: rotate(1.5deg);
+    border: 0.6rem solid #f6f0e0;
+    border-bottom-width: 2.4rem;
+    border-radius: 0.3rem;
+  }
+
   .back {
-    display: inline-block;
+    display: block;
+    width: fit-content;
     margin-bottom: 1.5rem;
-    color: var(--gold);
+    color: var(--accent);
   }
   .back:hover {
-    color: var(--gold-soft);
+    color: var(--accent-soft);
   }
   .text :global(h1) {
     font-family: var(--display);
@@ -63,14 +150,35 @@ const hasAside = Astro.slots.has('aside');
     margin: 1.25rem 0 0;
   }
   .aside {
+    position: relative;
     border-radius: 1.25rem;
     overflow: hidden;
     aspect-ratio: 800 / 520;
     box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.6);
+    background: var(--scene-deep);
+  }
+  .aside img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   @media (max-width: 56rem) {
-    .split {
+    .mode-split .inner,
+    .mode-tall .inner {
       grid-template-columns: 1fr;
+    }
+    .mode-tall {
+      margin-bottom: 0;
+    }
+    .mode-tall .aside {
+      margin-bottom: 0;
+      justify-self: start;
+    }
+    .poster {
+      width: 100%;
+      opacity: 0.35;
+      mask-image: none;
+      -webkit-mask-image: none;
     }
   }
 </style>

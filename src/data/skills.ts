@@ -38,6 +38,8 @@ export const categories: SkillCategory[] = [
       { id: 'filter-design', name: 'Filter design', featured: true },
       { id: 'component-selection', name: 'Component selection' },
       { id: 'ltspice', name: 'LTSpice simulation', featured: true },
+      { id: 'op-amps', name: 'Op-amp circuits', featured: true },
+      { id: 'comparator-logic', name: 'Comparator and latch logic' },
     ],
   },
   {
@@ -49,6 +51,8 @@ export const categories: SkillCategory[] = [
       { id: 'soldering', name: 'Hand-soldering', featured: true },
       { id: 'bench-tuning', name: 'Bench tuning' },
       { id: 'design-verification', name: 'Design verification' },
+      { id: 'oscilloscope', name: 'Oscilloscope measurement' },
+      { id: 'breadboarding', name: 'Breadboard prototyping' },
     ],
   },
   {
@@ -84,6 +88,7 @@ export const categories: SkillCategory[] = [
     skills: [
       { id: 'python', name: 'Python', featured: true },
       { id: 'c-cpp', name: 'C/C++', featured: true },
+      { id: 'data-analysis', name: 'Data analysis' },
       { id: 'matlab', name: 'MATLAB', featured: true },
       { id: 'systemverilog', name: 'SystemVerilog', note: 'self-study, HDLBits' },
     ],
@@ -95,6 +100,8 @@ export const categories: SkillCategory[] = [
     tone: 'rose',
     skills: [
       { id: 'raspberry-pi', name: 'Raspberry Pi' },
+      { id: 'arduino', name: 'Arduino', featured: true },
+      { id: 'closed-loop-control', name: 'Closed-loop control' },
       { id: 'mqtt', name: 'MQTT' },
       { id: 'i2c', name: 'I2C' },
       { id: 'spi', name: 'SPI' },

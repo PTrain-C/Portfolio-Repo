@@ -1,51 +1,97 @@
 ---
-title: Notch filter
-summary: A notch filter with more than 20 dB of attenuation at the notch in LTSpice simulation.
+title: Corrupted Chord
+fullName: Active notch filter in a cigar-box guitar, EE 202L final project
+summary: An active twin-T notch filter, built into a cigar-box electric guitar, that cuts the 196 Hz fundamental of the open G string and leaves the strings next to it alone.
 period: Aug 2025 to Dec 2025
-order: 2
+order: 3
 status: draft
+theme: cigar
+hero: tall
+heroImage: img/notch/box-led.webp
+cover: img/notch/cover.webp
+rail: left
 art: bode
 team: team
 mine:
-  - Transfer function derivation (nodal analysis)
-  - Component selection
-  - Hand-soldering
-  - Bench tuning
+  - Hand-soldering the filter PCB
+  - Bench testing on the scope
+  - Wiring the blue box (9 V battery, filter board, and jacks)
+  - Transfer function derivation, with John
+  - Component selection, with John
+  - Tuning the pots against the target, with John
 others:
-  # TODO(Peter): name John here, or keep it as "A collaborator".
-  - part: KiCAD schematic and layout
-    by: A collaborator
-outcome: Built and bench-tuned. Over 20 dB of attenuation at the notch in LTSpice.
-# KiCAD is left out on purpose: the schematic and layout were the collaborator's.
-# TODO(Peter): add ltspice if you ran the simulation yourself.
-skills: [nodal-analysis, transfer-functions, filter-design, component-selection, soldering, bench-tuning]
+  - part: KiCAD schematic and PCB layout
+    by: John Peng
+  - part: Hot-plate soldering and the woodwork
+    by: John Peng
+outcome: Built into the guitar and tuned on the bench. Over 20 dB of attenuation at the notch in LTSpice.
+# KiCAD is left out on purpose: the schematic and layout were John's.
+skills: [nodal-analysis, transfer-functions, filter-design, op-amps, component-selection, soldering, bench-tuning, oscilloscope, breadboarding]
+sources:
+  - label: 'EE 202L final project report, "Corrupted Chord" (Dec 12, 2025), including the team split of the work'
+  - label: EE 202L Lab 6 report, Rauch band-pass filter (measured sweep and error table)
+  - label: Build photos and scope capture from bench testing
 ---
-import Missing from '../../components/Missing.astro';
+import NotchExplorer from '../../components/content/NotchExplorer.astro';
+import MeasuredBode from '../../components/content/MeasuredBode.astro';
+import Pair from '../../components/content/Pair.astro';
 import Figure from '../../components/Figure.astro';
 
 {/*
   ATTRIBUTION RULES (firm):
-  - Peter: transfer function (nodal analysis), component selection, hand-soldering, bench tuning.
-  - Collaborator: KiCAD schematic and layout. Never attribute schematic/layout to Peter.
+  - Peter: hand-soldering, testing, wiring of the blue box. Shared with John: calculations,
+    component selection, tuning. John: schematic, PCB layout, hot-plate soldering, woodwork.
+  - Never attribute schematic/layout to Peter.
   - The >20 dB figure is from LTSpice. Do not describe it as a bench measurement.
 */}
 
 ## What it is
 
-<Missing>
-What the filter was for (what system it fed into) and the target notch frequency.
-</Missing>
+John and I built a cigar-box electric guitar and hid an active notch filter inside it. The filter's job is to take out one note, the open G string at 196 Hz, while the D and B strings on either side still come through. It's a twin-T band-stop with positive feedback added, which is what lets the notch be narrow instead of swallowing half the neck.
 
-## How it came together
+## The math
 
-I derived the transfer function with nodal analysis and used it to pick component values. A collaborator did the KiCAD schematic and board layout. Once the board was in hand, I hand-soldered it and tuned it on the bench.
+We started from the passive twin-T and wrote KCL at the three nodes: $V_1$ between the two $R$'s and the $2C$, $V_2$ between the two $C$'s and the $R/2$, and the output. Solving those together gives
 
-## Results
+$$
+\frac{V_{out}}{V_{in}} = \frac{s^2 + \frac{1}{(RC)^2}}{s^2 + s\,\frac{4}{RC} + \frac{1}{(RC)^2}}
+$$
 
-In LTSpice, the design gives more than 20 dB of attenuation at the notch.
+Matching that to the standard notch form $K\frac{s^2 + \omega_0^2}{s^2 + s\,\omega_0/Q + \omega_0^2}$ gives $\omega_0 = 1/RC$, $K = 1$, and $Q = 1/4$. A $Q$ of a quarter is a very wide notch. On its own it would cut the D and B strings almost as much as the G.
 
-<Missing>
-Target frequency, and any bench numbers you want to show (only if actually measured).
-</Missing>
+The fix is to stop tying the bottom of the T to ground and drive it from a fraction of the output instead, $V_x = \alpha V_{out}$ with $\alpha < 1$. Redoing the same three KCL equations with that one change gives
 
-<Figure caption="Bench setup" />
+$$
+\frac{V_{out}}{V_{in}} = \frac{s^2 + \frac{1}{(RC)^2}}{s^2 + s\,\frac{4(1-\alpha)}{RC} + \frac{1}{(RC)^2}}
+\quad\Rightarrow\quad
+Q = \frac{1}{4(1-\alpha)}
+$$
+
+The constant term didn't change, so $\omega_0$ stays at $1/RC$ and the notch doesn't move. Only $Q$ goes up, by a factor of $1/(1-\alpha)$. Drag the slider to see what that does to the six strings.
+
+<NotchExplorer />
+
+## Building it
+
+Component values had to come from a restricted parts list, so we checked each pick against the hand calculations and the LTSpice model before anything went on the board. John did the schematic and board layout in KiCAD and the hot-plate soldering. I hand-soldered the rest, and wired the blue box: the 9 V battery, the filter board, and the jacks, all sitting in the cigar box around the neck.
+
+<Pair offset>
+  <Figure src="img/notch/box-led.webp" ratio="4 / 5" frame="print" tilt={-1.5} caption="The finished box, powered up, with the LED lit." alt="Cigar-box guitar body with wiring and a lit green LED" />
+  <Figure src="img/notch/box-inside.webp" ratio="4 / 5" frame="print" tilt={1.2} caption="Inside: the blue enclosure holds the 9 V battery and the filter board." alt="Top view inside the cigar box showing the blue enclosure, battery, and filter board" />
+</Pair>
+
+Two things cost us time. Some values were mislabeled in KiCAD, so matching parts to footprints was slower than it should have been. And during testing we found a bad joint on the 9 V input. If I'd checked each connection as I soldered it, I would have caught that in a minute instead of chasing it on the bench.
+
+## Tuning on the bench
+
+In simulation the design gave more than 20 dB of attenuation at the notch. On the real board, some of the lower frequencies weren't being cut as much as they should have been. The potentiometers were slightly off the target values, so we nudged them up until the response lined up with the design. After that the filter and gain stages did what they were supposed to.
+
+<Figure src="img/notch/scope.webp" ratio="1080 / 484" caption="Bench testing on the Keysight InfiniiVision scope, channels 1 and 2." alt="Oscilloscope showing a yellow sine trace on channel 1 and a smaller green trace on channel 2" />
+
+## Before this: a band-pass lab
+
+Earlier in the same class we built a Rauch active band-pass filter on an LM741, aimed at $f_0 = 1$ kHz, $Q = 5$, and $|K| = 2$ with 10 nF caps. I built the breadboard circuit and logged the sweep; John did most of the data analysis. The measured Q came in 8% low, which we put down to part tolerances, since Q in that topology is sensitive to the feedback resistor. That's a big part of why we planned on bench tuning for the notch from the start.
+
+<MeasuredBode />
+
+<Figure src="img/notch/lab6-notebook.webp" ratio="auto" fit="contain" frame="print" tilt={-0.8} caption="Start of the band-pass derivation from the Lab 6 notebook: KCL with the ideal op-amp assumptions." alt="Handwritten derivation of the band-pass filter transfer function" />

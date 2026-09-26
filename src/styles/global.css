@@ -344,3 +344,145 @@ a.pill:hover::before {
     scroll-behavior: auto;
   }
 }
+
+/* ---- Page themes --------------------------------------------------------
+   Each project and role picks a theme. --scene / --scene-deep color its hero,
+   --accent is the bright color used on the dark hero, --ink-accent is the
+   readable version of the same hue on linen. */
+
+[data-theme] {
+  --scene: var(--mask);
+  --scene-deep: var(--mask-deep);
+  --accent: var(--gold);
+  --accent-soft: var(--gold-soft);
+  --ink-accent: var(--pine);
+}
+[data-theme='track'] {
+  --scene: #2b1d1b;
+  --scene-deep: #1c1312;
+  --accent: #e8664a;
+  --accent-soft: #f4a58f;
+  --ink-accent: #a63d27;
+}
+[data-theme='cigar'] {
+  --scene: #33241a;
+  --scene-deep: #231810;
+  --accent: #eab15a;
+  --accent-soft: #f5d59c;
+  --ink-accent: #8c5a14;
+}
+[data-theme='felt'] {
+  --scene: #1d4a36;
+  --scene-deep: #133426;
+  --accent: #efe5cc;
+  --accent-soft: #ffffff;
+  --ink-accent: #9b3440;
+}
+[data-theme='hydro'] {
+  --scene: #133d43;
+  --scene-deep: #0c2a2f;
+  --accent: #82d6c4;
+  --accent-soft: #c3eee4;
+  --ink-accent: #1f6a68;
+}
+[data-theme='bench'] {
+  --scene: #1f2528;
+  --scene-deep: #151a1c;
+  --accent: #a6dc6f;
+  --accent-soft: #d3f0b2;
+  --ink-accent: #4b7424;
+}
+[data-theme='space'] {
+  --scene: #141c30;
+  --scene-deep: #0c1221;
+  --accent: #e6b653;
+  --accent-soft: #f4dba2;
+  --ink-accent: #3d5f86;
+}
+[data-theme='naval'] {
+  --scene: #17272e;
+  --scene-deep: #0f1b20;
+  --accent: #7fdc98;
+  --accent-soft: #c0f0cc;
+  --ink-accent: #2b6541;
+}
+[data-theme='quantum'] {
+  --scene: #221f3d;
+  --scene-deep: #16142a;
+  --accent: #b9abf5;
+  --accent-soft: #dcd4fb;
+  --ink-accent: #53478a;
+}
+
+/* ---- Prose extras: tables, math, code ------------------------------------ */
+
+.prose table {
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0 2rem;
+  font-size: 0.93rem;
+}
+.prose th,
+.prose td {
+  text-align: left;
+  padding: 0.55rem 0.8rem 0.55rem 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--bark-2);
+}
+.prose th {
+  font-weight: 600;
+  color: var(--bark);
+  border-bottom: 1.5px solid var(--bark-3);
+}
+.prose td code,
+.prose p code,
+.prose li code {
+  font-family: var(--mono);
+  font-size: 0.86em;
+  padding: 0.1em 0.35em;
+  border-radius: 0.3em;
+  background: var(--linen-2);
+  color: var(--bark);
+}
+.prose h3 {
+  font-size: 1.1rem;
+  margin: 2rem 0 0.5rem;
+}
+.prose ul,
+.prose ol {
+  padding-left: 1.2rem;
+  margin: 0 0 1.2em;
+}
+.prose li {
+  margin-bottom: 0.35em;
+}
+.prose strong {
+  color: var(--bark);
+  font-weight: 620;
+}
+.prose .katex-display {
+  margin: 1.4rem 0;
+  padding: 1rem 1.2rem;
+  border-left: 2px solid var(--ink-accent, var(--pine));
+  background: color-mix(in oklab, var(--linen-2) 70%, transparent);
+  border-radius: 0 0.6rem 0.6rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.prose .katex {
+  font-size: 1.08em;
+  color: var(--bark);
+}
+.prose pre.astro-code {
+  margin: 1.5rem 0 2rem;
+  padding: 1.1rem 1.25rem;
+  border-radius: 0.8rem;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  overflow-x: auto;
+}
+.prose pre.astro-code code {
+  font-family: var(--mono);
+}

@@ -1,17 +1,23 @@
 ---
 // Photo slot. Without `src` it renders an empty frame so layout can be judged
 // before real photos exist. `src` is a path inside /public.
+//   frame: 'plain' (rounded) or 'print' (white border, slight tilt)
+//   ratio: CSS aspect ratio; 'auto' keeps the image's own shape
 import { href } from '../config';
 
 interface Props {
   src?: string;
   alt?: string;
   caption?: string;
+  ratio?: string;
+  frame?: 'plain' | 'print';
+  tilt?: number;
+  fit?: 'cover' | 'contain';
 }
-const { src, alt = '', caption } = Astro.props;
+const { src, alt = '', caption, ratio = '16 / 10', frame = 'plain', tilt = 0, fit = 'cover' } = Astro.props;
 ---
 
-<figure>
+<figure class:list={[frame]} style={`--ratio:${ratio};--tilt:${tilt}deg;--fit:${fit}`}>
   {
     src ? (
       <img src={href(`/${src}`)} alt={alt} loading="lazy" />
@@ -31,9 +37,23 @@ const { src, alt = '', caption } = Astro.props;
   img,
   .empty {
     width: 100%;
-    aspect-ratio: 16 / 10;
-    object-fit: cover;
+    aspect-ratio: var(--ratio);
+    object-fit: var(--fit);
     border-radius: 1rem;
+    background: var(--scene-deep);
+  }
+  .print {
+    padding: 0.6rem 0.6rem 0.2rem;
+    background: #fbf8ef;
+    border-radius: 0.3rem;
+    box-shadow: 0 18px 40px -22px rgb(0 0 0 / 0.45);
+    transform: rotate(var(--tilt));
+  }
+  .print img {
+    border-radius: 0.15rem;
+  }
+  .print figcaption {
+    padding: 0.55rem 0.2rem 0.5rem;
   }
   .empty {
     display: grid;

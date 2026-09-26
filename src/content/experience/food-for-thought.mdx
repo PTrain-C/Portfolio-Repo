@@ -1,0 +1,53 @@
+---
+org: Food for Thought Foundation
+# TODO(Peter): your actual title.
+role: Engineering Intern
+unit: Farms for Thought
+# TODO(Peter): location and start/end dates.
+order: 4
+summary: Internship at a nonprofit, building the firmware for a hydroponic grow system that keeps its own nutrient and pH levels in range.
+highlights:
+  - Wrote the Arduino firmware that runs the system's pH and EC control loop, grow lights, and pumps
+  - Brought up seven Atlas Scientific sensors and dosing pumps on a single I2C bus
+  - Found and fixed an intermittent I2C read bug that was corrupting sensor readings
+  - Checked the custom PCB against the breadboard build to confirm they matched electrically
+skills: [arduino, c-cpp, i2c, closed-loop-control, design-verification]
+theme: hydro
+rail: left
+projects: [hydroponics]
+sources:
+  - label: FFT 2026 firmware and README
+---
+import Stats from '../../components/content/Stats.astro';
+import Figure from '../../components/Figure.astro';
+import Pair from '../../components/content/Pair.astro';
+import Missing from '../../components/Missing.astro';
+
+{/*
+  ATTRIBUTION RULES (firm):
+  - PCB work is verification only. No design or layout claims.
+  - Firmware is Arduino. Never call it bare-metal.
+*/}
+
+The Food for Thought Foundation runs Farms for Thought, and part of that is a hydroponic grow setup. My part was the controller: the code on the Arduino that reads the water, decides when it needs nutrients or a pH adjustment, and runs the pumps to fix it.
+
+<Stats
+  items={[
+    { big: '7', label: 'I2C devices: pH, EC, and temperature sensors plus four dosing pumps' },
+    { big: '10 s', label: 'between dosing cycles, each one EC first and then pH' },
+    { big: '1', label: 'config file holding every pin, address, and setpoint' },
+  ]}
+/>
+
+I split the firmware into one module per job (pH, EC, temperature, pumps, dosing, lights, WiFi and time) with a single config header, so whoever maintains it next can change a setpoint or a pin without reading the control code.
+
+The most useful thing I did was probably the least visible one: the sensors occasionally returned garbage, and it turned out the read loops weren't stopping on the `0xFF` the I2C bus returns once a device runs out of data. That, the control loop, and the address map are all on the project page.
+
+<Pair>
+  <Figure caption="The grow system" ratio="4 / 3" />
+  <Figure caption="Breadboard setup" ratio="4 / 3" />
+</Pair>
+
+<Missing>
+Dates, location, team size, and the photos. Anything about who the system serves (a school, a community garden) would make this page a lot stronger.
+</Missing>

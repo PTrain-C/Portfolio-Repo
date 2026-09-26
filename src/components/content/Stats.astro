@@ -1,0 +1,41 @@
+---
+// Row of big numbers with a short label under each.
+interface Props {
+  items: { big: string; label: string }[];
+}
+const { items } = Astro.props;
+---
+
+<dl class="stats">
+  {
+    items.map((s) => (
+      <div>
+        <dt class="display">{s.big}</dt>
+        <dd>{s.label}</dd>
+      </div>
+    ))
+  }
+</dl>
+
+<style>
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0 2.5rem;
+  }
+  .stats div {
+    padding-left: 1rem;
+    border-left: 2px solid var(--accent);
+  }
+  dt {
+    font-size: clamp(2.4rem, 4vw, 3.4rem);
+    color: var(--ink-accent);
+  }
+  dd {
+    margin: 0.4rem 0 0;
+    font-size: 0.9rem;
+    color: var(--bark-2);
+    line-height: 1.4;
+  }
+</style>

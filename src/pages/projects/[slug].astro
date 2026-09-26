@@ -5,9 +5,11 @@ import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
 import DetailLayout from '../../components/DetailLayout.astro';
 import SkillPills from '../../components/SkillPills.astro';
+import Sources from '../../components/Sources.astro';
+import RelatedCard from '../../components/RelatedCard.astro';
 import ProjectArt from '../../components/art/ProjectArt.astro';
 import { href } from '../../config';
-import { getProjects } from '../../lib/content';
+import { getProjects, getExperience } from '../../lib/content';
 
 export async function getStaticPaths() {
   const projects = await getProjects();
@@ -27,42 +29,60 @@ const { project, prev, next } = Astro.props;
 const { data } = project;
 const { Content } = await render(project);
 
-const teamLabel = { solo: 'Solo project', team: 'Team project', unknown: 'Team size to come' }[
-  data.team
-];
-const neighbor = (p?: CollectionEntry<'projects'>) =>
-  p && { label: p.data.title, path: `/projects/${p.id}` };
+const role = data.experience ? (await getExperience()).find((e) => e.id === data.experience) : undefined;
+const heroImage = data.heroImage ?? data.cover;
+const teamLabel = { solo: 'Solo project', team: 'Team project', unknown: 'Team size to come' }[data.team];
+const neighbor = (p?: CollectionEntry<'projects'>) => p && { label: p.data.title, path: `/projects/${p.id}` };
 ---
 
-<Base title={data.title} description={data.summary}>
-  <PageHero back={{ label: 'projects', path: '/projects' }} seed={9}>
+<Base title={data.title} description={data.summary} theme={data.theme}>
+  <PageHero
+    back={{ label: 'projects', path: '/projects' }}
+    seed={9}
+    theme={data.theme}
+    layout={data.hero}
+    image={data.hero === 'scene' ? undefined : heroImage}
+  >
+    {data.fullName && <p class="kicker">{data.fullName}</p>}
     <h1>{data.title}</h1>
-    {data.fullName && <p class="full">{data.fullName}</p>}
     <p class="lede">{data.summary}</p>
     <dl class="meta">
-      {data.period && (
-        <div>
-          <dt>When</dt>
-          <dd>{data.period}</dd>
-        </div>
-      )}
+      {
+        data.period && (
+          <div>
+            <dt>When</dt>
+            <dd>{data.period}</dd>
+          </div>
+        )
+      }
       <div>
         <dt>Team</dt>
         <dd>{teamLabel}</dd>
       </div>
-      {data.outcome && (
-        <div>
-          <dt>Where it ended up</dt>
-          <dd>{data.outcome}</dd>
-        </div>
-      )}
+      {
+        data.outcome && (
+          <div>
+            <dt>Where it ended up</dt>
+            <dd>{data.outcome}</dd>
+          </div>
+        )
+      }
     </dl>
-    <Fragment slot="aside">
-      {data.cover ? <img src={href(`/${data.cover}`)} alt="" /> : <ProjectArt variant={data.art} />}
-    </Fragment>
+    {
+      data.links.length > 0 && (
+        <p class="links">
+          {data.links.map((l) => (
+            <a class="btn ghost-dark" href={l.url.startsWith('/') ? href(l.url) : l.url} target="_blank" rel="noopener">
+              {l.label}
+            </a>
+          ))}
+        </p>
+      )
+    }
+    {!heroImage && data.hero !== 'scene' && <ProjectArt slot="aside" variant={data.art} />}
   </PageHero>
 
-  <DetailLayout prev={neighbor(prev)} next={neighbor(next)}>
+  <DetailLayout prev={neighbor(prev)} next={neighbor(next)} rail={data.rail}>
     <div class="prose">
       <Content />
     </div>
@@ -70,47 +90,65 @@ const neighbor = (p?: CollectionEntry<'projects'>) =>
     <Fragment slot="side">
       <div class="mine">
         <h2>My part</h2>
-        {data.mine.length ? (
-          <ul>
-            {data.mine.map((m) => (
-              <li>{m}</li>
-            ))}
-          </ul>
-        ) : (
-          <span class="todo">Still to write</span>
-        )}
-      </div>
-
-      {data.team !== 'solo' && (
-        <div class="others">
-          <h2>Teammates' parts</h2>
-          {data.others.length ? (
+        {
+          data.mine.length ? (
             <ul>
-              {data.others.map((o) => (
-                <li>
-                  {o.part}
-                  <span class="small quiet by">{o.by}</span>
-                </li>
+              {data.mine.map((m) => (
+                <li>{m}</li>
               ))}
             </ul>
           ) : (
             <span class="todo">Still to write</span>
-          )}
-        </div>
-      )}
+          )
+        }
+      </div>
+
+      {
+        data.team !== 'solo' && (
+          <div class="others">
+            <h2>Teammates' parts</h2>
+            {data.others.length ? (
+              <ul>
+                {data.others.map((o) => (
+                  <li>
+                    {o.part}
+                    <span class="small quiet by">{o.by}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <span class="todo">Still to write</span>
+            )}
+          </div>
+        )
+      }
 
       <div>
         <h2>Skills I used</h2>
         {data.skills.length ? <SkillPills ids={data.skills} grouped /> : <span class="todo">Still to write</span>}
       </div>
+
+      {
+        role && (
+          <RelatedCard
+            path={`/experience/${role.id}`}
+            kicker="Part of my role at"
+            title={role.data.org}
+            theme={role.data.theme}
+          />
+        )
+      }
     </Fragment>
+
+    <Sources slot="after" items={data.sources} />
   </DetailLayout>
 </Base>
 
 <style>
-  .full {
-    margin: 0.75rem 0 0;
-    color: var(--gold);
+  .kicker {
+    margin: 0 0 0.8rem;
+    color: var(--accent);
+    font-size: 0.95rem;
   }
   .meta {
     display: flex;
@@ -126,6 +164,16 @@ const neighbor = (p?: CollectionEntry<'projects'>) =>
     margin: 0.1rem 0 0;
     color: var(--silk);
     max-width: 18rem;
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 2rem 0 0;
+  }
+  .links .btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
   }
   .mine ul,
   .others ul {
@@ -152,7 +200,7 @@ const neighbor = (p?: CollectionEntry<'projects'>) =>
     border-radius: 50%;
   }
   .mine li::before {
-    background: var(--pine);
+    background: var(--ink-accent);
   }
   .others li {
     color: var(--bark-2);

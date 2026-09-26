@@ -1,9 +1,15 @@
 ---
 title: BSPD board
-# TODO(Peter): what BSPD stands for.
-summary: Schematic capture and KiCAD layout of a BSPD board, taken through DRC and fabrication output.
+fullName: Brake System Plausibility Device, USC Racing SCR26
+summary: An all-analog safety board for USC Racing's SCR26 car. If the driver is on the throttle and hard on the brakes at the same time, or a pedal sensor drops out, it opens the shutdown circuit.
 order: 1
 status: draft
+theme: track
+hero: poster
+heroImage: img/bspd/render-front.webp
+cover: img/bspd/cover.webp
+rail: right
+experience: usc-racing
 art: pcb
 # TODO(Peter): solo or team? If team, list the other roles under `others`.
 team: unknown
@@ -13,11 +19,21 @@ mine:
   - Design rule check (DRC)
   - Fabrication output
 others: []
-outcome: Design and fabrication only. The board was never installed or brought up.
-skills: [kicad, schematic-capture, pcb-layout, drc, fab-output]
+outcome: Design and fabrication files only. The board was never installed or brought up.
+skills: [kicad, schematic-capture, pcb-layout, drc, fab-output, op-amps, comparator-logic]
+links:
+  - label: Full schematic (PDF)
+    url: /files/bspd-schematic.pdf
+sources:
+  - label: BSPD schematic, KiCAD export (every value and threshold quoted on this page is from its annotations)
+    file: files/bspd-schematic.pdf
+  - label: KiCAD layout and 3D renders of the SCR26 BSPD
 ---
-import Missing from '../../components/Missing.astro';
+import Chain from '../../components/content/Chain.astro';
+import Tabs from '../../components/content/Tabs.astro';
+import Pair from '../../components/content/Pair.astro';
 import Figure from '../../components/Figure.astro';
+import Missing from '../../components/Missing.astro';
 
 {/*
   ATTRIBUTION RULES (firm, regardless of what else gets filled in):
@@ -27,20 +43,56 @@ import Figure from '../../components/Figure.astro';
 
 ## What it is
 
+Formula SAE cars have to carry a Brake System Plausibility Device. It watches the throttle and brake pedal sensors, and if the two say something that shouldn't happen together (full-ish throttle while braking hard), it cuts the car's shutdown circuit. It also has to catch a pedal sensor that has come unplugged.
+
+This is the one I did for SCR26. It's all op-amps, RC timers and diodes, no microcontroller, so there is no code to crash. Five LEDs on the edge of the board (Throttle, Brake, B-Disc, T-Disc, Output) show which condition tripped.
+
+## How the logic works
+
+Click through the blocks. Every threshold here comes straight from the schematic notes.
+
+<Chain
+  label="Signal path, pedal sensors to shutdown relay"
+  steps={[
+    { tag: 'U2, U5', title: 'Buffer the pedals', text: 'The raw throttle (TPS) and brake (BSE) signals go through MCP6004 unity-gain followers, so the same signal feeds both the BSPD and the ECU without the BSPD loading it.' },
+    { tag: 'U1A, U1B', title: 'Compare to set points', text: 'Two comparators check throttle against TREF (about 10% throttle) and brake against BREF (hard braking). TREF and BREF come off trimpots, with test points TP1 and TP2 so they can be set with a meter.' },
+    { tag: 'R13, R14, U3A', title: 'Analog AND', text: 'The two comparator outputs are summed through equal 10k resistors. One high gives 2.5 V, both high gives 5 V. U3A only goes high above 2.75 V (the R17/R18 divider), so it only fires when both are true.' },
+    { tag: 'R22, C5, U3B', title: '1 s timer and latch', text: 'The AND output charges a 10k and 100 uF RC, a 1 s time constant. Past 3.2 V (the R24/R25 divider) U3B trips, and D12 with R23 feed its output back so it stays latched.' },
+    { tag: 'U3D, Q2, U4', title: 'Open shutdown', text: 'U3D ORs the latch with the sensor-fault path. When either is high it turns on Q2, which drives the UB2-5NUN relay and opens the shutdown circuit.' },
+  ]}
+/>
+
+The second path catches a disconnected sensor. Both pedal sensors are ratiometric, 0.5 V to 4.5 V, and each input has a 100k pull-up to 5 V. If a sensor comes unplugged, the line floats up past 4.5 V and U1C or U1D goes high. Those two are diode-ORed into a 10k and 10 uF RC (100 ms), and U3C trips once it passes 3.2 V. The schematic notes tie this to rule IC.4.8.3 (b/c).
+
+<Tabs
+  items={[
+    { label: 'Throttle and brake comparators', src: 'img/bspd/sch-compare.webp', caption: 'U1A and U1B. Each output also lights an LED through 330 ohms, so you can see which pedal crossed its threshold.' },
+    { label: 'AND, timer, latch', src: 'img/bspd/sch-latch.webp', caption: 'U3A is the AND threshold, U3B the 1 s timer with its diode-and-resistor latch, U3C the 100 ms fault timer, and U3D the final OR that drives Q2.' },
+    { label: 'Sensor-loss detection', src: 'img/bspd/sch-faults.webp', caption: 'U1C and U1D compare each pedal against 4.5 V. The 100k pull-ups (R4, R5) push an unplugged sensor above that line.' },
+    { label: 'Input buffers', src: 'img/bspd/sch-inputs.webp', caption: 'U5 (throttle) and U2 (brake). One follower per signal feeds a pair of followers, one to the BSPD and one out to the ECU.' },
+    { label: 'Shutdown relay', src: 'img/bspd/sch-relay.webp', caption: 'U4 sits in series with the shutdown loop (SHDN_IN to Output). D16 clamps the coil, and D17 lights when the loop is closed.' },
+    { label: 'Whole sheet', src: 'img/bspd/sch-overview.webp', caption: 'The full logic sheet. Open it in a new tab to zoom in, or grab the PDF from the top of the page.' },
+  ]}
+/>
+
+## The board
+
+Everything comes in and goes out through one 12-pin connector: 12 V and ground, throttle and brake in, throttle and brake back out to the ECU, and the two sides of the shutdown loop. A small regulator (Q1) makes 5 V for the logic. The three MCP6004 quad op-amps sit down the middle, with the timing caps and diodes next to the stage that uses them, and the test points and trimpots along the right edge where you can get a probe on them.
+
+<Tabs
+  tone="dark"
+  ratio="1 / 1"
+  items={[
+    { label: '3D, top', src: 'img/bspd/render-front.webp', caption: 'Top side. Pedal inputs come in on the left, the logic runs top to bottom, and the status LEDs line the bottom edge.' },
+    { label: '3D, bottom', src: 'img/bspd/render-back.webp', caption: 'Bottom side, where the shutdown relay (U4) and its flyback diode (D16) sit.' },
+    { label: 'Copper layout', src: 'img/bspd/layout.webp', caption: 'The layout view in KiCAD with both copper layers showing, before the fabrication files were generated.' },
+  ]}
+/>
+
 <Missing>
-What BSPD stands for, what the board does, and what system it was designed for.
-</Missing>
-
-## What I did
-
-I took the board from schematic to fabrication-ready files: schematic capture, layout in KiCAD, a clean DRC pass, and the fabrication output.
-
-<Missing>
-Any design details worth showing: key constraints, layer count, notable layout decisions.
+A line on the layout choices you'd want to defend in an interview (why the relay went on the bottom, how you set up the ground pour, board size limits), and whether this was solo or with other people on the electrical team.
 </Missing>
 
 ## Where it ended up
 
-This one covered design and fabrication only. The board was never installed or brought up, so there are no bench results here.
-
-<Figure caption="Board render or layout screenshot" />
+I took it through DRC and generated the fabrication files. The board was never installed or brought up, so there are no bench results here.

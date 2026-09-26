@@ -1,0 +1,56 @@
+---
+// "Where this comes from": the documents a page's claims are drawn from.
+import { href } from '../config';
+
+interface Props {
+  items: { label: string; file?: string }[];
+}
+const { items } = Astro.props;
+---
+
+{
+  items.length > 0 && (
+    <section class="sources">
+      <h2>Where this comes from</h2>
+      <ul>
+        {items.map((s) => (
+          <li>
+            {s.file ? (
+              <a href={href(`/${s.file}`)} target="_blank" rel="noopener">
+                {s.label}
+              </a>
+            ) : (
+              s.label
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+<style>
+  .sources {
+    margin-top: 4rem;
+    padding: 1.4rem 1.6rem;
+    border-radius: 1rem;
+    border: 1px dashed var(--bark-3);
+    max-width: 46rem;
+  }
+  h2 {
+    font-size: 0.95rem;
+    margin-bottom: 0.6rem;
+  }
+  ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: var(--bark-2);
+    font-size: 0.93rem;
+  }
+  li {
+    margin: 0.2rem 0;
+  }
+  a {
+    color: var(--ink-accent);
+  }
+</style>

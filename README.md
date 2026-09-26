@@ -23,21 +23,29 @@ HIDE_DRAFTS=true npm run build   # leave out anything marked status: draft
 | Interests | `src/config.ts` |
 | Coursework | `src/data/coursework.ts` |
 | Home bio | `src/pages/index.astro` |
+| Images shown on the site | `public/img/<project>/` |
+| Raw source docs, reports, and code (not published) | `docs/source/<project>/` |
+
+Put raw uploads (PDFs, code, original photos) in `docs/source/`, never in `src/content/`: every `.md` in the content folders is treated as a page. Web-ready images go in `public/img/`.
 
 ### Adding a project
 
 Add a new `.mdx` file in `src/content/projects/`. Frontmatter:
 
 - `mine`: exactly what Peter did. Keep it literal.
-- `others`: `{ part, by }` for anything someone else owned. `by` can be a role ("A collaborator") instead of a name.
-- `outcome`: where the project ended up (e.g. "Design and fabrication only").
-- `skills`: skill ids from `src/data/skills.ts`. These show as pills on the page and link to the Skills page, which lists every place each skill was used. An unknown id fails the build.
-- `art`: the generated cover (`pcb`, `bode`, `compare`, or `gpio`) shown until you set `cover` to a real photo in `public/`.
-- `status: draft` marks it unfinished. Drafts are shown unless you build with `HIDE_DRAFTS=true`.
+- `others`: `{ part, by }` for anything someone else owned.
+- `outcome`: where the project ended up.
+- `skills`: skill ids from `src/data/skills.ts`. An unknown id fails the build.
+- `theme`: the page's look. One of `board`, `track` (racing), `cigar` (guitar), `felt` (poker), `hydro`, `bench` (breadboard), `space`, `naval`, `quantum`.
+- `hero`: how the top is arranged: `split`, `poster` (image fills the right), `tall` (portrait photo that hangs into the page), or `scene` (just the theme art).
+- `rail`: where "My part / Skills" sits: `right`, `left`, or `top`.
+- `cover` (card image) and `heroImage` (top of page), both paths inside `public/`.
+- `experience`: id of the role it came from; `links`; `sources` (documents the claims come from).
+- `status: draft` marks it unfinished.
 
-Experience entries work the same way, with `summary`, `highlights`, and `skills`.
+Experience entries use `summary`, `highlights`, `skills`, `theme`, `rail`, `projects` (related project ids), and `sources`.
 
-Use `<Missing>...</Missing>` for gaps and `<Figure src="..." caption="..." />` for photos (put images in `public/`).
+Components for MDX bodies live in `src/components/content/`: `Chain` (clickable signal chain or state machine), `Tabs` (image viewer), `NotchExplorer`, `MeasuredBode`, `Excerpt` (shows real lines from a file in `docs/source`), `Stats`, `Pair`, `TeamDots`, `ThermalProfile`. Also `<Missing>` for gaps, `<Figure>` for photos, and `$...$` / `$$...$$` for math.
 
 ## Deploying
 
@@ -45,15 +53,16 @@ Use `<Missing>...</Missing>` for gaps and `<Figure src="..." caption="..." />` f
 
 ## Still needed
 
-- [ ] Full name, LinkedIn, GitHub, email (`src/config.ts`)
+- [ ] LinkedIn, GitHub, email (`src/config.ts`)
 - [ ] Headshot
-- [ ] Real bio and the "Hiring for an EE role?" blurb (both placeholders)
+- [ ] Real bio and the "Hiring for an EE role?" blurb
 - [ ] Hobbies for the interests section
-- [ ] QEE role dates
-- [ ] BSPD: what it stands for, what it does, solo or team, photos
-- [ ] Notch filter: what it fed into, target frequency, bench photos, name John or keep "a collaborator"
-- [ ] FFTF: what it stands for, what it monitored/controlled, what the firmware ran on and who wrote it, team size, photos
-- [ ] Poke the Poker: what it is, scope, role, photos
+- [ ] QEE, USC Racing, and Food for Thought dates and exact titles
+- [ ] BSPD: solo or team
+- [ ] Circuit Sensei: your role, teammates, skills, demo screenshots
+- [ ] Poke the Poker: confirm the split with Christopher, demo screenshots
+- [ ] Food for Thought: confirm firmware authorship, photos
+- [ ] Racing car photos (`public/img/racing/`)
 - [ ] Coursework list
 
 ## Deliberately left off

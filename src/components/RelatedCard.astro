@@ -1,0 +1,74 @@
+---
+// Compact link to another page, shown in a themed swatch: used to join a
+// project to the role it came from and back.
+import { href } from '../config';
+
+interface Props {
+  path: string;
+  kicker: string;
+  title: string;
+  text?: string;
+  theme?: string;
+  image?: string;
+}
+const { path, kicker, title, text, theme = 'board', image } = Astro.props;
+---
+
+<a class="related" href={href(path)} data-theme={theme}>
+  {image && <img src={href(`/${image}`)} alt="" loading="lazy" />}
+  <span class="body">
+    <span class="kicker small">{kicker}</span>
+    <span class="title display">{title}</span>
+    {text && <span class="text small">{text}</span>}
+  </span>
+  <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" /></svg>
+</a>
+
+<style>
+  .related {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 1.1rem 0.8rem 0.8rem;
+    border-radius: 1.1rem;
+    background: var(--scene);
+    color: var(--silk);
+    text-decoration: none;
+    transition: transform 0.25s var(--ease);
+  }
+  .related:hover {
+    color: var(--silk);
+    transform: translateY(-2px);
+  }
+  img {
+    width: 5.5rem;
+    height: 4.2rem;
+    object-fit: cover;
+    border-radius: 0.6rem;
+  }
+  .body {
+    display: grid;
+    gap: 0.15rem;
+    min-width: 0;
+    padding-left: 0.3rem;
+  }
+  .kicker {
+    color: var(--accent);
+  }
+  .title {
+    font-size: 1.6rem;
+  }
+  .text {
+    color: var(--silk-2);
+  }
+  .arrow {
+    width: 1.3rem;
+    height: 1.3rem;
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+</style>

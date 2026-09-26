@@ -31,7 +31,7 @@ const topSkills = (ids: string[]) =>
     entries.map((e) => (
       <li>
         <a href={href(`/experience/${e.id}`)} class:list={{ current: e.data.current }}>
-          <span class="mono-badge display" aria-hidden="true">
+          <span class="mono-badge display" aria-hidden="true" data-theme={e.data.theme}>
             {monogram(e.data.org)}
           </span>
           <span class="who">
@@ -91,8 +91,8 @@ const topSkills = (ids: string[]) =>
     width: 3.5rem;
     height: 3.5rem;
     border-radius: 50%;
-    background: var(--mask);
-    color: var(--gold);
+    background: var(--scene);
+    color: var(--accent);
     font-size: 1.35rem;
   }
   .current .mono-badge {

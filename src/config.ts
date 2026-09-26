@@ -2,9 +2,8 @@
 // renders as a visible "pending" marker instead of a broken link.
 
 export const site = {
-  // TODO(Peter): full name as it should appear on the site.
-  name: 'Peter',
-  initials: 'P',
+  name: 'Peter Connolly',
+  initials: 'PC',
   identity:
     'EE student at USC, focused on analog/mixed-signal circuits, PCB design, and quantum hardware.',
   // TODO(Peter): drop a headshot in /public (e.g. /public/headshot.jpg) and set

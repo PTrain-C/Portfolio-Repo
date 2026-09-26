@@ -1,0 +1,66 @@
+---
+// Workbench: a breadboard hole grid with power rails, a few jumper wires, and
+// an on-screen guidance arrow like the ones Circuit Sensei draws.
+const cols = 30;
+const rows = 10;
+const holes: [number, number][] = [];
+for (let c = 0; c < cols; c++)
+  for (let r = 0; r < rows; r++) holes.push([860 + c * 24, 190 + r * 24 + (r >= 5 ? 36 : 0)]);
+---
+
+<svg class="scene" viewBox="0 0 1600 720" preserveAspectRatio="xMaxYMid slice" aria-hidden="true">
+  <rect x="830" y="110" width="780" height="480" rx="14" fill="var(--silk)" fill-opacity="0.06" stroke="var(--silk)" stroke-opacity="0.12" />
+  <path d="M850 132 H1600 M850 568 H1600" stroke="#e8664a" stroke-opacity="0.6" stroke-width="2" />
+  <path d="M850 150 H1600 M850 550 H1600" stroke="#5a9bd8" stroke-opacity="0.6" stroke-width="2" />
+  {holes.map(([x, y]) => <rect x={x - 4} y={y - 4} width="8" height="8" rx="1.5" fill="#000" fill-opacity="0.45" />)}
+
+  <path d="M932 214 C 960 130, 1060 130, 1100 238" fill="none" stroke="#e8664a" stroke-width="5" stroke-linecap="round" />
+  <path d="M1172 406 C 1200 470, 1300 470, 1316 382" fill="none" stroke="#5a9bd8" stroke-width="5" stroke-linecap="round" />
+  <path d="M1004 310 H1100" stroke="#caa56a" stroke-width="6" />
+  <rect x="1030" y="300" width="44" height="20" rx="6" fill="#d7b98a" />
+  <path d="M1036 300v20M1046 300v20M1062 300v20" stroke="#8a4b2a" stroke-width="3" />
+
+  <g class="led">
+    <circle cx="1244" cy="286" r="16" fill="var(--accent)" opacity="0.25" />
+    <circle cx="1244" cy="286" r="9" fill="var(--accent)" />
+  </g>
+
+  <g class="guide">
+    <circle cx="1100" cy="310" r="18" fill="none" stroke="var(--accent)" stroke-width="4" />
+    <path d="M1390 200 C 1300 210, 1180 250, 1122 298" fill="none" stroke="var(--accent)" stroke-width="5" stroke-linecap="round" />
+    <path d="M1122 298 l6 -24 M1122 298 l24 -4" stroke="var(--accent)" stroke-width="5" stroke-linecap="round" />
+    <rect x="1320" y="160" width="230" height="46" rx="10" fill="var(--scene-deep)" stroke="var(--accent)" stroke-opacity="0.6" />
+    <text x="1336" y="190" class="tag">Step 1: resistor A10 to A20</text>
+  </g>
+</svg>
+
+<style>
+  .scene {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .tag {
+    font-family: var(--mono);
+    font-size: 15px;
+    fill: var(--silk);
+  }
+  .led {
+    animation: blink 1.6s steps(2, jump-none) infinite;
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0.2;
+    }
+  }
+  .guide {
+    animation: nudge 2.4s var(--ease) infinite;
+  }
+  @keyframes nudge {
+    50% {
+      transform: translate(-6px, 4px);
+    }
+  }
+</style>

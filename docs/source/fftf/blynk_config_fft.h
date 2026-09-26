@@ -7,9 +7,9 @@
 // These MUST be defined before including Blynk headers
 // Get these values from your Blynk.Console template
 
-#define BLYNK_TEMPLATE_ID "TMPL2SRTXx9onQ"
+#define BLYNK_TEMPLATE_ID "REDACTED"
 #define BLYNK_TEMPLATE_NAME "FFT Arduino Rev2"
-#define BLYNK_AUTH_TOKEN "77RDGrajdD80yQ_yT1YNPEb1P7vBX_7h"
+#define BLYNK_AUTH_TOKEN "REDACTED"
 
 // Print Blynk debug info to Serial
 #define BLYNK_PRINT Serial

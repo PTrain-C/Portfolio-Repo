@@ -11,14 +11,15 @@ interface Props {
   showMine?: boolean;
 }
 const { projects, showMine = false } = Astro.props;
-const span = (i: number) => ([7, 5, 5, 7][i % 4]);
+// An odd one out at the end takes the full row.
+const span = (i: number) => (i === projects.length - 1 && i % 2 === 0 ? 12 : [7, 5, 5, 7][i % 4]);
 ---
 
 <ul class="bento">
   {
     projects.map((p, i) => (
       <li style={`--span:${span(i)}`}>
-        <a class="media" href={href(`/projects/${p.id}`)} aria-label={`Open ${p.data.title}`}>
+        <a class="media" href={href(`/projects/${p.id}`)} aria-label={`Open ${p.data.title}`} data-theme={p.data.theme}>
           {p.data.cover ? (
             <img src={href(`/${p.data.cover}`)} alt="" loading="lazy" />
           ) : (
@@ -66,7 +67,7 @@ const span = (i: number) => ([7, 5, 5, 7][i % 4]);
     height: clamp(15rem, 27vw, 24rem);
     border-radius: 1.25rem;
     overflow: hidden;
-    background: var(--mask);
+    background: var(--scene);
   }
   .media :global(svg),
   .media img {

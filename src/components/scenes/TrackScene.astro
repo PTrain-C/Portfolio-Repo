@@ -1,0 +1,119 @@
+---
+// Racing: an FSAE-style open-wheel car in profile, speed lines streaming off
+// the back, and a checkered band along the bottom edge.
+import { rng } from '../../lib/art';
+
+const rand = rng(26);
+// Streaks above and below the car, trailing off to the right.
+const lines = Array.from({ length: 22 }, (_, i) => ({
+  y: i < 11 ? 150 + i * 9 + Math.round(rand() * 6) : 500 + (i - 11) * 9 + Math.round(rand() * 6),
+  x: 820 + Math.round(rand() * 520),
+  len: 120 + Math.round(rand() * 320),
+  d: (rand() * 2.4).toFixed(2),
+  o: (0.15 + rand() * 0.35).toFixed(2),
+}));
+const checks = Array.from({ length: 3 * 60 }, (_, i) => ({
+  x: (i % 60) * 24,
+  y: Math.floor(i / 60) * 24,
+  on: (i + Math.floor(i / 60)) % 2 === 0,
+}));
+---
+
+<svg class="scene" viewBox="0 0 1600 720" preserveAspectRatio="xMaxYMid slice" aria-hidden="true">
+
+  <g class="speed">
+    {lines.map((l) => (
+      <line
+        x1={l.x}
+        x2={l.x + l.len}
+        y1={l.y}
+        y2={l.y}
+        stroke="var(--accent)" stroke-linecap="round"
+        stroke-opacity={l.o}
+        stroke-width="2"
+        style={`animation-delay:-${l.d}s`}
+      />
+    ))}
+  </g>
+
+  <!-- Car, facing left. Drawn in a 620 x 220 box. -->
+  <g class="car" transform="translate(760 250)">
+    <ellipse cx="310" cy="206" rx="300" ry="10" fill="#000" opacity="0.35" />
+    <!-- rear wing -->
+    <path d="M540 38h78v14h-78z" fill="var(--accent)" />
+    <path d="M552 52l-6 70M600 52l-8 70" stroke="var(--silk)" stroke-opacity="0.5" stroke-width="4" />
+    <!-- body -->
+    <path
+      d="M26 150 L150 128 L250 116 L318 110 Q334 76 372 74 L420 80 L446 104 L560 110 L596 128 L600 158 L40 164 Z"
+      fill="var(--scene-deep)"
+      stroke="var(--accent)"
+      stroke-width="3"
+      stroke-linejoin="round"
+    />
+    <path d="M250 150 L430 146" stroke="var(--accent)" stroke-opacity="0.45" stroke-width="2" />
+    <!-- roll hoop and helmet -->
+    <path d="M408 80 L424 44 L446 44 L446 104" fill="none" stroke="var(--silk)" stroke-opacity="0.65" stroke-width="5" stroke-linejoin="round" />
+    <circle cx="378" cy="72" r="19" fill="var(--silk)" />
+    <path d="M364 68h26" stroke="var(--scene-deep)" stroke-width="7" stroke-linecap="round" />
+    <!-- number -->
+    <text x="480" y="143" class="num">26</text>
+    <!-- front wing -->
+    <path d="M0 170h120v10H0z" fill="var(--accent)" />
+    <path d="M6 150v30" stroke="var(--accent)" stroke-width="6" />
+    <!-- wheels -->
+    <g class="wheel" style="transform-origin:150px 168px">
+      <circle cx="150" cy="168" r="42" fill="#0d0908" />
+      <circle cx="150" cy="168" r="24" fill="none" stroke="var(--silk)" stroke-opacity="0.55" stroke-width="3" />
+      <path d="M150 146v44M128 168h44" stroke="var(--silk)" stroke-opacity="0.35" stroke-width="3" />
+    </g>
+    <g class="wheel" style="transform-origin:510px 166px">
+      <circle cx="510" cy="166" r="46" fill="#0d0908" />
+      <circle cx="510" cy="166" r="26" fill="none" stroke="var(--silk)" stroke-opacity="0.55" stroke-width="3" />
+      <path d="M510 142v48M486 166h48" stroke="var(--silk)" stroke-opacity="0.35" stroke-width="3" />
+    </g>
+  </g>
+
+  <g transform="translate(560 600) skewX(-30)" opacity="0.35">
+    {checks.map((c) => c.on && <rect x={c.x} y={c.y} width="24" height="24" fill="var(--silk)" />)}
+  </g>
+</svg>
+
+<style>
+  .scene {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .num {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 34px;
+    fill: var(--accent);
+  }
+  .speed line {
+    animation: streak 2.4s linear infinite;
+  }
+  @keyframes streak {
+    from {
+      transform: translateX(-60px);
+      opacity: 0;
+    }
+    30% {
+      opacity: 1;
+    }
+    to {
+      transform: translateX(160px);
+      opacity: 0;
+    }
+  }
+  .wheel {
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(-360deg);
+    }
+  }
+</style>
