@@ -24,8 +24,10 @@ const projects = defineCollection({
     outcome: z.string().optional(),
     // Skill ids from src/data/skills.ts. Only skills Peter used himself.
     skills: z.array(z.string()).default([]),
-    // Image in /public, e.g. 'projects/notch-filter.jpg'.
+    // Image in /public, e.g. 'projects/notch-filter.jpg'. Replaces the art.
     cover: z.string().optional(),
+    // Generated cover art used when there is no photo.
+    art: z.enum(['pcb', 'bode', 'compare', 'gpio']).default('pcb'),
   }),
 });
 

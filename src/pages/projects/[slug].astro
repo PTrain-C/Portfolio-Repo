@@ -2,8 +2,11 @@
 import { render } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
 import DetailLayout from '../../components/DetailLayout.astro';
 import SkillPills from '../../components/SkillPills.astro';
+import ProjectArt from '../../components/art/ProjectArt.astro';
+import { href } from '../../config';
 import { getProjects } from '../../lib/content';
 
 export async function getStaticPaths() {
@@ -32,40 +35,41 @@ const neighbor = (p?: CollectionEntry<'projects'>) =>
 ---
 
 <Base title={data.title} description={data.summary}>
-  <DetailLayout backLabel="projects" backPath="/projects" prev={neighbor(prev)} next={neighbor(next)}>
-    <Fragment slot="header">
-      <h1>{data.title}</h1>
-      {data.fullName && <p class="quiet full">{data.fullName}</p>}
-      <p class="lede">{data.summary}</p>
+  <PageHero back={{ label: 'projects', path: '/projects' }} seed={9}>
+    <h1>{data.title}</h1>
+    {data.fullName && <p class="full">{data.fullName}</p>}
+    <p class="lede">{data.summary}</p>
+    <dl class="meta">
+      {data.period && (
+        <div>
+          <dt>When</dt>
+          <dd>{data.period}</dd>
+        </div>
+      )}
+      <div>
+        <dt>Team</dt>
+        <dd>{teamLabel}</dd>
+      </div>
+      {data.outcome && (
+        <div>
+          <dt>Where it ended up</dt>
+          <dd>{data.outcome}</dd>
+        </div>
+      )}
+    </dl>
+    <Fragment slot="aside">
+      {data.cover ? <img src={href(`/${data.cover}`)} alt="" /> : <ProjectArt variant={data.art} />}
     </Fragment>
+  </PageHero>
 
+  <DetailLayout prev={neighbor(prev)} next={neighbor(next)}>
     <div class="prose">
       <Content />
     </div>
 
     <Fragment slot="side">
-      <div>
-        <h2 class="side-h">At a glance</h2>
-        <dl class="facts">
-          {data.period && (
-            <>
-              <dt>When</dt>
-              <dd>{data.period}</dd>
-            </>
-          )}
-          <dt>Team</dt>
-          <dd>{teamLabel}</dd>
-          {data.outcome && (
-            <>
-              <dt>Where it ended up</dt>
-              <dd>{data.outcome}</dd>
-            </>
-          )}
-        </dl>
-      </div>
-
       <div class="mine">
-        <h2 class="side-h">My part</h2>
+        <h2>My part</h2>
         {data.mine.length ? (
           <ul>
             {data.mine.map((m) => (
@@ -79,7 +83,7 @@ const neighbor = (p?: CollectionEntry<'projects'>) =>
 
       {data.team !== 'solo' && (
         <div class="others">
-          <h2 class="side-h">Teammates' parts</h2>
+          <h2>Teammates' parts</h2>
           {data.others.length ? (
             <ul>
               {data.others.map((o) => (
@@ -96,7 +100,7 @@ const neighbor = (p?: CollectionEntry<'projects'>) =>
       )}
 
       <div>
-        <h2 class="side-h">Skills I used</h2>
+        <h2>Skills I used</h2>
         {data.skills.length ? <SkillPills ids={data.skills} grouped /> : <span class="todo">Still to write</span>}
       </div>
     </Fragment>
@@ -105,26 +109,23 @@ const neighbor = (p?: CollectionEntry<'projects'>) =>
 
 <style>
   .full {
-    margin: 0.5rem 0 0;
+    margin: 0.75rem 0 0;
+    color: var(--gold);
   }
-  .lede {
-    margin: 1.25rem 0 0;
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2.5rem;
+    margin: 2rem 0 0;
   }
-  .side-h {
-    font-size: 1.05rem;
-    margin-bottom: 0.75rem;
+  .meta dt {
+    font-size: 0.8rem;
+    color: var(--silk-2);
   }
-  .facts {
-    margin: 0;
-    display: grid;
-    gap: 0.15rem;
-  }
-  .facts dt {
-    font-size: 0.85rem;
-    color: var(--bark-3);
-  }
-  .facts dd {
-    margin: 0 0 0.6rem;
+  .meta dd {
+    margin: 0.1rem 0 0;
+    color: var(--silk);
+    max-width: 18rem;
   }
   .mine ul,
   .others ul {
@@ -132,18 +133,32 @@ const neighbor = (p?: CollectionEntry<'projects'>) =>
     margin: 0;
     padding: 0;
     display: grid;
-    gap: 0.5rem;
+    gap: 0.55rem;
   }
-  .mine li {
-    padding-left: 0.85rem;
-    border-left: 3px solid var(--pine);
-    line-height: 1.35;
+  .mine li,
+  .others li {
+    position: relative;
+    padding-left: 1.1rem;
+    line-height: 1.4;
+  }
+  .mine li::before,
+  .others li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.5em;
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+  }
+  .mine li::before {
+    background: var(--pine);
   }
   .others li {
-    padding-left: 0.85rem;
-    border-left: 3px solid var(--line);
     color: var(--bark-2);
-    line-height: 1.35;
+  }
+  .others li::before {
+    border: 1.5px solid var(--bark-3);
   }
   .by {
     display: block;

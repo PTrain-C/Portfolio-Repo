@@ -2,6 +2,7 @@
 import { render } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
 import DetailLayout from '../../components/DetailLayout.astro';
 import SkillPills from '../../components/SkillPills.astro';
 import { getExperience } from '../../lib/content';
@@ -34,26 +35,39 @@ const neighbor = (e?: CollectionEntry<'experience'>) =>
 ---
 
 <Base title={`${data.role}, ${data.org}`} description={data.summary}>
-  <DetailLayout
-    backLabel="experience"
-    backPath="/experience"
-    prev={neighbor(prev)}
-    next={neighbor(next)}
-  >
-    <Fragment slot="header">
-      {data.current && <span class="now small">Current role</span>}
-      <h1>{data.org}</h1>
-      <p class="role">
-        {data.role}
-        {data.unit && <span class="quiet">, {data.unit}</span>}
-      </p>
-      <p class="lede">{data.summary}</p>
-    </Fragment>
+  <PageHero back={{ label: 'experience', path: '/experience' }} seed={17}>
+    {
+      data.current && (
+        <p class="now">
+          <span class="live" aria-hidden="true" /> Current role
+        </p>
+      )
+    }
+    <h1>{data.org}</h1>
+    <p class="role">
+      {data.role}
+      {data.unit && <span>, {data.unit}</span>}
+    </p>
+    <p class="lede">{data.summary}</p>
+    <dl class="meta">
+      <div>
+        <dt>When</dt>
+        <dd>{dates ?? 'Dates to come'}</dd>
+      </div>
+      {data.location && (
+        <div>
+          <dt>Where</dt>
+          <dd>{data.location}</dd>
+        </div>
+      )}
+    </dl>
+  </PageHero>
 
+  <DetailLayout prev={neighbor(prev)} next={neighbor(next)}>
     {
       data.highlights.length > 0 && (
         <section class="highlights">
-          <h2>What I did</h2>
+          <h2 class="display">What I did</h2>
           <ul>
             {data.highlights.map((h) => (
               <li>{h}</li>
@@ -70,26 +84,7 @@ const neighbor = (e?: CollectionEntry<'experience'>) =>
 
     <Fragment slot="side">
       <div>
-        <h2 class="side-h">At a glance</h2>
-        <dl class="facts">
-          <dt>When</dt>
-          <dd>{dates ?? <span class="todo">Dates to come</span>}</dd>
-          {data.location && (
-            <>
-              <dt>Where</dt>
-              <dd>{data.location}</dd>
-            </>
-          )}
-          {data.unit && (
-            <>
-              <dt>Team or program</dt>
-              <dd>{data.unit}</dd>
-            </>
-          )}
-        </dl>
-      </div>
-      <div>
-        <h2 class="side-h">Skills I used</h2>
+        <h2>Skills I used</h2>
         <SkillPills ids={data.skills} grouped />
       </div>
     </Fragment>
@@ -98,55 +93,63 @@ const neighbor = (e?: CollectionEntry<'experience'>) =>
 
 <style>
   .now {
-    display: inline-block;
-    margin-bottom: 0.75rem;
-    padding: 0.1rem 0.65rem;
-    border-radius: 999px;
-    background: var(--honey-soft);
-    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 1rem;
+    color: var(--gold);
+    font-size: 0.9rem;
   }
   .role {
-    margin: 0.6rem 0 0;
-    font-size: 1.25rem;
-    font-weight: 650;
+    margin: 0.9rem 0 0;
+    font-size: 1.3rem;
+    color: var(--silk);
   }
-  .lede {
-    margin: 1.25rem 0 0;
+  .role span {
+    color: var(--silk-2);
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2.5rem;
+    margin: 2rem 0 0;
+  }
+  .meta dt {
+    font-size: 0.8rem;
+    color: var(--silk-2);
+  }
+  .meta dd {
+    margin: 0.1rem 0 0;
+    color: var(--silk);
   }
   .highlights {
     margin-bottom: 3rem;
-    padding: 1.75rem 2rem;
-    border-radius: var(--radius-lg);
-    background: color-mix(in oklab, var(--pine) 7%, var(--linen));
   }
-  .highlights h2,
-  .prose h2 {
-    font-size: 1.5rem;
-    margin: 0 0 1rem;
+  .highlights h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
   }
   .highlights ul {
+    list-style: none;
     margin: 0;
-    padding-left: 1.2rem;
-    display: grid;
-    gap: 0.5rem;
+    padding: 0;
+    border-top: 1px solid var(--line);
   }
-  .highlights li::marker {
-    color: var(--pine);
-  }
-  .side-h {
+  .highlights li {
+    position: relative;
+    padding: 0.85rem 0 0.85rem 1.6rem;
+    border-bottom: 1px solid var(--line);
     font-size: 1.05rem;
-    margin-bottom: 0.75rem;
   }
-  .facts {
-    margin: 0;
-    display: grid;
-    gap: 0.15rem;
-  }
-  .facts dt {
-    font-size: 0.85rem;
-    color: var(--bark-3);
-  }
-  .facts dd {
-    margin: 0 0 0.6rem;
+  .highlights li::before {
+    content: '';
+    position: absolute;
+    left: 0.2rem;
+    top: 1.35rem;
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: var(--mask);
+    box-shadow: 0 0 0 2px var(--gold);
   }
 </style>

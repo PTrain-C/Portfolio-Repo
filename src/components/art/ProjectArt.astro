@@ -1,0 +1,416 @@
+---
+// Generated cover art for projects, one motif per project, all drawn on the
+// same "board" palette. Used until real photos exist (and as a fallback).
+//   pcb      board layout (BSPD)
+//   bode     magnitude response with a notch (notch filter)
+//   compare  breadboard next to its PCB, marked equivalent (FFTF)
+//   gpio     Raspberry Pi 40-pin header with jumpers (Poke the Poker)
+
+interface Props {
+  variant?: 'pcb' | 'bode' | 'compare' | 'gpio';
+  label?: string;
+  // 'slice' fills any box by cropping; 'meet' shows the whole drawing.
+  fit?: 'slice' | 'meet';
+}
+const { variant = 'pcb', label, fit = 'slice' } = Astro.props;
+
+// Background dot grid, shared by all variants.
+const dots: [number, number][] = [];
+for (let x = 20; x < 800; x += 40) for (let y = 20; y < 520; y += 40) dots.push([x, y]);
+
+// ---- bode ----
+const f0x = 415;
+const toX = (u: number) => f0x + u * 216; // u = log10(f/f0), -1.5..1.5
+const toY = (db: number) => 130 - db * 6;
+const Q = 2.2;
+const curve: string[] = [];
+for (let i = 0; i <= 400; i++) {
+  const u = -1.5 + (3 * i) / 400;
+  const r = Math.pow(10, u);
+  const num = Math.abs(1 - r * r);
+  const den = Math.hypot(1 - r * r, r / Q);
+  const db = Math.max(20 * Math.log10(num / den || 1e-6), -46);
+  curve.push(`${toX(u).toFixed(1)},${toY(db).toFixed(1)}`);
+}
+const decades = [-1, 0, 1];
+const minors: number[] = [];
+for (const d of [-2, -1, 0, 1])
+  for (let m = 2; m < 10; m++) {
+    const u = d + Math.log10(m);
+    if (u > -1.5 && u < 1.5) minors.push(u);
+  }
+
+// ---- gpio ----
+const pitch = 26;
+const hx = 153;
+const pins: { x: number; y: number; n: number }[] = [];
+for (let c = 0; c < 20; c++) {
+  pins.push({ x: hx + c * pitch, y: 247, n: c * 2 + 1 });
+  pins.push({ x: hx + c * pitch, y: 221, n: c * 2 + 2 });
+}
+const pinAt = (n: number) => pins.find((p) => p.n === n)!;
+const pinLabels = [
+  { n: 1, t: '3V3', below: true },
+  { n: 2, t: '5V', below: false },
+  { n: 6, t: 'GND', below: false },
+  { n: 11, t: 'GPIO17', below: true },
+  { n: 12, t: 'GPIO18', below: false },
+];
+
+// ---- compare ----
+const bbHoles: [number, number][] = [];
+for (let c = 0; c < 13; c++) for (let r = 0; r < 5; r++) bbHoles.push([92 + c * 20, 170 + r * 18]);
+for (let c = 0; c < 13; c++) for (let r = 0; r < 5; r++) bbHoles.push([92 + c * 20, 290 + r * 18]);
+---
+
+<svg
+  class:list={['art', variant]}
+  viewBox="0 0 800 520"
+  preserveAspectRatio={`xMidYMid ${fit}`}
+  role="img"
+  aria-label={label ?? ''}
+>
+  <rect width="800" height="520" class="bg"></rect>
+  <g class="dots">{dots.map(([x, y]) => <circle cx={x} cy={y} r="1.6" />)}</g>
+
+  {
+    variant === 'pcb' && (
+      <g>
+        <rect x="60" y="50" width="680" height="420" rx="22" class="board-edge" />
+        {[[92, 82], [708, 82], [92, 438], [708, 438]].map(([x, y]) => (
+          <circle cx={x} cy={y} r="11" class="hole" />
+        ))}
+        <g class="tr">
+          <path d="M110 180 L200 180 L220 160 L228 160" />
+          <path d="M110 220 L228 220" />
+          <path d="M110 260 L190 260 L228 298 L228 300" />
+          <path d="M110 300 L150 300 L210 360 L228 360" />
+          <path d="M252 160 L300 160 L355 215 L370 215" />
+          <path d="M252 220 L300 220 L325 245 L370 245" />
+          <path d="M252 300 L320 300 L345 275 L370 275" />
+          <path d="M252 360 L300 360 L355 305 L370 305" />
+          <path d="M510 215 L545 215 L580 180 L588 180" />
+          <path d="M510 305 L553 305 L588 340" />
+          <path d="M612 180 L640 180 L690 230 L690 240" />
+          <path d="M612 340 L640 340 L690 290 L690 280" />
+          <path d="M510 245 L545 245" />
+          <path d="M510 275 L545 275" />
+        </g>
+        <g class="pads">
+          <rect x="99" y="169" width="22" height="22" rx="2" />
+          {[220, 260, 300].map((y) => <circle cx="110" cy={y} r="11" />)}
+          {[160, 220, 300, 360].map((y) => (
+            <>
+              <rect x="222" y={y - 8} width="12" height="16" rx="2" />
+              <rect x="246" y={y - 8} width="12" height="16" rx="2" />
+            </>
+          ))}
+          {[215, 245, 275, 305].map((y) => (
+            <>
+              <rect x="358" y={y - 6} width="26" height="12" rx="2" />
+              <rect x="496" y={y - 6} width="26" height="12" rx="2" />
+            </>
+          ))}
+          {[180, 340].map((y) => (
+            <>
+              <rect x="582" y={y - 8} width="12" height="16" rx="2" />
+              <rect x="606" y={y - 8} width="12" height="16" rx="2" />
+            </>
+          ))}
+          <rect x="679" y="229" width="22" height="22" rx="2" />
+          <circle cx="690" cy="280" r="11" />
+        </g>
+        <g class="via">
+          <circle cx="545" cy="245" r="7" />
+          <circle cx="545" cy="275" r="7" />
+          <circle cx="160" cy="400" r="7" />
+          <circle cx="640" cy="120" r="7" />
+        </g>
+        <g class="silk">
+          <rect x="384" y="190" width="112" height="140" rx="4" />
+          <circle cx="398" cy="204" r="4" class="fill" />
+          <text x="440" y="266" text-anchor="middle">U1</text>
+          <text x="86" y="150">J1</text>
+          <text x="226" y="142">R1</text>
+          <text x="226" y="202">R2</text>
+          <text x="226" y="282">C1</text>
+          <text x="226" y="342">C2</text>
+          <text x="586" y="162">R3</text>
+          <text x="586" y="322">R4</text>
+          <text x="676" y="212">J2</text>
+          <text x="720" y="452" text-anchor="end" class="big">BSPD</text>
+        </g>
+      </g>
+    )
+  }
+
+  {
+    variant === 'bode' && (
+      <g>
+        <g class="grid">
+          {minors.map((u) => <line x1={toX(u)} x2={toX(u)} y1="70" y2="430" class="minor" />)}
+          {decades.map((u) => <line x1={toX(u)} x2={toX(u)} y1="70" y2="430" />)}
+          {[0, -10, -20, -30, -40].map((db) => <line x1="90" x2="740" y1={toY(db)} y2={toY(db)} />)}
+        </g>
+        <line x1="90" x2="740" y1="430" y2="430" class="axis" />
+        <line x1="90" x2="90" y1="60" y2="430" class="axis" />
+        <line x1="90" x2="740" y1={toY(-20)} y2={toY(-20)} class="mark" />
+        <polyline points={curve.join(' ')} class="curve glow" />
+        <polyline points={curve.join(' ')} class="curve" />
+        <g class="bracket">
+          <line x1="470" x2="470" y1={toY(0)} y2={toY(-20)} />
+          <line x1="462" x2="478" y1={toY(0)} y2={toY(0)} />
+          <line x1="462" x2="478" y1={toY(-20)} y2={toY(-20)} />
+        </g>
+        <g class="silk">
+          <text x="486" y={toY(-9)}>&gt; 20 dB</text>
+          <text x="486" y={toY(-9) + 24} class="dim">LTSpice</text>
+          <text x={f0x} y="458" text-anchor="middle">f₀</text>
+          <text x="740" y="458" text-anchor="end" class="dim">frequency (log)</text>
+          <text x="80" y={toY(0) + 5} text-anchor="end" class="dim">0</text>
+          <text x="80" y={toY(-20) + 5} text-anchor="end" class="dim">−20</text>
+          <text x="80" y={toY(-40) + 5} text-anchor="end" class="dim">−40</text>
+          <text x="90" y="46" class="dim">|H(f)| in dB</text>
+        </g>
+      </g>
+    )
+  }
+
+  {
+    variant === 'compare' && (
+      <g>
+        <rect x="60" y="120" width="300" height="290" rx="14" class="bb" />
+        <line x1="80" x2="340" y1="145" y2="145" class="rail-r" />
+        <line x1="80" x2="340" y1="385" y2="385" class="rail-b" />
+        <rect x="70" y="262" width="280" height="10" class="bb-gap" />
+        <g class="bb-holes">{bbHoles.map(([x, y]) => <rect x={x - 3} y={y - 3} width="6" height="6" rx="1" />)}</g>
+        <g class="wires">
+          <path d="M112 170 C112 120 192 120 192 170" class="w1" />
+          <path d="M152 188 C152 240 232 250 232 290" class="w2" />
+          <path d="M272 206 C272 250 312 260 312 308" class="w3" />
+          <path d="M212 344 C212 400 292 400 292 385" class="w1" />
+        </g>
+        <rect x="160" y="178" width="46" height="18" rx="9" class="part" />
+        <rect x="244" y="312" width="18" height="44" rx="4" class="part dark" />
+
+        <text x="400" y="282" text-anchor="middle" class="equiv">≡</text>
+
+        <rect x="440" y="120" width="300" height="290" rx="14" class="board-edge solid" />
+        <g class="tr">
+          <path d="M480 170 L540 170 L560 150 L600 150 L620 170 L660 170" />
+          <path d="M520 200 L560 240 L560 290 L600 290" />
+          <path d="M620 210 L660 250 L660 320 L690 320" />
+          <path d="M560 350 L600 380 L680 380" />
+        </g>
+        <g class="pads">
+          {[[480, 170], [660, 170], [520, 200], [600, 290], [620, 210], [690, 320], [560, 350], [680, 380]].map(
+            ([x, y]) => <circle cx={x} cy={y} r="8" />,
+          )}
+        </g>
+        <g class="silk">
+          <text x="210" y="446" text-anchor="middle">breadboard</text>
+          <text x="590" y="446" text-anchor="middle">PCB</text>
+        </g>
+      </g>
+    )
+  }
+
+  {
+    variant === 'gpio' && (
+      <g>
+        <rect x="40" y="70" width="720" height="380" rx="26" class="board-edge" />
+        <circle cx="76" cy="106" r="13" class="hole" />
+        <circle cx="724" cy="106" r="13" class="hole" />
+        <rect x={hx - 17} y="204" width={19 * pitch + 34} height="60" rx="5" class="header" />
+        <g class="pads">
+          {pins.map((p) =>
+            p.n === 1 ? (
+              <rect x={p.x - 9} y={p.y - 9} width="18" height="18" rx="2" />
+            ) : (
+              <circle cx={p.x} cy={p.y} r="9" />
+            ),
+          )}
+        </g>
+        <g class="pinholes">{pins.map((p) => <circle cx={p.x} cy={p.y} r="3.5" />)}</g>
+        <g class="wires">
+          <path d={`M${pinAt(1).x} ${pinAt(1).y} C${pinAt(1).x} 360 ${pinAt(1).x + 60} 400 ${pinAt(1).x + 40} 520`} class="w2" />
+          <path d={`M${pinAt(11).x} ${pinAt(11).y} C${pinAt(11).x} 340 ${pinAt(11).x + 90} 380 ${pinAt(11).x + 120} 520`} class="w1" />
+          <path d={`M${pinAt(6).x} ${pinAt(6).y} C${pinAt(6).x} 120 ${pinAt(6).x + 160} 90 ${pinAt(6).x + 220} 0`} class="w3" />
+        </g>
+        <g class="silk">
+          {pinLabels.map((l) => (
+            <text x={pinAt(l.n).x} y={l.below ? 290 : 192} text-anchor="middle" class="tiny">
+              {l.t}
+            </text>
+          ))}
+          <text x={hx - 17} y="176" class="dim">J8</text>
+          <text x="720" y="420" text-anchor="end" class="big">RPi</text>
+        </g>
+      </g>
+    )
+  }
+</svg>
+
+<style>
+  .art {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .bg {
+    fill: var(--mask);
+  }
+  .dots circle {
+    fill: var(--mask-line);
+  }
+  .board-edge {
+    fill: none;
+    stroke: var(--silk-2);
+    stroke-width: 2;
+    opacity: 0.6;
+  }
+  .board-edge.solid {
+    fill: var(--mask-deep);
+    opacity: 1;
+    stroke: var(--mask-line);
+  }
+  .hole {
+    fill: var(--mask-deep);
+    stroke: var(--gold);
+    stroke-width: 4;
+  }
+  .tr path {
+    fill: none;
+    stroke: color-mix(in oklab, var(--gold) 80%, var(--mask));
+    stroke-width: 7;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+  .pads rect,
+  .pads circle {
+    fill: var(--gold);
+  }
+  .via circle {
+    fill: var(--mask-deep);
+    stroke: var(--gold);
+    stroke-width: 4;
+  }
+  .silk text {
+    font-family: var(--mono);
+    font-size: 17px;
+    fill: var(--silk);
+    opacity: 0.85;
+  }
+  .silk .big {
+    font-size: 30px;
+    letter-spacing: 0.04em;
+  }
+  .silk .dim {
+    fill: var(--silk-2);
+    opacity: 0.8;
+    font-size: 15px;
+  }
+  .silk .tiny {
+    font-size: 13px;
+  }
+  .silk rect {
+    fill: none;
+    stroke: var(--silk);
+    stroke-width: 2;
+    opacity: 0.8;
+  }
+  .silk .fill {
+    fill: var(--silk);
+  }
+
+  /* bode */
+  .grid line {
+    stroke: var(--mask-line);
+    stroke-width: 1.5;
+  }
+  .grid .minor {
+    stroke-width: 0.8;
+    opacity: 0.7;
+  }
+  .axis {
+    stroke: var(--silk-2);
+    stroke-width: 2;
+  }
+  .mark {
+    stroke: var(--silk-2);
+    stroke-width: 1.5;
+    stroke-dasharray: 6 6;
+    opacity: 0.7;
+  }
+  .curve {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 4;
+    stroke-linejoin: round;
+  }
+  .curve.glow {
+    stroke-width: 12;
+    opacity: 0.25;
+    filter: blur(4px);
+  }
+  .bracket line {
+    stroke: var(--silk);
+    stroke-width: 2;
+  }
+
+  /* compare */
+  .bb {
+    fill: #efeadc;
+  }
+  .bb-gap {
+    fill: #e2dccb;
+  }
+  .bb-holes rect {
+    fill: #bdb6a3;
+  }
+  .rail-r,
+  .rail-b {
+    stroke-width: 3;
+  }
+  .rail-r {
+    stroke: var(--tone-rose);
+  }
+  .rail-b {
+    stroke: var(--tone-sky);
+  }
+  .wires path {
+    fill: none;
+    stroke-width: 6;
+    stroke-linecap: round;
+  }
+  .w1 {
+    stroke: var(--gold);
+  }
+  .w2 {
+    stroke: #c8566a;
+  }
+  .w3 {
+    stroke: #6b93b0;
+  }
+  .part {
+    fill: #c9a878;
+  }
+  .part.dark {
+    fill: #3b3a36;
+  }
+  .equiv {
+    font-family: var(--sans);
+    font-size: 64px;
+    fill: var(--gold);
+  }
+
+  /* gpio */
+  .header {
+    fill: #121a16;
+    stroke: var(--mask-line);
+    stroke-width: 2;
+  }
+  .pinholes circle {
+    fill: var(--mask-deep);
+  }
+</style>

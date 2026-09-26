@@ -1,6 +1,9 @@
 ---
-import '@fontsource-variable/fraunces/full.css';
-import '@fontsource-variable/nunito-sans';
+import { ClientRouter } from 'astro:transitions';
+import '@fontsource/instrument-serif/400-italic.css';
+import '@fontsource/instrument-serif/400.css';
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -22,13 +25,14 @@ const fullTitle = title ? `${title} | ${site.name}` : `${site.name}, Electrical 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#eceee2" />
+    <meta name="theme-color" content="#1e3d31" />
     <link rel="icon" type="image/svg+xml" href={href('/favicon.svg')} />
+    <ClientRouter />
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
     <Header />
-    <main id="main">
+    <main id="main" transition:animate="fade">
       <slot />
     </main>
     <Footer />
@@ -38,18 +42,15 @@ const fullTitle = title ? `${title} | ${site.name}` : `${site.name}, Electrical 
         position: absolute;
         left: -9999px;
         top: 0;
-        z-index: 10;
-        background: var(--pine);
-        color: var(--linen);
+        z-index: 100;
+        background: var(--gold);
+        color: var(--mask-deep);
         padding: 0.5rem 0.9rem;
-        border-radius: var(--radius-sm);
+        border-radius: 999px;
       }
       .skip:focus {
         left: 0.75rem;
         top: 0.75rem;
-      }
-      main {
-        min-height: 70vh;
       }
     </style>
   </body>

@@ -2,26 +2,35 @@
 import { contact } from '../config';
 
 interface Props {
-  inverted?: boolean;
+  // 'dark' for use on the board (dark) areas, 'light' for linen areas.
+  on?: 'dark' | 'light';
+  // Include GitHub (the hero keeps it to Email + LinkedIn).
+  github?: boolean;
 }
-const { inverted = false } = Astro.props;
+const { on = 'dark', github = true } = Astro.props;
 
 const items = [
   { label: 'Email me', url: contact.email, primary: true },
   { label: 'LinkedIn', url: contact.linkedin },
-  { label: 'GitHub', url: contact.github },
+  ...(github ? [{ label: 'GitHub', url: contact.github }] : []),
 ];
+const primary = on === 'dark' ? 'gold' : 'solid';
+const secondary = on === 'dark' ? 'ghost-dark' : '';
 ---
 
-<div class:list={['row', { inverted }]}>
+<div class="row">
   {
     items.map((i) =>
       i.url ? (
-        <a class:list={['btn', { primary: i.primary }]} href={i.url}>
+        <a class:list={['btn', i.primary ? primary : secondary]} href={i.url}>
           {i.label}
         </a>
       ) : (
-        <span class="btn" aria-disabled="true" title="Link not added yet (src/config.ts)">
+        <span
+          class:list={['btn', i.primary ? primary : secondary]}
+          aria-disabled="true"
+          title="Link not added yet (src/config.ts)"
+        >
           {i.label}
         </span>
       ),
@@ -33,24 +42,6 @@ const items = [
   .row {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-  .inverted .btn {
-    border-color: var(--linen);
-    color: var(--linen);
-  }
-  .inverted .btn.primary {
-    background: var(--honey);
-    border-color: var(--honey);
-    color: var(--pine-deep);
-  }
-  .inverted .btn:hover {
-    background: var(--linen);
-    color: var(--pine-deep);
-  }
-  .inverted .btn[aria-disabled='true'] {
-    border-color: color-mix(in oklab, var(--linen) 55%, transparent);
-    color: color-mix(in oklab, var(--linen) 70%, transparent);
-    background: transparent;
+    gap: 0.7rem;
   }
 </style>

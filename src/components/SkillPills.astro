@@ -1,15 +1,20 @@
 ---
 // Skill ids rendered as pills that link to that skill on the Skills page.
 // `grouped` shows one row per category with the category name above it.
+// `limit` caps a flat list and adds a "+N more" note.
 import { groupSkills } from '../data/skills';
 import { href } from '../config';
 
 interface Props {
   ids: string[];
   grouped?: boolean;
+  limit?: number;
 }
-const { ids, grouped = false } = Astro.props;
+const { ids, grouped = false, limit } = Astro.props;
 const groups = groupSkills(ids);
+const flat = groups.flatMap((g) => g.skills.map((s) => ({ ...s, tone: g.category.tone })));
+const shown = limit ? flat.slice(0, limit) : flat;
+const more = flat.length - shown.length;
 ---
 
 {
@@ -34,15 +39,14 @@ const groups = groupSkills(ids);
     </div>
   ) : (
     <ul class="pills">
-      {groups.flatMap((g) =>
-        g.skills.map((s) => (
-          <li>
-            <a class="pill" data-tone={g.category.tone} href={href(`/skills#${s.id}`)}>
-              {s.name}
-            </a>
-          </li>
-        )),
-      )}
+      {shown.map((s) => (
+        <li>
+          <a class="pill" data-tone={s.tone} href={href(`/skills#${s.id}`)}>
+            {s.name}
+          </a>
+        </li>
+      ))}
+      {more > 0 && <li class="more small quiet">+{more} more</li>}
     </ul>
   )
 }
@@ -53,8 +57,12 @@ const groups = groupSkills(ids);
     gap: 1rem;
   }
   .cat {
-    margin: 0 0 0.4rem;
-    font-weight: 700;
+    margin: 0 0 0.45rem;
+    font-weight: 600;
     color: var(--tone);
+  }
+  .more {
+    align-self: center;
+    margin-left: 0.2rem;
   }
 </style>

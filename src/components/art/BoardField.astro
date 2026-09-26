@@ -1,0 +1,85 @@
+---
+// Faint background routing for dark "board" areas: parallel buses with 45
+// degree bends, vias, and a few passive footprints. Purely decorative.
+import { bus, rng } from '../../lib/art';
+
+interface Props {
+  seed?: number;
+  opacity?: number;
+}
+const { seed = 7, opacity = 0.22 } = Astro.props;
+const rand = rng(seed);
+
+const buses = [
+  bus([-20, 120], [[260, 0], [90, 90], [300, 0], [60, -60], [900, 0]], 4, 14),
+  bus([-20, 780], [[180, 0], [120, -120], [420, 0], [80, 80], [800, 0]], 5, 12),
+  bus([1460, 420], [[-220, 0], [-70, 70], [-160, 0], [-60, -60], [-120, 0]], 3, 14),
+  bus([620, 940], [[0, -120], [60, -60], [0, -90]], 3, 14),
+  bus([1100, -20], [[0, 140], [-80, 80], [0, 120]], 4, 12),
+];
+const traces = buses.flat();
+
+const vias = Array.from({ length: 34 }, () => [
+  Math.round(rand() * 1440),
+  Math.round(rand() * 900),
+]);
+const passives = Array.from({ length: 10 }, () => ({
+  x: Math.round(rand() * 1360 + 40),
+  y: Math.round(rand() * 840 + 30),
+  r: rand() > 0.5 ? 90 : 0,
+}));
+---
+
+<svg
+  class="field"
+  viewBox="0 0 1440 900"
+  preserveAspectRatio="xMidYMid slice"
+  aria-hidden="true"
+  style={`--o:${opacity}`}
+>
+  <g class="traces">
+    {traces.map((t) => <path d={t.d} />)}
+  </g>
+  <g class="ends">
+    {traces.map((t) => <circle cx={t.end[0]} cy={t.end[1]} r="4.5" />)}
+  </g>
+  <g class="vias">
+    {vias.map(([x, y]) => <circle cx={x} cy={y} r="3.5" />)}
+  </g>
+  <g class="passives">
+    {
+      passives.map((p) => (
+        <g transform={`translate(${p.x} ${p.y}) rotate(${p.r})`}>
+          <rect x="-13" y="-6" width="9" height="12" rx="1.5" />
+          <rect x="4" y="-6" width="9" height="12" rx="1.5" />
+        </g>
+      ))
+    }
+  </g>
+</svg>
+
+<style>
+  .field {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: var(--o);
+    pointer-events: none;
+  }
+  .traces path {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+  }
+  .ends circle,
+  .vias circle {
+    fill: var(--mask);
+    stroke: var(--gold);
+    stroke-width: 2.5;
+  }
+  .passives rect {
+    fill: var(--gold);
+  }
+</style>

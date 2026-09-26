@@ -1,21 +1,19 @@
 ---
 import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
 import { href } from '../config';
 ---
 
 <Base title="Page not found">
-  <section class="wrap page">
-    <h1>This page doesn't exist.</h1>
-    <p class="lede">The link may be old, or the page may have moved.</p>
-    <p><a class="btn primary" href={href('/')}>Go to the home page</a></p>
-  </section>
+  <PageHero seed={41}>
+    <h1>Open circuit.</h1>
+    <p class="lede">This page doesn't exist. The link may be old, or the page may have moved.</p>
+    <p class="go"><a class="btn gold" href={href('/')}>Go to the home page</a></p>
+  </PageHero>
 </Base>
 
 <style>
-  .page {
-    padding-top: 6rem;
-  }
-  .lede {
-    margin: 1rem 0 2rem;
+  .go {
+    margin-top: 2rem;
   }
 </style>

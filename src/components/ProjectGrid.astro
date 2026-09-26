@@ -1,0 +1,147 @@
+---
+// Bento grid of projects: spans alternate 7/5 then 5/7 across a 12-column
+// grid. Title, summary, and skills are always visible (no hover needed).
+import type { CollectionEntry } from 'astro:content';
+import ProjectArt from './art/ProjectArt.astro';
+import SkillPills from './SkillPills.astro';
+import { href } from '../config';
+
+interface Props {
+  projects: CollectionEntry<'projects'>[];
+  showMine?: boolean;
+}
+const { projects, showMine = false } = Astro.props;
+const span = (i: number) => ([7, 5, 5, 7][i % 4]);
+---
+
+<ul class="bento">
+  {
+    projects.map((p, i) => (
+      <li style={`--span:${span(i)}`}>
+        <a class="media" href={href(`/projects/${p.id}`)} aria-label={`Open ${p.data.title}`}>
+          {p.data.cover ? (
+            <img src={href(`/${p.data.cover}`)} alt="" loading="lazy" />
+          ) : (
+            <ProjectArt variant={p.data.art} fit="meet" />
+          )}
+          <span class="hover-label">
+            View <span class="display">{p.data.title}</span>
+          </span>
+        </a>
+        <div class="meta">
+          <h3>
+            <a href={href(`/projects/${p.id}`)}>{p.data.title}</a>
+          </h3>
+          {p.data.period && <span class="small quiet">{p.data.period}</span>}
+        </div>
+        <p class="summary">{p.data.summary}</p>
+        {showMine && p.data.mine.length > 0 && (
+          <p class="small mine">
+            <span>My part</span> {p.data.mine.join(', ')}
+          </p>
+        )}
+        <SkillPills ids={p.data.skills} limit={4} />
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .bento {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 3rem 1.75rem;
+  }
+  .bento > li {
+    grid-column: span var(--span);
+    min-width: 0;
+  }
+  .media {
+    position: relative;
+    display: block;
+    /* Fixed height so both cards in a row line up; art fills by cropping. */
+    height: clamp(15rem, 27vw, 24rem);
+    border-radius: 1.25rem;
+    overflow: hidden;
+    background: var(--mask);
+  }
+  .media :global(svg),
+  .media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s var(--ease);
+  }
+  .media:hover :global(svg),
+  .media:hover img {
+    transform: scale(1.04);
+  }
+  .hover-label {
+    position: absolute;
+    left: 50%;
+    bottom: 1.25rem;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    padding: 0.55rem 1.1rem;
+    border-radius: 999px;
+    background: var(--silk);
+    color: var(--mask-deep);
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translate(-50%, 8px);
+    transition:
+      opacity 0.25s,
+      transform 0.35s var(--ease);
+  }
+  .hover-label .display {
+    font-size: 1.2rem;
+  }
+  .media:hover .hover-label,
+  .media:focus-visible .hover-label {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  .meta {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.1rem;
+  }
+  h3 {
+    font-size: 1.25rem;
+  }
+  h3 a {
+    color: var(--bark);
+    text-decoration: none;
+  }
+  h3 a:hover {
+    color: var(--pine);
+    text-decoration: underline;
+  }
+  .summary {
+    margin: 0.4rem 0 0.9rem;
+    color: var(--bark-2);
+    max-width: 38rem;
+  }
+  .mine {
+    margin: -0.3rem 0 0.9rem;
+    color: var(--bark-2);
+  }
+  .mine span {
+    font-weight: 650;
+    color: var(--pine);
+    margin-right: 0.3rem;
+  }
+  @media (max-width: 52rem) {
+    .bento > li {
+      grid-column: span 12;
+    }
+  }
+</style>

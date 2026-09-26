@@ -1,357 +1,438 @@
 ---
 import Base from '../layouts/Base.astro';
-import Avatar from '../components/Avatar.astro';
-import ContactButtons from '../components/ContactButtons.astro';
-import { site, interests, href } from '../config';
+import BoardField from '../components/art/BoardField.astro';
+import HeadshotPad from '../components/art/HeadshotPad.astro';
+import QuantumCircuit from '../components/art/QuantumCircuit.astro';
+import ProjectGrid from '../components/ProjectGrid.astro';
+import ExperienceRows from '../components/ExperienceRows.astro';
+import { site, contact, interests, href } from '../config';
 import { categories } from '../data/skills';
-import { getProjects, getExperience } from '../lib/content';
+import { getProjects, getExperience, getCredentials } from '../lib/content';
 
 const projects = await getProjects();
 const experience = await getExperience();
+const credentials = await getCredentials();
 const current = experience.find((e) => e.data.current);
 
+// Categories shown in the hero's key skills strip (all featured skills are
+// still on the Skills page).
+const heroCategories = ['pcb', 'analog', 'test', 'systems', 'programming', 'quantum'];
 const keySkills = categories
+  .filter((c) => heroCategories.includes(c.id))
   .map((c) => ({ category: c, skills: c.skills.filter((s) => s.featured) }))
   .filter((g) => g.skills.length > 0);
+
+const focus = [
+  'analog & mixed-signal circuits',
+  'PCB design',
+  'quantum hardware',
+  'space hardware test',
+];
+
+// Facts pulled straight from the experience entries.
+const facts = [
+  { big: '13', label: 'interns I led defining SWAP-C constraints at Lockheed Martin' },
+  { big: '140+', label: 'participants at Qompute 2026, which I co-organize' },
+  { big: 'Class B', label: 'NASA risk classification of the space hardware I test at Draper' },
+  { big: String(projects.length), label: 'projects, each with my part spelled out' },
+];
 ---
 
 <Base>
-  <section class="hero wrap">
-    <div class="intro">
-      <h1>Hi, I'm {site.name}.</h1>
-      <p class="lede">
-        I'm an electrical engineering student at USC. I spend most of my time on analog and
-        mixed-signal circuits, PCB design, and quantum hardware.
-      </p>
-      {/* TODO(Peter): rewrite this paragraph in your own words. */}
-      <p class="bio">
-        I like the whole path of a circuit: working out what it should do on paper, laying out the
-        board, and then seeing what it actually does on the bench. Outside of class I help run
-        Qompute, USC's quantum computing event.
-      </p>
-      <ContactButtons />
-    </div>
-
-    <div class="portrait">
-      <Avatar />
-      {
-        current && (
-          <a class="now" href={href(`/experience/${current.id}`)}>
-            <span class="small quiet">Right now</span>
-            <span class="serif now-role">{current.data.role}</span>
-            <span class="small">at {current.data.org}</span>
-          </a>
-        )
-      }
-    </div>
-  </section>
-
-  <section class="wrap section">
-    <div class="head">
-      <h2>Key skills</h2>
-      <a href={href('/skills')}>See every skill and where I used it</a>
-    </div>
-    <div class="skill-grid">
-      {
-        keySkills.map((g) => (
-          <div class="skill-cat" data-tone={g.category.tone}>
-            <h3>{g.category.name}</h3>
-            <ul class="pills">
-              {g.skills.map((s) => (
-                <li>
-                  <a class="pill" data-tone={g.category.tone} href={href(`/skills#${s.id}`)}>
-                    {s.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))
-      }
-    </div>
-  </section>
-
-  <section class="wrap section work">
-    <div>
-      <div class="head">
-        <h2>Experience</h2>
-        <a href={href('/experience')}>All experience</a>
-      </div>
-      <ol class="mini-timeline">
+  <section class="hero">
+    <BoardField seed={21} opacity={0.2} />
+    <div class="wrap hero-grid">
+      <div class="intro">
         {
-          experience.map((e) => (
-            <li>
-              <a href={href(`/experience/${e.id}`)}>
-                <span class="serif org">{e.data.org}</span>
-                <span class="role">{e.data.role}</span>
-                <span class="small quiet">
-                  {e.data.start
-                    ? e.data.start === e.data.end
-                      ? e.data.start
-                      : `${e.data.start} to ${e.data.end}`
-                    : 'Dates to come'}
-                </span>
-              </a>
-            </li>
-          ))
+          current && (
+            <a class="status rise" href={href(`/experience/${current.id}`)}>
+              <span class="live" aria-hidden="true" />
+              Now: {current.data.role} at {current.data.org}
+            </a>
+          )
         }
-      </ol>
+        <h1 class="display name rise" style="--d:1">{site.name}</h1>
+        <p class="focus rise" style="--d:2">
+          Electrical engineering at USC, working on
+          <span class="rotator" data-rotator={JSON.stringify(focus)}>
+            <span class="word">{focus[0]}</span>
+          </span>
+        </p>
+        {/* TODO(Peter): rewrite in your own words. */}
+        <p class="bio rise" style="--d:3">
+          I like the whole path of a circuit: working out what it should do on paper, laying out the
+          board, and seeing what it actually does on the bench. Right now that means integration and
+          test on space hardware.
+        </p>
+        <div class="ctas rise" style="--d:4">
+          <a class="btn gold" href={href('/projects')}>See projects</a>
+          {
+            contact.email ? (
+              <a class="btn ghost-dark" href={contact.email}>Email me</a>
+            ) : (
+              <a class="btn ghost-dark" href="#contact">Email me</a>
+            )
+          }
+          {
+            contact.linkedin ? (
+              <a class="btn ghost-dark" href={contact.linkedin}>LinkedIn</a>
+            ) : (
+              <span class="btn ghost-dark" aria-disabled="true" title="Link not added yet (src/config.ts)">
+                LinkedIn
+              </span>
+            )
+          }
+        </div>
+      </div>
+      <div class="pad rise" style="--d:2">
+        <HeadshotPad />
+      </div>
     </div>
 
-    <div>
-      <div class="head">
-        <h2>Projects</h2>
-        <a href={href('/projects')}>All projects</a>
+    <div class="wrap">
+      <div class="keys rise" style="--d:5">
+        <div class="keys-head">
+          <h2>Key skills</h2>
+          <a href={href('/skills')}>Full skill map</a>
+        </div>
+        <ul class="key-cols">
+          {
+            keySkills.map((g) => (
+              <li>
+                <span class="k-cat">{g.category.name}</span>
+                <ul>
+                  {g.skills.map((s) => (
+                    <li>
+                      <a href={href(`/skills#${s.id}`)}>{s.name}</a>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))
+          }
+        </ul>
       </div>
-      <ul class="mini-projects">
+    </div>
+  </section>
+
+  <section class="wrap sec" id="projects">
+    <div class="sec-head">
+      <div>
+        <h2 class="display">Projects</h2>
+        <p>Hardware I've designed, built, or verified, with my part spelled out on each one.</p>
+      </div>
+      <a class="btn" href={href('/projects')}>All projects</a>
+    </div>
+    <ProjectGrid projects={projects} />
+  </section>
+
+  <section class="wrap sec" id="experience">
+    <div class="sec-head">
+      <div>
+        <h2 class="display">Experience</h2>
+        <p>Most recent first. Each role lists what I did and the skills it used.</p>
+      </div>
+      <a class="btn" href={href('/experience')}>All experience</a>
+    </div>
+    <ExperienceRows entries={experience} />
+    {
+      credentials.length > 0 && (
+        <p class="creds small">
+          Also:{' '}
+          {credentials.map((c, i) => (
+            <>
+              {i > 0 && ', '}
+              {c.data.title}, {c.data.issuer} {c.data.date}
+            </>
+          ))}
+        </p>
+      )
+    }
+  </section>
+
+  <section class="wrap facts" aria-label="Highlights">
+    {
+      facts.map((f) => (
+        <div>
+          <p class="display big">{f.big}</p>
+          <p class="label">{f.label}</p>
+        </div>
+      ))
+    }
+  </section>
+
+  <section class="wrap sec" id="interests">
+    <div class="sec-head">
+      <div>
+        <h2 class="display">What I'm into</h2>
+        <p>The areas I keep coming back to, in class and out of it.</p>
+      </div>
+    </div>
+    <div class="interests">
+      <QuantumCircuit rows={interests.length} rowHeight={96} />
+      <ul>
         {
-          projects.map((p) => (
+          interests.map((i) => (
             <li>
-              <a href={href(`/projects/${p.id}`)}>
-                <span class="serif org">{p.data.title}</span>
-                <span class="small quiet">{p.data.summary}</span>
-              </a>
+              <h3>{i.title}</h3>
+              <p>
+                {i.text} {i.placeholder && <span class="todo">Still to write</span>}
+              </p>
             </li>
           ))
         }
       </ul>
     </div>
   </section>
-
-  <section class="wrap section">
-    <div class="head">
-      <h2>What I'm into</h2>
-    </div>
-    <ul class="interests">
-      {
-        interests.map((i) => (
-          <li class:list={{ placeholder: i.placeholder }}>
-            <h3>{i.title}</h3>
-            <p>{i.text}</p>
-            {i.placeholder && <span class="todo">Still to write</span>}
-          </li>
-        ))
-      }
-    </ul>
-  </section>
-
-  <section class="wrap section" id="contact">
-    <div class="contact">
-      <div>
-        {/* TODO(Peter): adjust the kinds of roles you're looking for. */}
-        <h2>Hiring for an EE role? I'd like to hear about it.</h2>
-        <p>
-          I'm looking for internships and co-ops in analog and mixed-signal design, PCB design,
-          hardware test, and quantum hardware. Email is the fastest way to reach me.
-        </p>
-      </div>
-      <ContactButtons inverted />
-    </div>
-  </section>
 </Base>
 
+<script>
+  // Cycle the focus word in the hero. Re-runs after client-side navigation.
+  let timer: number | undefined;
+  function start() {
+    clearInterval(timer);
+    const el = document.querySelector<HTMLElement>('[data-rotator]');
+    if (!el || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const words: string[] = JSON.parse(el.dataset.rotator ?? '[]');
+    let i = 0;
+    timer = window.setInterval(() => {
+      i = (i + 1) % words.length;
+      const span = document.createElement('span');
+      span.className = 'word';
+      span.textContent = words[i];
+      el.replaceChildren(span);
+    }, 2400);
+  }
+  document.addEventListener('astro:page-load', start);
+</script>
+
 <style>
+  /* ---- Hero (the board) ---------------------------------------------- */
   .hero {
-    display: grid;
-    grid-template-columns: 1.35fr 1fr;
-    gap: 4rem;
-    align-items: center;
-    padding-top: 3.5rem;
+    position: relative;
+    overflow: hidden;
+    background: var(--mask);
+    color: var(--silk);
+    padding-top: 6.5rem;
   }
-  .hero h1 {
-    font-size: clamp(3.2rem, 6.5vw, 5.4rem);
-    line-height: 1;
-    margin-bottom: 1.75rem;
-  }
-  .bio {
-    max-width: 38rem;
-    color: var(--bark-2);
-    margin: 0 0 2rem;
-  }
-  .portrait {
+  .hero-grid {
     position: relative;
     display: grid;
-    justify-items: center;
+    grid-template-columns: 1.25fr 1fr;
+    gap: 3rem;
+    align-items: center;
   }
-  .now {
-    position: absolute;
-    left: -1.5rem;
-    bottom: 1.5rem;
-    display: grid;
-    gap: 0.1rem;
-    max-width: 15rem;
-    padding: 0.9rem 1.1rem;
-    border-radius: var(--radius);
-    background: var(--surface);
-    box-shadow: 0 10px 30px -12px rgb(43 38 32 / 0.35);
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.4rem 0.9rem 0.4rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--silk) 16%, transparent);
+    color: var(--silk-2);
+    font-size: 0.88rem;
     text-decoration: none;
-    color: var(--bark);
-    transform: rotate(-2deg);
   }
-  .now:hover {
-    color: var(--pine);
+  .status:hover {
+    color: var(--silk);
+    border-color: var(--gold);
   }
-  .now-role {
-    font-size: 1.1rem;
-    line-height: 1.2;
+  .name {
+    margin: 1.5rem 0 1.25rem;
+    font-size: clamp(6rem, 13vw, 11rem);
+    line-height: 0.85;
+    color: var(--silk);
+  }
+  .focus {
+    margin: 0;
+    font-size: clamp(1.3rem, 2.1vw, 1.7rem);
+    line-height: 1.35;
+    color: var(--silk-2);
+    min-height: 2.7em;
+  }
+  .rotator {
+    color: var(--gold);
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 1.15em;
+  }
+  .rotator :global(.word) {
+    display: inline-block;
+    animation: word-in 0.45s var(--ease);
+  }
+  @keyframes word-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+  .bio {
+    max-width: 34rem;
+    margin: 1.25rem 0 2rem;
+    color: var(--silk-2);
+  }
+  .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+  }
+  .pad {
+    max-width: 30rem;
+    justify-self: end;
+    width: 100%;
   }
 
-  .section {
-    margin-top: 6.5rem;
+  .keys {
+    position: relative;
+    margin-top: 2.5rem;
+    padding: 1.5rem 0 2.5rem;
+    border-top: 2px solid color-mix(in oklab, var(--gold) 55%, transparent);
   }
-  .head {
+  .keys-head {
     display: flex;
     align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1.75rem;
-  }
-  .head a {
-    font-weight: 650;
-  }
-
-  .skill-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
     gap: 1.25rem;
+    margin-bottom: 1.1rem;
   }
-  .skill-cat {
-    padding: 1.4rem 1.5rem 1.6rem;
-    border-radius: var(--radius);
-    background: var(--surface);
-    border-top: 4px solid var(--tone);
+  .keys-head h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--silk);
   }
-  .skill-cat h3 {
-    font-size: 1.15rem;
-    margin-bottom: 0.9rem;
+  .keys-head a {
+    font-size: 0.88rem;
+    color: var(--gold);
   }
-
-  .work {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4rem;
-  }
-  .mini-timeline,
-  .mini-projects {
+  .key-cols {
     list-style: none;
     margin: 0;
     padding: 0;
-  }
-  .mini-timeline {
-    border-left: 2px solid var(--line);
-  }
-  .mini-timeline li {
-    position: relative;
-  }
-  .mini-timeline li::before {
-    content: '';
-    position: absolute;
-    left: -0.45rem;
-    top: 1.35rem;
-    width: 0.8rem;
-    height: 0.8rem;
-    border-radius: 50%;
-    background: var(--linen);
-    border: 2px solid var(--pine);
-  }
-  .mini-timeline li:first-child::before {
-    background: var(--honey);
-    border-color: var(--honey);
-  }
-  .mini-timeline a,
-  .mini-projects a {
     display: grid;
-    gap: 0.1rem;
-    padding: 0.9rem 1.25rem;
-    margin-left: 0.75rem;
-    border-radius: var(--radius);
+    grid-template-columns: repeat(6, 1fr);
+  }
+  .key-cols > li {
+    position: relative;
+    padding: 0 1.1rem;
+    border-left: 1px solid color-mix(in oklab, var(--gold) 35%, transparent);
+  }
+  .key-cols > li:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .k-cat {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--silk-2);
+    margin-bottom: 0.4rem;
+  }
+  .key-cols ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.15rem;
+  }
+  .key-cols ul a {
+    color: var(--silk);
     text-decoration: none;
-    color: var(--bark);
+    font-size: 0.95rem;
   }
-  .mini-projects a {
-    margin-left: 0;
+  .key-cols ul a:hover {
+    color: var(--gold);
+    text-decoration: underline;
   }
-  .mini-timeline a:hover,
-  .mini-projects a:hover {
-    background: var(--surface);
+
+  /* ---- Sections ------------------------------------------------------- */
+  .sec {
+    margin-top: 7rem;
   }
-  .mini-timeline a:hover .org,
-  .mini-projects a:hover .org {
+  .creds {
+    margin: 1.25rem 0 0 1rem;
+    color: var(--bark-2);
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    margin-top: 7rem;
+  }
+  .facts > div {
+    padding: 0.5rem 2rem 0.5rem 1.5rem;
+    border-left: 1px solid var(--line);
+  }
+  .facts > div:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .facts p {
+    margin: 0;
+  }
+  .big {
+    font-size: clamp(3rem, 5vw, 4.5rem);
     color: var(--pine);
   }
-  .org {
-    font-size: 1.25rem;
-  }
-  .role {
+  .label {
+    margin-top: 0.6rem !important;
     color: var(--bark-2);
+    font-size: 0.95rem;
+    max-width: 15rem;
   }
 
   .interests {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 2.5rem;
+    align-items: start;
+  }
+  .interests ul {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 2rem;
   }
   .interests li {
-    border-top: 2px solid var(--honey);
-    padding-top: 1rem;
-  }
-  .interests .placeholder {
-    border-top-style: dashed;
+    height: 96px;
+    display: grid;
+    align-content: center;
   }
   .interests h3 {
     font-size: 1.1rem;
-    margin-bottom: 0.4rem;
   }
-  .interests p {
-    margin: 0 0 0.6rem;
+  .interests li p {
+    margin: 0.15rem 0 0;
     color: var(--bark-2);
     font-size: 0.95rem;
   }
 
-  .contact {
-    display: grid;
-    grid-template-columns: 1.3fr 1fr;
-    gap: 3rem;
-    align-items: center;
-    padding: 3.5rem 3.5rem;
-    border-radius: var(--radius-lg);
-    background: var(--pine);
-    color: var(--linen);
-  }
-  .contact h2 {
-    color: var(--linen);
-    font-size: clamp(1.8rem, 3vw, 2.5rem);
-    margin-bottom: 1rem;
-  }
-  .contact p {
-    margin: 0;
-    color: color-mix(in oklab, var(--linen) 82%, transparent);
-    max-width: 34rem;
-  }
-
   @media (max-width: 60rem) {
-    .hero,
-    .work,
-    .contact {
+    .hero-grid {
       grid-template-columns: 1fr;
     }
-    .skill-grid {
+    .pad {
+      justify-self: start;
+      max-width: 20rem;
+      grid-row: 1;
+    }
+    .key-cols {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem 0;
+    }
+    .key-cols > li:nth-child(3n + 1) {
+      padding-left: 0;
+      border-left: 0;
+    }
+    .facts {
       grid-template-columns: 1fr 1fr;
+      gap: 2rem 0;
     }
     .interests {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 1fr;
     }
-    .portrait {
-      max-width: 20rem;
+    .interests :global(.qc) {
+      display: none;
     }
-    .now {
-      left: 0;
-    }
-    .contact {
-      padding: 2rem;
+    .interests li {
+      height: auto;
+      padding: 0.75rem 0;
     }
   }
 </style>

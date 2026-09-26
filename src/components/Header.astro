@@ -1,95 +1,172 @@
 ---
+// Floating pill navigation, fixed at the top on every page. "Contact" jumps
+// to the contact footer, which is on every page.
 import { site, href } from '../config';
 
 const nav = [
+  { label: 'Home', path: '/' },
   { label: 'Projects', path: '/projects' },
   { label: 'Experience', path: '/experience' },
   { label: 'Skills', path: '/skills' },
   { label: 'Coursework', path: '/coursework' },
 ];
 
-const current = Astro.url.pathname.replace(/\/$/, '');
+const current = Astro.url.pathname.replace(/\/$/, '') || '/';
 const isActive = (path: string) => {
-  const target = href(path);
+  const target = href(path).replace(/\/$/, '') || '/';
+  if (path === '/') return current === target;
   return current === target || current.startsWith(`${target}/`);
 };
 ---
 
-<header class="wrap">
-  <a class="home serif" href={href('/')}>{site.name}</a>
-  <nav aria-label="Main">
+<header class="nav-shell" transition:persist>
+  <nav class="pill" aria-label="Main" data-nav>
+    <a class="logo" href={href('/')} aria-label={`${site.name}, home`}>
+      <span class="display">{site.initials}</span>
+    </a>
+    <span class="div" aria-hidden="true"></span>
     <ul>
       {
         nav.map((item) => (
           <li>
-            <a href={href(item.path)} aria-current={isActive(item.path) ? 'page' : undefined}>
+            <a
+              href={href(item.path)}
+              data-path={href(item.path)}
+              aria-current={isActive(item.path) ? 'page' : undefined}
+            >
               {item.label}
             </a>
           </li>
         ))
       }
     </ul>
-    <a class="btn primary talk" href={href('/#contact')}>Get in touch</a>
+    <span class="div" aria-hidden="true"></span>
+    <a class="contact" href="#contact">Contact</a>
   </nav>
 </header>
 
+<script>
+  // Shadow once the page scrolls; keep the active link right after
+  // client-side navigation (the header persists across pages).
+  const onScroll = () =>
+    document.querySelector('[data-nav]')?.classList.toggle('lifted', window.scrollY > 40);
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  function setup() {
+    const nav = document.querySelector<HTMLElement>('[data-nav]');
+    if (!nav) return;
+    onScroll();
+
+    const here = location.pathname.replace(/\/$/, '');
+    nav.querySelectorAll<HTMLAnchorElement>('a[data-path]').forEach((a) => {
+      const p = (a.dataset.path ?? '').replace(/\/$/, '');
+      const home = a.textContent?.trim() === 'Home';
+      const active = home ? here === p : here === p || here.startsWith(`${p}/`);
+      if (active) a.setAttribute('aria-current', 'page');
+      else a.removeAttribute('aria-current');
+    });
+  }
+  document.addEventListener('astro:page-load', setup);
+</script>
+
 <style>
-  header {
+  .nav-shell {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.5rem;
-    padding-block: 1.5rem;
+    justify-content: center;
+    padding: 1.1rem 1rem 0;
+    pointer-events: none;
   }
-  .home {
-    font-size: 1.6rem;
-    font-weight: 600;
+  .pill {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.4rem;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--mask-deep) 94%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid color-mix(in oklab, var(--silk) 12%, transparent);
+    transition: box-shadow 0.3s;
+  }
+  .pill.lifted {
+    box-shadow: 0 12px 30px -12px rgb(10 20 16 / 0.55);
+  }
+  .logo {
+    display: grid;
+    place-items: center;
+    width: 2.3rem;
+    height: 2.3rem;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    color: var(--silk);
     text-decoration: none;
-    color: var(--bark);
+    transition: transform 0.25s var(--ease);
   }
-  .home:hover {
-    color: var(--pine);
+  .logo .display {
+    font-size: 1.15rem;
+    line-height: 1;
   }
-  nav {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
+  .logo:hover {
+    transform: scale(1.08);
+    color: var(--gold);
+  }
+  .div {
+    width: 1px;
+    height: 1.25rem;
+    margin: 0 0.3rem;
+    background: color-mix(in oklab, var(--silk) 18%, transparent);
   }
   ul {
     display: flex;
-    gap: 0.25rem;
     list-style: none;
     margin: 0;
     padding: 0;
   }
-  ul a {
+  ul a,
+  .contact {
     display: block;
-    padding: 0.45rem 0.9rem;
+    padding: 0.5rem 0.95rem;
     border-radius: 999px;
-    color: var(--bark-2);
-    font-weight: 650;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--silk-2);
     text-decoration: none;
+    transition:
+      color 0.2s,
+      background-color 0.2s;
   }
   ul a:hover {
-    color: var(--pine);
-    background: var(--surface-2);
+    color: var(--silk);
+    background: color-mix(in oklab, var(--silk) 9%, transparent);
   }
   ul a[aria-current='page'] {
-    color: var(--pine);
-    background: var(--surface);
-    box-shadow: inset 0 0 0 1.5px var(--pine);
+    color: var(--silk);
+    background: color-mix(in oklab, var(--silk) 13%, transparent);
   }
-  .talk {
-    padding: 0.55rem 1.1rem;
+  .contact {
+    color: var(--mask-deep);
+    background: var(--gold);
+    font-weight: 600;
   }
-  @media (max-width: 52rem) {
-    header,
-    nav {
-      flex-wrap: wrap;
-      gap: 0.75rem;
-    }
-    .talk {
+  .contact:hover {
+    background: var(--gold-soft);
+    color: var(--mask-deep);
+  }
+  @media (max-width: 44rem) {
+    .logo,
+    .div {
       display: none;
+    }
+    ul a,
+    .contact {
+      padding: 0.45rem 0.6rem;
+      font-size: 0.8rem;
     }
   }
 </style>

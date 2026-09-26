@@ -1,0 +1,76 @@
+---
+// Dark board band at the top of every inner page. Default slot is the title
+// block; the optional "aside" slot sits on the right (e.g. project art).
+import BoardField from './art/BoardField.astro';
+import { href } from '../config';
+
+interface Props {
+  back?: { label: string; path: string };
+  seed?: number;
+}
+const { back, seed = 3 } = Astro.props;
+const hasAside = Astro.slots.has('aside');
+---
+
+<section class="page-hero">
+  <BoardField seed={seed} opacity={0.16} />
+  <div class:list={['wrap', 'inner', { split: hasAside }]}>
+    <div class="text">
+      {back && <a class="back small" href={href(back.path)}>Back to {back.label}</a>}
+      <slot />
+    </div>
+    {hasAside && <div class="aside"><slot name="aside" /></div>}
+  </div>
+</section>
+
+<style>
+  .page-hero {
+    position: relative;
+    overflow: hidden;
+    background: var(--mask);
+    color: var(--silk);
+  }
+  .inner {
+    position: relative;
+    padding-top: 8rem;
+    padding-bottom: 3.5rem;
+  }
+  .split {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 4rem;
+    align-items: end;
+  }
+  .back {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    color: var(--gold);
+  }
+  .back:hover {
+    color: var(--gold-soft);
+  }
+  .text :global(h1) {
+    font-family: var(--display);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(3.5rem, 7vw, 6rem);
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+    color: var(--silk);
+  }
+  .text :global(.lede) {
+    color: var(--silk-2);
+    margin: 1.25rem 0 0;
+  }
+  .aside {
+    border-radius: 1.25rem;
+    overflow: hidden;
+    aspect-ratio: 800 / 520;
+    box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.6);
+  }
+  @media (max-width: 56rem) {
+    .split {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

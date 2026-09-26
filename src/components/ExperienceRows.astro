@@ -1,0 +1,166 @@
+---
+// Experience as horizontal pill rows: monogram, org and role, dates, key
+// skills, and an arrow. The whole row opens the role's page.
+import type { CollectionEntry } from 'astro:content';
+import { groupSkills } from '../data/skills';
+import { href } from '../config';
+
+interface Props {
+  entries: CollectionEntry<'experience'>[];
+  showSummary?: boolean;
+}
+const { entries, showSummary = false } = Astro.props;
+
+const dates = (s?: string, e?: string) => (!s ? 'Dates to come' : s === e ? s : `${s} to ${e}`);
+const monogram = (org: string) =>
+  org
+    .replace(/\(.*?\)/g, '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join('');
+const topSkills = (ids: string[]) =>
+  groupSkills(ids)
+    .flatMap((g) => g.skills.map((s) => ({ ...s, tone: g.category.tone })))
+    .slice(0, 3);
+---
+
+<ol class="rows">
+  {
+    entries.map((e) => (
+      <li>
+        <a href={href(`/experience/${e.id}`)} class:list={{ current: e.data.current }}>
+          <span class="mono-badge display" aria-hidden="true">
+            {monogram(e.data.org)}
+          </span>
+          <span class="who">
+            <span class="org">{e.data.org}</span>
+            <span class="role">{e.data.role}</span>
+            {showSummary && <span class="sum">{e.data.summary}</span>}
+          </span>
+          <span class="when small">
+            {e.data.current && <span class="live" aria-hidden="true" />}
+            {dates(e.data.start, e.data.end)}
+          </span>
+          <span class="skills">
+            {topSkills(e.data.skills).map((s) => (
+              <span class="pill" data-tone={s.tone}>
+                {s.name}
+              </span>
+            ))}
+          </span>
+          <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12h13M13 6l6 6-6 6" />
+          </svg>
+        </a>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .rows {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+  a {
+    display: grid;
+    grid-template-columns: 3.5rem minmax(0, 1.3fr) 12rem minmax(0, 1.4fr) 1.5rem;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.9rem 1.6rem 0.9rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    color: var(--bark);
+    text-decoration: none;
+    transition:
+      background-color 0.2s,
+      border-color 0.2s;
+  }
+  a:hover {
+    background: var(--linen-2);
+    border-color: var(--bark-3);
+  }
+  .mono-badge {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: var(--mask);
+    color: var(--gold);
+    font-size: 1.35rem;
+  }
+  .current .mono-badge {
+    box-shadow:
+      0 0 0 3px var(--linen),
+      0 0 0 5px var(--gold);
+  }
+  .who {
+    display: grid;
+    min-width: 0;
+  }
+  .org {
+    font-weight: 650;
+    font-size: 1.05rem;
+  }
+  .role {
+    color: var(--bark-2);
+    font-size: 0.95rem;
+  }
+  .sum {
+    margin-top: 0.25rem;
+    color: var(--bark-3);
+    font-size: 0.88rem;
+  }
+  .when {
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--bark-2);
+  }
+  .skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  .arrow {
+    width: 1.3rem;
+    height: 1.3rem;
+    fill: none;
+    stroke: var(--bark-3);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition:
+      transform 0.25s var(--ease),
+      stroke 0.2s;
+  }
+  a:hover .arrow {
+    transform: translateX(3px);
+    stroke: var(--pine);
+  }
+  @media (max-width: 60rem) {
+    a {
+      grid-template-columns: 3rem 1fr;
+      border-radius: 1.75rem;
+      gap: 0.75rem 1rem;
+    }
+    .mono-badge {
+      width: 3rem;
+      height: 3rem;
+    }
+    .when,
+    .skills {
+      grid-column: 2;
+    }
+    .arrow {
+      display: none;
+    }
+  }
+</style>

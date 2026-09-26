@@ -1,21 +1,24 @@
 ---
 import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
 import { coursework } from '../data/coursework';
 
 const hasPlaceholders = coursework.some((g) => g.courses.some((c) => c.placeholder));
 ---
 
 <Base title="Coursework" description="Relevant coursework at USC.">
-  <section class="wrap page">
+  <PageHero seed={31}>
     <h1>Coursework</h1>
     <p class="lede">Classes at USC, grouped by area.</p>
-    {hasPlaceholders && <p class="todo">Course list to come</p>}
+  </PageHero>
 
+  <section class="wrap body">
+    {hasPlaceholders && <p class="todo">Course list to come</p>}
     <div class="groups">
       {
         coursework.map((g) => (
           <section class="group">
-            <h2>{g.group}</h2>
+            <h2 class="display">{g.group}</h2>
             <p class="quiet small">{g.blurb}</p>
             <ul>
               {g.courses.map((c) => (
@@ -33,52 +36,48 @@ const hasPlaceholders = coursework.some((g) => g.courses.some((c) => c.placehold
 </Base>
 
 <style>
-  .page {
+  .body {
     padding-top: 3rem;
   }
-  .lede {
-    margin: 1rem 0 1rem;
-  }
   .groups {
-    margin-top: 2.5rem;
+    margin-top: 2rem;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3rem;
   }
   .group {
-    padding: 1.75rem 2rem;
-    border-radius: var(--radius-lg);
-    background: var(--surface);
+    padding-top: 1rem;
+    border-top: 2px solid var(--gold);
   }
   h2 {
-    font-size: 1.45rem;
+    font-size: 1.9rem;
   }
   .group > p {
-    margin: 0.35rem 0 1.25rem;
+    margin: 0.4rem 0 1.25rem;
   }
   ul {
     list-style: none;
     margin: 0;
     padding: 0;
     display: grid;
-    gap: 0.6rem;
+    gap: 0.55rem;
   }
   li {
     display: grid;
-    grid-template-columns: 5rem 1fr;
-    gap: 0.75rem;
+    grid-template-columns: 4.5rem 1fr;
+    gap: 0.5rem;
   }
   .code {
-    font-weight: 700;
+    font-weight: 600;
     color: var(--pine);
   }
   .placeholder,
   .placeholder .code {
     color: var(--bark-3);
   }
-  @media (max-width: 48rem) {
+  @media (max-width: 60rem) {
     .groups {
-      grid-template-columns: 1fr;
+      grid-template-columns: 1fr 1fr;
     }
   }
 </style>

@@ -1,140 +1,28 @@
 ---
 import Base from '../../layouts/Base.astro';
-import SkillPills from '../../components/SkillPills.astro';
-import { href } from '../../config';
+import PageHero from '../../components/PageHero.astro';
+import ProjectGrid from '../../components/ProjectGrid.astro';
 import { getProjects } from '../../lib/content';
 
 const projects = await getProjects();
 ---
 
 <Base title="Projects" description="Circuit, PCB, and hardware projects.">
-  <section class="wrap page">
+  <PageHero seed={5}>
     <h1>Projects</h1>
     <p class="lede">
-      Each project page covers the whole project, then spells out which parts were mine and which
-      were a teammate's, and the skills I used.
+      Each page covers the whole project, then spells out which parts were mine, which were a
+      teammate's, and the skills I used.
     </p>
+  </PageHero>
 
-    <ul class="projects">
-      {
-        projects.map((p) => (
-          <li>
-            <a class="cover" href={href(`/projects/${p.id}`)} tabindex="-1" aria-hidden="true">
-              {p.data.cover ? (
-                <img src={href(`/${p.data.cover}`)} alt="" loading="lazy" />
-              ) : (
-                <span class="cover-empty serif">{p.data.title}</span>
-              )}
-            </a>
-            <div class="text">
-              <h2>
-                <a href={href(`/projects/${p.id}`)}>{p.data.title}</a>
-              </h2>
-              {p.data.period && <p class="small quiet period">{p.data.period}</p>}
-              <p class="summary">{p.data.summary}</p>
-              {p.data.mine.length > 0 && (
-                <p class="small mine">
-                  <strong>My part:</strong> {p.data.mine.join(', ')}
-                </p>
-              )}
-              <SkillPills ids={p.data.skills} />
-              <a class="more" href={href(`/projects/${p.id}`)}>
-                Read about {p.data.title}
-              </a>
-            </div>
-          </li>
-        ))
-      }
-    </ul>
+  <section class="wrap list">
+    <ProjectGrid projects={projects} showMine />
   </section>
 </Base>
 
 <style>
-  .page {
-    padding-top: 3rem;
-  }
-  .lede {
-    margin: 1rem 0 3.5rem;
-  }
-  .projects {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: 3.5rem;
-  }
-  .projects > li {
-    display: grid;
-    grid-template-columns: 1fr 1.15fr;
-    gap: 3rem;
-    align-items: center;
-  }
-  .projects > li:nth-child(even) .cover {
-    order: 2;
-  }
-  .cover {
-    display: block;
-    aspect-ratio: 4 / 3;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    background: var(--surface-2);
-    text-decoration: none;
-  }
-  .cover img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.4s ease;
-  }
-  .cover:hover img {
-    transform: scale(1.03);
-  }
-  .cover-empty {
-    display: grid;
-    place-items: center;
-    height: 100%;
-    padding: 2rem;
-    font-size: clamp(2rem, 4vw, 3.2rem);
-    color: color-mix(in oklab, var(--pine) 35%, transparent);
-    background:
-      radial-gradient(circle at 30% 25%, color-mix(in oklab, var(--honey) 30%, transparent), transparent 60%),
-      var(--surface-2);
-    text-align: center;
-  }
-  h2 a {
-    color: var(--bark);
-    text-decoration: none;
-  }
-  h2 a:hover {
-    color: var(--pine);
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-  }
-  .period {
-    margin: 0.35rem 0 0;
-  }
-  .summary {
-    color: var(--bark-2);
-    margin: 0.9rem 0;
-  }
-  .mine {
-    margin: 0 0 1.1rem;
-  }
-  .mine strong {
-    color: var(--pine);
-  }
-  .more {
-    display: inline-block;
-    margin-top: 1.25rem;
-    font-weight: 700;
-  }
-  @media (max-width: 52rem) {
-    .projects > li {
-      grid-template-columns: 1fr;
-      gap: 1.25rem;
-    }
-    .projects > li:nth-child(even) .cover {
-      order: 0;
-    }
+  .list {
+    padding-top: 4rem;
   }
 </style>

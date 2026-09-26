@@ -1,7 +1,7 @@
 ---
-// Shared shell for project and experience detail pages: title block on top,
-// long-form content on the left, a sticky "at a glance" panel on the right,
-// and links to the previous and next entries.
+// Body of project and experience pages (the PageHero sits above it): long
+// form content on the left, an "at a glance" rail on the right, and links to
+// the previous and next entries.
 import { href } from '../config';
 
 interface Neighbor {
@@ -9,19 +9,13 @@ interface Neighbor {
   path: string;
 }
 interface Props {
-  backLabel: string;
-  backPath: string;
   prev?: Neighbor;
   next?: Neighbor;
 }
-const { backLabel, backPath, prev, next } = Astro.props;
+const { prev, next } = Astro.props;
 ---
 
-<article class="wrap page">
-  <a class="back small" href={href(backPath)}>Back to {backLabel}</a>
-  <header>
-    <slot name="header" />
-  </header>
+<div class="wrap body">
   <div class="columns">
     <div class="main">
       <slot />
@@ -36,7 +30,7 @@ const { backLabel, backPath, prev, next } = Astro.props;
         {prev ? (
           <a href={href(prev.path)}>
             <span class="small quiet">Previous</span>
-            <span class="serif">{prev.label}</span>
+            <span class="display">{prev.label}</span>
           </a>
         ) : (
           <span />
@@ -44,39 +38,36 @@ const { backLabel, backPath, prev, next } = Astro.props;
         {next && (
           <a class="right" href={href(next.path)}>
             <span class="small quiet">Next</span>
-            <span class="serif">{next.label}</span>
+            <span class="display">{next.label}</span>
           </a>
         )}
       </nav>
     )
   }
-</article>
+</div>
 
 <style>
-  .page {
-    padding-top: 2rem;
-  }
-  .back {
-    font-weight: 650;
-  }
-  header {
-    margin: 2rem 0 3rem;
-    max-width: 48rem;
+  .body {
+    padding-top: 4rem;
   }
   .columns {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 21rem;
-    gap: 4.5rem;
+    grid-template-columns: minmax(0, 1fr) 20rem;
+    gap: 5rem;
     align-items: start;
   }
   .side {
     position: sticky;
-    top: 1.5rem;
+    top: 6.5rem;
     display: grid;
-    gap: 1.5rem;
-    padding: 1.6rem;
-    border-radius: var(--radius-lg);
-    background: var(--surface);
+    gap: 2rem;
+    padding-left: 2rem;
+    border-left: 2px solid var(--gold);
+  }
+  .side :global(h2) {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.7rem;
   }
   .pager {
     display: flex;
@@ -88,18 +79,15 @@ const { backLabel, backPath, prev, next } = Astro.props;
   }
   .pager a {
     display: grid;
-    gap: 0.2rem;
-    padding: 1rem 1.25rem;
-    border-radius: var(--radius);
-    text-decoration: none;
+    gap: 0.1rem;
     color: var(--bark);
+    text-decoration: none;
   }
   .pager a:hover {
-    background: var(--surface);
     color: var(--pine);
   }
-  .pager .serif {
-    font-size: 1.4rem;
+  .pager .display {
+    font-size: 2.2rem;
   }
   .right {
     text-align: right;

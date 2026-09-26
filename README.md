@@ -32,6 +32,7 @@ Add a new `.mdx` file in `src/content/projects/`. Frontmatter:
 - `others`: `{ part, by }` for anything someone else owned. `by` can be a role ("A collaborator") instead of a name.
 - `outcome`: where the project ended up (e.g. "Design and fabrication only").
 - `skills`: skill ids from `src/data/skills.ts`. These show as pills on the page and link to the Skills page, which lists every place each skill was used. An unknown id fails the build.
+- `art`: the generated cover (`pcb`, `bode`, `compare`, or `gpio`) shown until you set `cover` to a real photo in `public/`.
 - `status: draft` marks it unfinished. Drafts are shown unless you build with `HIDE_DRAFTS=true`.
 
 Experience entries work the same way, with `summary`, `highlights`, and `skills`.
