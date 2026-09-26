@@ -57,15 +57,17 @@ const isActive = (path: string) => {
     if (!nav) return;
     onScroll();
 
-    const here = location.pathname.replace(/\/$/, '');
+    const strip = (p: string) => p.replace(/(\/index)?\.html$/, '').replace(/\/$/, '');
+    const here = strip(location.pathname);
     nav.querySelectorAll<HTMLAnchorElement>('a[data-path]').forEach((a) => {
-      const p = (a.dataset.path ?? '').replace(/\/$/, '');
+      const p = strip(a.pathname);
       const home = a.textContent?.trim() === 'Home';
       const active = home ? here === p : here === p || here.startsWith(`${p}/`);
       if (active) a.setAttribute('aria-current', 'page');
       else a.removeAttribute('aria-current');
     });
   }
+  setup();
   document.addEventListener('astro:page-load', setup);
 </script>
 

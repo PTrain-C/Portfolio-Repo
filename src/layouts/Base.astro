@@ -15,6 +15,7 @@ interface Props {
 }
 
 const { title, description = site.identity } = Astro.props;
+const clientRouter = process.env.PREVIEW !== 'true';
 const fullTitle = title ? `${title} | ${site.name}` : `${site.name}, Electrical Engineering at USC`;
 ---
 
@@ -27,7 +28,7 @@ const fullTitle = title ? `${title} | ${site.name}` : `${site.name}, Electrical 
     <meta name="description" content={description} />
     <meta name="theme-color" content="#1e3d31" />
     <link rel="icon" type="image/svg+xml" href={href('/favicon.svg')} />
-    <ClientRouter />
+    {clientRouter && <ClientRouter />}
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
