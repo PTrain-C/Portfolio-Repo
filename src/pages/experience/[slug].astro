@@ -42,7 +42,7 @@ const neighbor = (e?: CollectionEntry<'experience'>) => e && { label: e.data.org
     back={{ label: 'experience', path: '/experience' }}
     seed={17}
     theme={data.theme}
-    layout={data.heroImage ? 'split' : 'scene'}
+    layout={data.heroImage ? data.hero : 'scene'}
     image={data.heroImage}
   >
     {

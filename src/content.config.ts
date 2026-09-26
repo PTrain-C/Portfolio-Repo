@@ -67,6 +67,7 @@ const experience = defineCollection({
     skills: z.array(z.string()).default([]),
     theme,
     heroImage: z.string().optional(),
+    hero: z.enum(['split', 'poster', 'tall', 'scene']).default('split'),
     rail: z.enum(['right', 'left', 'top']).default('right'),
     // Project pages that came out of this role.
     projects: z.array(z.string()).default([]),

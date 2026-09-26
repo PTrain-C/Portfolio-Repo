@@ -13,13 +13,14 @@ highlights:
   - Laid out the board in KiCAD, took it through DRC, and generated the fabrication output
 skills: [kicad, schematic-capture, pcb-layout, drc, fab-output, op-amps, comparator-logic]
 theme: track
+hero: poster
+heroImage: img/racing/track-hero.webp
 rail: right
 projects: [bspd]
 sources:
   - label: BSPD schematic and KiCAD layout for SCR26
     file: files/bspd-schematic.pdf
 ---
-import Pair from '../../components/content/Pair.astro';
 import Figure from '../../components/Figure.astro';
 import Missing from '../../components/Missing.astro';
 
@@ -28,17 +29,14 @@ import Missing from '../../components/Missing.astro';
   the board was never installed or brought up.
 */}
 
-USC Racing builds a car for Formula SAE every year, and SCR26 is this year's. The rules require a Brake System Plausibility Device: a standalone circuit that cuts power if the throttle and hard braking show up together, or if a pedal sensor fails. That board was mine to design.
+USC Racing builds a car for Formula SAE every year, and SCR26 is this year's. The rules require a Brake System Plausibility Device: a standalone circuit that cuts power if the throttle and hard braking show up together, or if a pedal sensor fails. I did that board's schematic and layout.
 
-I kept it fully analog. The pedal signals are buffered so the BSPD and the ECU both see them without either loading the other, then compared against trimpot set points. An RC timer means a brief overlap won't trip it, but holding throttle through hard braking for about a second will, and once it trips it latches. A separate 100 ms path catches a sensor that's come unplugged. The full walkthrough, with the schematic broken into sections, is on the project page.
+The board is fully analog. The pedal signals are buffered so the BSPD and the ECU both see them without either loading the other, then compared against trimpot set points. An RC timer means a brief overlap won't trip it, but holding throttle through hard braking for about a second will, and once it trips it latches. A separate 100 ms path catches a sensor that's come unplugged. The full walkthrough, with the schematic broken into sections, is on the project page.
 
 The board went through DRC and I produced the fabrication files. It wasn't installed or brought up on the car.
 
-<Pair>
-  <Figure caption="SCR26 on track" ratio="4 / 3" />
-  <Figure caption="The team with the car" ratio="4 / 3" />
-</Pair>
+<Figure src="img/racing/campus.webp" ratio="4 / 3" caption="The car on display on campus." alt="USC Racing's black and red Formula SAE car, number 109, parked on a campus walkway with students around it" />
 
 <Missing>
-What else you did on the electrical team (harness, other boards, testing days), and the car photos. Drop them in public/img/racing/ and they'll replace the empty frames above.
+What else you did on the electrical team (harness, other boards, testing days), and whether the car in these photos is SCR26.
 </Missing>

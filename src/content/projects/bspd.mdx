@@ -45,6 +45,8 @@ import Missing from '../../components/Missing.astro';
 
 Formula SAE cars have to carry a Brake System Plausibility Device. It watches the throttle and brake pedal sensors, and if the two say something that shouldn't happen together (full-ish throttle while braking hard), it cuts the car's shutdown circuit. It also has to catch a pedal sensor that has come unplugged.
 
+<Figure src="img/racing/track.webp" ratio="1340 / 800" frame="print" tilt={-1} caption="USC Racing's car on track. The BSPD sits between the pedal sensors and the car's shutdown circuit." alt="USC Racing's Formula SAE car, number 109, driving past a traffic cone" />
+
 This is the one I did for SCR26. It's all op-amps, RC timers and diodes, no microcontroller, so there is no code to crash. Five LEDs on the edge of the board (Throttle, Brake, B-Disc, T-Disc, Output) show which condition tripped.
 
 ## How the logic works
