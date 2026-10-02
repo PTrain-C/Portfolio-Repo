@@ -2,7 +2,7 @@
 // Interactive plot of the bootstrapped twin-T notch from the EE 202L report:
 //   H(s) = (s^2 + w0^2) / (s^2 + s*w0/Q + w0^2),  Q = 1 / (4(1 - alpha))
 // Dragging alpha (the positive-feedback fraction) shows the notch narrowing
-// around 196 Hz while the neighboring open strings pass through. This is the
+// around 196 Hz while the neighboring notes, F#3 and Ab3, still come through. This is the
 // ideal model from the derivation, not a measurement.
 const F0 = 196;
 const FMIN = 60;
@@ -37,12 +37,9 @@ const ALPHA0 = 0;
 const Q_DESIGN = 8.5;
 const ALPHA_DESIGN = 1 - 1 / (4 * Q_DESIGN);
 const strings = [
-  { n: 'E2', f: 82.41 },
-  { n: 'A2', f: 110 },
-  { n: 'D3', f: 146.83 },
+  { n: 'F#3', f: 185 },
   { n: 'G3', f: 196 },
-  { n: 'B3', f: 246.94 },
-  { n: 'E4', f: 329.63 },
+  { n: 'Ab3', f: 207.65 },
 ];
 const gridF = [60, 100, 200, 300, 500];
 const gridDb = [0, -10, -20, -30, -40];
@@ -75,7 +72,11 @@ const fmt = (n: number) => n.toFixed(1);
       strings.map((s) => (
         <g class:list={['string', { target: s.n === 'G3' }]}>
           <line x1={xOf(s.f)} x2={xOf(s.f)} y1={PAD.t - 6} y2={H - PAD.b} />
-          <text x={xOf(s.f)} y={PAD.t - 12} class="mid">
+          <text
+            x={xOf(s.f) + (s.n === 'F#3' ? -4 : s.n === 'Ab3' ? 4 : 0)}
+            y={PAD.t - 12}
+            class={s.n === 'F#3' ? 'end' : s.n === 'Ab3' ? 'start' : 'mid'}
+          >
             {s.n}
           </text>
         </g>
@@ -105,18 +106,18 @@ const fmt = (n: number) => n.toFixed(1);
         <dd><span data-out="bw">{(F0 / qOf(ALPHA0)).toFixed(0)}</span> Hz</dd>
       </div>
       <div>
-        <dt>D3 (147 Hz)</dt>
-        <dd><span data-out="d3">{fmt(gainDb(146.83, qOf(ALPHA0)))}</span> dB</dd>
+        <dt>F#3 (185 Hz)</dt>
+        <dd><span data-out="fs3">{fmt(gainDb(185, qOf(ALPHA0)))}</span> dB</dd>
       </div>
       <div>
-        <dt>B3 (247 Hz)</dt>
-        <dd><span data-out="b3">{fmt(gainDb(246.94, qOf(ALPHA0)))}</span> dB</dd>
+        <dt>Ab3 (208 Hz)</dt>
+        <dd><span data-out="ab3">{fmt(gainDb(207.65, qOf(ALPHA0)))}</span> dB</dd>
       </div>
     </dl>
   </div>
   <figcaption class="small quiet">
     Ideal model from the derivation above, not a bench measurement. At &alpha; = 0 the passive twin-T also
-    eats the neighboring strings; feeding back part of the output narrows the notch without moving it.
+    eats the neighboring notes; feeding back part of the output narrows the notch without moving it.
   </figcaption>
 </figure>
 
@@ -150,8 +151,8 @@ const fmt = (n: number) => n.toFixed(1);
     set('alpha', a.toFixed(2));
     set('q', q.toFixed(2));
     set('bw', (f0 / q).toFixed(0));
-    set('d3', gain(146.83).toFixed(1));
-    set('b3', gain(246.94).toFixed(1));
+    set('fs3', gain(185).toFixed(1));
+    set('ab3', gain(207.65).toFixed(1));
   }
   document.addEventListener('input', (e) => {
     const t = e.target as HTMLInputElement;
@@ -190,6 +191,9 @@ const fmt = (n: number) => n.toFixed(1);
   }
   .end {
     text-anchor: end;
+  }
+  .start {
+    text-anchor: start;
   }
   .mid {
     text-anchor: middle;

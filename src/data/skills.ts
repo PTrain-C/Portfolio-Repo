@@ -100,6 +100,7 @@ export const categories: SkillCategory[] = [
       { id: 'c-cpp', name: 'C/C++', featured: true },
       { id: 'data-analysis', name: 'Data analysis' },
       { id: 'matlab', name: 'MATLAB', featured: true },
+      { id: 'java', name: 'Java', note: 'FIRST Robotics' },
       { id: 'verilog', name: 'Verilog', note: 'learning, HDLBits' },
     ],
   },

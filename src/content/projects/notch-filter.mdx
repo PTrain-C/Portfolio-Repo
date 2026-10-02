@@ -13,18 +13,18 @@ rail: left
 art: bode
 team: team
 mine:
-  - Transfer function derivation and component selection, shared with John
+  - Transfer function derivation and component selection, shared with John Peng
   - Hand-soldering the through-hole parts
   - Testing and bench tuning with potentiometers
   - Wiring the blue box (9 V battery, filter board, and jacks)
-  - Guitar assembly, stringing, tuning, and the writeup, shared with John
+  - Guitar assembly, stringing, tuning, and the writeup, shared with John Peng
 others:
   - part: KiCAD schematic and PCB layout
-    by: John
+    by: John Peng
   - part: Hot-plate soldering of the small parts, and the woodwork
-    by: John
+    by: John Peng
 outcome: Built into the guitar and tuned on the bench. Designed for Q = 8.5 at 196 Hz, with over 20 dB of attenuation at the notch in LTSpice.
-# KiCAD is left out on purpose: the schematic and layout were John's.
+# KiCAD is left out on purpose: the schematic and layout were John Peng's.
 skills: [nodal-analysis, transfer-functions, filter-design, op-amps, component-selection, soldering, bench-tuning, oscilloscope, breadboarding]
 sources:
   - label: 'EE 202L final project report, "Corrupted Chord" (Dec 12, 2025), including the team split of the work'
@@ -46,7 +46,7 @@ import Figure from '../../components/Figure.astro';
 
 ## What it is
 
-John and I built a cigar-box electric guitar and hid an active notch filter inside it. The filter's job is to take out one note, the open G string at 196 Hz, while the neighboring notes, F# and Ab, still come through with little attenuation. It's a twin-T band-stop with positive feedback added, which is what lets the notch be narrow instead of swallowing half the neck.
+John Peng and I built a cigar-box electric guitar and hid an active notch filter inside it. The filter's job is to take out one note, the open G string at 196 Hz, while the neighboring notes, F# and Ab, still come through. It's a twin-T band-stop with positive feedback added, which is what lets the notch be narrow instead of swallowing half the neck.
 
 ## The math
 
