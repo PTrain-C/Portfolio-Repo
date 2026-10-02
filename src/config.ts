@@ -50,7 +50,7 @@ export const interests: { title: string; text: string; placeholder?: boolean }[]
 // HIDE_DRAFTS=true at build time to leave drafts out.
 export const showDrafts = process.env.HIDE_DRAFTS !== 'true';
 
-/** Prefix an internal path with the configured base (e.g. /Portfolio-Repo). */
+/** Prefix an internal path with the configured base (empty at the site root). */
 export function href(path = '/'): string {
   const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   const clean = path.startsWith('/') ? path : `/${path}`;

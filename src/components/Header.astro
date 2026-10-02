@@ -161,14 +161,34 @@ const isActive = (path: string) => {
     color: var(--mask-deep);
   }
   @media (max-width: 44rem) {
+    .nav-shell {
+      padding: 0.6rem 0.5rem 0;
+    }
+    .pill {
+      width: 100%;
+      max-width: 26rem;
+      justify-content: space-between;
+      gap: 0;
+      padding: 0.3rem;
+    }
     .logo,
-    .div {
+    .div,
+    .pill::before {
       display: none;
+    }
+    ul {
+      flex: 1;
+      justify-content: space-between;
     }
     ul a,
     .contact {
-      padding: 0.45rem 0.6rem;
-      font-size: 0.8rem;
+      /* Scales with the screen so all six links always fit on one line. */
+      padding: 0.55em 0.42em;
+      font-size: clamp(0.58rem, 2.8vw, 0.8rem);
+      white-space: nowrap;
+    }
+    .contact {
+      margin-left: 0.15rem;
     }
   }
 </style>
