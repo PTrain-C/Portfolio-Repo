@@ -1,12 +1,12 @@
 # Portfolio
 
-Peter's personal site. Astro, fully static, deploys to GitHub Pages.
+Peter's personal site. Astro, fully static, deploys to GitHub Pages. The repo is named `ptrain-c.github.io`, so the site lives at https://ptrain-c.github.io/.
 
 ## Run it
 
 ```sh
 npm install
-npm run dev        # http://localhost:4321/Portfolio-Repo/
+npm run dev        # http://localhost:4321/
 npm run build      # production build into dist/
 HIDE_DRAFTS=true npm run build   # leave out anything marked status: draft
 ```
@@ -49,13 +49,13 @@ Components for MDX bodies live in `src/components/content/`: `Chain` (clickable 
 
 ## Deploying
 
-`.github/workflows/deploy.yml` builds and deploys on every push to `main`. The live build sets `HIDE_DRAFTS=true`, so anything marked `status: draft` (currently the Quantum Magic 8-Ball) stays off the site until you flip it to `published`. One-time setup: repo Settings → Pages → Source: **GitHub Actions**. If you move to a custom domain, Vercel, or Netlify, update `site` and remove `base` in `astro.config.mjs`.
+`.github/workflows/deploy.yml` builds and deploys on every push to `main`. The live build sets `HIDE_DRAFTS=true`, so anything marked `status: draft` (currently the Quantum Magic 8-Ball) stays off the site until you flip it to `published`. One-time setup: repo Settings → Pages → Source: **GitHub Actions**. If you move to a custom domain, Vercel, or Netlify, update `site` in `astro.config.mjs`.
 
 ## Updating after a resume change
 
 1. Edit the file for what changed (see the table above). A new or changed role is `src/content/experience/<id>.mdx`.
 2. Quick edits: use the pencil icon on github.com, or ask Claude. Commit to a branch and open a PR; the build runs on the PR and flags a broken edit.
-3. Merge to `main`. The site redeploys in 1 to 2 minutes at https://ptrain-c.github.io/Portfolio-Repo/.
+3. Merge to `main`. The site redeploys in 1 to 2 minutes at https://ptrain-c.github.io/.
 
 ## Visitor tracking
 
