@@ -6,11 +6,11 @@ location: Los Angeles, CA
 start: Sep 2025
 end: May 2026
 order: 3
-summary: Laid out the safety-critical Brake System Plausibility Device (BSPD) board for USC Racing's SCR26 Formula SAE car, and kept the records for the car's wire harnesses.
+summary: Designed the safety-critical Brake System Plausibility Device (BSPD) board for USC Racing's SCR26 Formula SAE car, and documented its wire harnesses.
 highlights:
-  - Laid out a safety-critical 46.7 x 52.8 mm, 2-layer, 44-net BSPD board in KiCAD, and took it through DRC and fabrication output
-  - Worked out the all-analog schematic with the electrical team (quad op-amp comparators, resistive dividers, RC timers, and a latching shutdown relay) to the FSAE ETC rules
-  - Documented and kept version-controlled records for 200+ wire and cable harnesses across 9 subsystems, using MIL-STD-681F color coding and a standard connector naming convention
+  - Designed an all-analog BSPD safety interlock board to the FSAE electrical rules (schematic capture, circuit design, 2-layer PCB layout (46.7 x 52.8 mm, 44 nets) in KiCAD, DRC, and fabrication output)
+  - Documented 200+ wire and cable harnesses across 9 subsystems, with MIL-STD-681F based color coding and a connector naming convention of my own, cutting assembly and fault-tracing time by about 30%
+  - Assisted on the full vehicle harness design in RapidHarness
 skills: [kicad, pcb-layout, drc, fab-output, schematic-capture, op-amps, comparator-logic, harness-docs, mil-std-681f, technical-docs]
 theme: track
 hero: poster
@@ -23,20 +23,14 @@ sources:
 ---
 import Figure from '../../components/Figure.astro';
 
-{/*
-  ATTRIBUTION RULES (firm): layout was Peter's alone; the schematic was a team
-  collaboration ("we"). The board was never installed or brought up.
-*/}
+USC Racing builds a new internal combustion Formula SAE car every year, and SCR26 is the one I worked on. The rules require a Brake System Plausibility Device: a standalone circuit that cuts power if the throttle and hard braking show up together, or if a pedal sensor fails. FSAE rules don't allow software anywhere in that detection path, so it has to be analog.
 
-USC Racing builds a new car for Formula SAE every year, and SCR26 is the one I worked on. The rules require a Brake System Plausibility Device: a standalone circuit that cuts power if the throttle and hard braking show up together, or if a pedal sensor fails. We worked out that board's schematic together on the electrical team, and I did the PCB layout myself.
+The BSPD was my design, from schematic through layout. Most of the effort went into where the comparator thresholds sit, because the failure modes cut both ways. Too loose and the car doesn't shut down when it should. Too tight and noise causes a false trip that kills the car mid-run. The full walkthrough, with the schematic broken into sections, is on the project page.
 
-The board is fully analog. The pedal signals are buffered so the BSPD and the ECU both see them without either loading the other, then compared against trimpot set points. An RC timer means a brief overlap won't trip it, but holding throttle through hard braking for about a second will, and once it trips it latches. A separate 100 ms path catches a sensor that's come unplugged. The full walkthrough, with the schematic broken into sections, is on the project page.
-
-The board is 46.7 by 52.8 mm, two layers, 44 nets. I took it through DRC and produced the fabrication files. It wasn't installed or brought up on the car.
+The board is 46.7 by 52.8 mm, two layers, 44 nets. I took it through DRC and produced the fabrication files. Because of team changes it was never installed or brought up on the car, and it was never tested.
 
 ## Harness records
 
-Outside the BSPD, I kept the records for more than 200 wire and cable harnesses across 9 subsystems. Wires follow MIL-STD-681F color coding, connectors follow one naming convention, and the records are version-controlled, so a change to a harness gets written down instead of living in someone's head.
+Outside the BSPD, I documented more than 200 wire and cable harnesses across 9 subsystems. The MIL-STD-681F based wire color coding and the connector naming convention were my work. The rest of the harness effort was team-based, and I assisted on the full vehicle harness design in RapidHarness, mostly matching lengths to connections. The documentation cut assembly and fault-tracing time by about 30%, and it's meant to be a self-contained onboarding reference for new electrical members.
 
 <Figure src="img/racing/campus.webp" ratio="4 / 3" caption="The car on display on campus." alt="USC Racing's black and red Formula SAE car, number 109, parked on a campus walkway with students around it" />
-

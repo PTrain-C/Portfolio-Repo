@@ -60,7 +60,7 @@ export const categories: SkillCategory[] = [
   {
     id: 'test',
     name: 'Integration & Test',
-    blurb: 'Qualifying flight-grade hardware.',
+    blurb: 'Validating chips and proving flight-grade hardware.',
     tone: 'moss',
     skills: [
       { id: 'acceptance-testing', name: 'Acceptance testing', featured: true },
@@ -69,7 +69,9 @@ export const categories: SkillCategory[] = [
       { id: 'nasa-class-b', name: 'NASA Class B hardware' },
       { id: 'charge-discharge', name: 'Charge and discharge testing' },
       { id: 'flight-hardware', name: 'Flight hardware handling' },
-      { id: 'test-scripts', name: 'Test scripting and automation' },
+      { id: 'design-validation', name: 'Design validation testing (DVT)', featured: true },
+      { id: 'smu', name: 'Source Measure Units (SMUs)' },
+      { id: 'test-scripts', name: 'Running test scripts' },
     ],
   },
   {
@@ -98,7 +100,7 @@ export const categories: SkillCategory[] = [
       { id: 'c-cpp', name: 'C/C++', featured: true },
       { id: 'data-analysis', name: 'Data analysis' },
       { id: 'matlab', name: 'MATLAB', featured: true },
-      { id: 'systemverilog', name: 'Verilog/SystemVerilog', note: 'self-study, HDLBits and Verilator' },
+      { id: 'verilog', name: 'Verilog', note: 'learning, HDLBits' },
     ],
   },
   {

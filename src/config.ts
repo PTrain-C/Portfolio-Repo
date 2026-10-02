@@ -5,10 +5,9 @@ export const site = {
   name: 'Peter Connolly',
   initials: 'PC',
   identity:
-    'EE student at USC, focused on analog/mixed-signal circuits, PCB design, and quantum hardware.',
-  // TODO(Peter): drop a headshot in /public (e.g. /public/headshot.jpg) and set
-  // this to 'headshot.jpg'. Until then a placeholder is shown.
-  headshot: null as string | null,
+    'Electrical engineer working toward analog and board-level design. Requirements at Lockheed Martin, flight hardware test at Draper.',
+  // File in /public. Currently the LinkedIn photo; swap in a new one any time.
+  headshot: 'headshot.webp' as string | null,
 };
 
 export const contact = {
@@ -27,29 +26,23 @@ export const contact = {
 // no tracking script is added to the site.
 export const hubspotPortalId: string | null = null;
 
-// Shown on the home page. The first four come from the brief's focus areas;
-// the last is a placeholder for things outside engineering.
+// Shown on the home page.
 export const interests: { title: string; text: string; placeholder?: boolean }[] = [
   {
-    title: 'Analog & mixed-signal',
-    text: 'Circuits where the math on paper has to meet the behavior on the bench.',
+    title: 'Analog front ends',
+    text: 'Low-noise power and signal chains for quantum control systems.',
   },
   {
-    title: 'PCB design',
-    text: 'Turning a schematic into a board someone can actually build.',
+    title: 'Photonic I/O',
+    text: 'Co-packaged optics, where the electronics are modulator drivers, transimpedance amplifiers, and bias and thermal control loops.',
   },
   {
-    title: 'Quantum hardware',
-    text: 'The physical side of quantum computing, and the community around it.',
+    title: 'Cryogenic readout ICs',
+    text: 'The chips that read out quantum hardware at very low temperatures.',
   },
   {
-    title: 'Space systems',
-    text: 'Hardware that has to survive vibration, heat, and cold before it ever flies.',
-  },
-  {
-    title: 'Outside of engineering',
-    text: 'Hobbies and interests go here.',
-    placeholder: true,
+    title: 'Trusted microelectronics',
+    text: 'Chip design and validation for defense and space.',
   },
 ];
 

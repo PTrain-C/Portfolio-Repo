@@ -6,40 +6,39 @@ location: Los Angeles, CA
 start: Dec 2025
 end: May 2026
 order: 4
-summary: Built the closed-loop control system for a nonprofit's hydroponic grow setup, in C++ on an Arduino UNO R4.
+summary: Wrote all of the control code for a closed-loop pH and EC nutrient dosing system for a nonprofit's hydroponic farms, in C++ on an Arduino UNO R4 WiFi.
 highlights:
-  - Built a closed-loop hydroponics control system in C++ on an Arduino UNO R4, with real-time pH and EC sensing, dosing across 4 peristaltic pumps, and scheduled lighting
-  - Debugged I2C NAK errors across the 4 pump drivers with serial monitoring and a logic analyzer, then migrated the pumps to UART
+  - Wrote all of the control code, in C++ across 7 source files, for a closed-loop pH and EC dosing system driving 4 peristaltic pumps from real-time sensor feedback
+  - Traced corrupted sensor reads to vendor sample code parsing I2C idle bytes (0xFF) as data, and fixed every driver
+  - Isolated undocumented pump protocol limits that were causing dose commands to be rejected
   - Verified the custom PCB netlist against the validated breadboard build
-  - Documented the sensor calibration procedures and wiring specifications
-skills: [arduino, c-cpp, closed-loop-control, i2c, uart, logic-analyzer, design-verification, technical-docs]
+skills: [arduino, c-cpp, closed-loop-control, i2c, logic-analyzer, design-verification]
 theme: hydro
 rail: left
 projects: [hydroponics]
 sources:
-  - label: FFT 2026 firmware and README
+  - label: FFT 2026 control code and README
 ---
 import Stats from '../../components/content/Stats.astro';
 
 {/*
   ATTRIBUTION RULES (firm):
   - PCB work is verification only. No design or layout claims.
-  - Firmware is Arduino. Never call it bare-metal.
+  - It is "C++" or "control code". Never firmware or bare-metal. The final build is all I2C.
 */}
 
-The Food for Thought Foundation runs Farms for Thought, and part of that is a hydroponic grow setup. My part was the controller: the code on the Arduino that reads the water, decides when it needs nutrients or a pH adjustment, and runs the pumps to fix it.
+The Food For Thought Foundation is a Los Angeles nonprofit that puts modular hydroponic vertical farms in K-12 schools in underserved communities, where students learn STEM, sustainability, and basic C/C++ through the farms. My part was the controller: the code that reads the water, decides when it needs nutrients or a pH adjustment, and runs the pumps to fix it. I wrote all of it.
 
 <Stats
   items={[
+    { big: '7', label: 'Atlas Scientific EZO modules on one I2C bus' },
     { big: '4', label: 'peristaltic dosing pumps, driven from pH and EC feedback' },
-    { big: '10 s', label: 'between dosing cycles, each one EC first and then pH' },
-    { big: 'UART', label: 'where the pumps ended up after the I2C NAK errors' },
+    { big: '7', label: 'C++ source files, one module per job' },
   ]}
 />
 
-I split the firmware into one module per job (pH, EC, temperature, pumps, dosing, lights, WiFi and time) with a single config header, so whoever maintains it next can change a setpoint or a pin without reading the control code.
+It's deadband control with a cap on how much it can dose per cycle, so it can't overdose. EC gets dosed before pH, so adding nutrients doesn't undo the pH correction. The two loops are independent, so if one probe fails the other keeps regulating.
 
-The hardest part was the pump bus. The four pump drivers started throwing I2C NAK errors, where a device doesn't acknowledge its address. I chased it with the serial monitor and a logic analyzer on the bus, and in the end moved the pumps off I2C onto UART. I also wrote up the sensor calibration procedures and the wiring specs, so the next person can recalibrate a probe or rewire a pump without guessing.
+The hardest part was bugs that looked like my own logic and weren't. I spent too long assuming they were. Corrupted sensor reads turned out to be the vendor's sample code parsing the 0xFF bytes an I2C device returns when it has nothing left to say, as if they were data. I also found undocumented limits in the pump protocol that were getting dose commands rejected. What I use from it now: look at what's really on the bus before rewriting code.
 
 The control loop, the code, and the bus story are on the project page.
-

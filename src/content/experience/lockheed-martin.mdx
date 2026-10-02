@@ -6,43 +6,44 @@ location: Mount Laurel, NJ
 start: Jun 2026
 end: Aug 2026
 order: 2
-summary: Test data validation in MATLAB and requirements work in IBM DOORS/Jazz on the Aegis Combat System, plus leading 13 interns on a 1U server rack study.
+summary: Wrote and verified requirements on the Aegis Combat System, and ran a 13-intern team defining requirements and SWAP-C for a 1U server rack.
 highlights:
-  - Scripted dataset validation in MATLAB to check radar sensor-derived kinematics against predicted trajectories and timing requirements, automating the specified-versus-measured comparisons
-  - Validated test datasets in MATLAB and Excel for Aegis shipboard packages, surfacing discrepancies between documented and measured system configurations
-  - Authored and version-controlled Aegis requirements in IBM DOORS/Jazz, capturing changes that had never been documented
-  - Ran simulation testing and summarized pass/fail outcomes for team review before deployment
-  - Led 13 interns defining requirements and SWAP-C for a 1U data center server rack, sizing the thermal and power budgets, and presented the results to Lockheed leadership
-skills: [matlab, matlab-sim, data-validation, test-scripts, doors, requirements, swap-c, team-lead]
+  - Authored and updated system requirements in IBM DOORS/Jazz for Aegis Combat System shipboard packages, capturing previously undocumented changes
+  - Validated test datasets in MATLAB and Excel, surfacing discrepancies between documented and measured system configurations
+  - Scripted MATLAB dataset validation and simulation testing to verify radar sensor-derived kinematics reports against predicted trajectories and timing requirements
+  - Led a 13-intern project team as unofficial project manager, defining requirements and SWAP-C constraints for a 1U data center server rack from COTS reference hardware, and presented to Lockheed leadership
+skills: [matlab, matlab-sim, data-validation, doors, requirements, swap-c, team-lead]
 theme: naval
 rail: right
 ---
 import Chain from '../../components/content/Chain.astro';
 import TeamDots from '../../components/content/TeamDots.astro';
 
-I spent the summer as a systems engineering intern on the Aegis Combat System, the combat system that ties together radar, weapons, and command on Navy ships. Most of my work was checking that what the system actually does matches what it's specified to do.
+I spent the summer as a systems engineering intern on the Aegis Combat System. Most of my work was checking that what the system does matches what it's specified to do, and it's where I learned how requirements drive verification.
 
 ## Specified versus measured
 
-The core of it was test data validation. Radar data gets turned into kinematics (where a track is and how it's moving), and those have to line up with the predicted trajectories and meet the timing requirements. I scripted that comparison in MATLAB, so it runs the same way every time instead of being checked by hand.
+Radar data gets turned into kinematics (where a track is and how it's moving), and those have to line up with predicted trajectories and meet timing requirements. I scripted that comparison in MATLAB so it runs the same way every time.
 
 <Chain
   label="What the validation scripts do"
   steps={[
     { tag: 'spec', title: 'The requirement', text: 'Predicted trajectories and the timing requirements the system has to meet.' },
     { tag: 'data', title: 'What was measured', text: 'Kinematics derived from the radar sensor data in the test datasets.' },
-    { tag: 'MATLAB', title: 'Compare', text: 'Scripts line the two up and check the measured values against the specified ones automatically.' },
-    { tag: 'result', title: 'Pass or fail', text: 'Outcomes are recorded and summarized for the team to review before deployment.' },
+    { tag: 'MATLAB', title: 'Compare', text: 'Scripts line the two up and check the measured values against the specified ones.' },
+    { tag: 'result', title: 'Pass or fail', text: 'Outcomes are recorded and summarized for the team to review.' },
   ]}
 />
 
-The same idea applied to configuration. Validating datasets for Aegis shipboard packages in MATLAB and Excel turned up places where the documented configuration didn't match what was measured. Those went back into the requirements: I updated and version-controlled them in IBM DOORS/Jazz, including changes that had never been written down.
+Validating datasets for Aegis shipboard packages in MATLAB and Excel also turned up places where the documented configuration didn't match what was measured. Those went back into the requirements, which I updated in IBM DOORS/Jazz, including changes nobody had written down. I used Confluence on my host team.
 
 ## The intern project
 
-I also led a team of 13 interns defining the requirements and SWAP-C for a 1U data center server rack, and we presented the results to Lockheed leadership. 1U is one rack unit, 1.75 inches tall, so everything has to fit in a very thin box, and every one of the four letters pulls against the others.
+At the first meeting of our 13-intern project team, nobody spoke and nobody wanted to start a roadmap. I took the unofficial project manager role, even though I would rather have stayed on my host team work. We defined requirements and SWAP-C (size, weight, power, and cost) for a 1U data center server rack, working from COTS reference hardware, including thermal and power budgets.
 
-<TeamDots count={13} label="13 interns, one lead. I ran the team that worked out the requirements and constraints." />
+I ran weekly scrums, cut the work into check-in sized pieces, took the tasks nobody wanted, presented to Lockheed leadership, and wrote knowledge transfer documents for future teams. The team got a perfect project score.
+
+<TeamDots count={13} label="13 interns, one unofficial lead." />
 
 | | What it covers |
 | --- | --- |

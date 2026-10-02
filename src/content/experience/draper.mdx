@@ -1,45 +1,50 @@
 ---
 org: Draper
-role: Microelectronics Integration & Test Intern
+role: Microelectronics Integration & Test Engineering Intern
 unit: Space Systems
 location: Cambridge, MA
 start: Sep 2026
-end: Dec 2026
+end: Present
 current: true
 order: 1
-summary: Acceptance testing on flight hardware for a Space Systems program built to NASA Class B risk classification.
+summary: Design validation testing of a linear regulator for an ASIC team, and acceptance testing on flight hardware for a NASA Class B space program.
 highlights:
-  - Oversee acceptance testing across multiple production batches of assembled PCB and microcontroller flight hardware, logging results against acceptance criteria and flagging units outside specification
-  - Run performance test scripts through vibration testing and temperature cycling at the hot and cold limits
-  - Execute charge and discharge testing, following flight hardware handling procedures
-  - Work to NASA Class B risk classification requirements
-skills: [acceptance-testing, vibration-testing, thermal-cycling, charge-discharge, flight-hardware, test-scripts, nasa-class-b]
+  - Performing design validation testing (DVT) of a custom ASIC linear regulator (LDO), characterizing line and load transient response with Source Measure Units (SMUs)
+  - Executing acceptance testing on 30 flight modules for a NASA Class B space program, verifying performance and power after each random vibration and thermal cycling exposure
+  - Wrote a MATLAB script that plotted vibration test data and showed an aborted test was a bad sensor reading, not a bad unit, then presented it to the review board
+  - Handle delicate flight hardware under flight hardware procedures
+skills: [design-validation, smu, acceptance-testing, vibration-testing, thermal-cycling, charge-discharge, flight-hardware, matlab, nasa-class-b]
 theme: space
 rail: top
 ---
 import Chain from '../../components/content/Chain.astro';
 import ThermalProfile from '../../components/content/ThermalProfile.astro';
 
-{/* Keep this generic: no program specifics beyond "Space Systems program" and "flight hardware". */}
+{/* Keep this generic: no program specifics beyond "a NASA Class B space program" and "flight hardware". Confirm with Draper what can be published. If the regulator turns out to be a COTS part, drop "custom ASIC". */}
 
-I'm on the Microelectronics Integration & Test team at Draper, working on flight hardware for a Space Systems program built to NASA Class B risk classification. The hardware, assembled PCBs and microcontroller boards, comes in in production batches. My job is overseeing their acceptance testing.
+I took this semester off from classes on purpose. A normal school schedule wasn't going to give me hands-on hardware time, and Draper would. I'm on the Microelectronics Integration & Test team in the Space Systems business area, and I work on two things.
 
-## What acceptance testing is for
+## ASIC design validation
 
-Acceptance tests aren't about proving a design works; that was qualification. They're about proving that this particular unit, from this particular batch, was built right and will survive the ride. Every unit goes through them, which is why it's batch work.
+This one came in October and it's the work I most want to be doing. Before a linear regulator (an LDO) gets integrated into the larger board, it gets tested on its own. I run design validation testing on it, looking at how the output responds to line transients and load transients, using Source Measure Units to drive and measure.
+
+## Flight hardware acceptance testing
+
+The other half is acceptance testing on about 5 batches of 6 identical modules, around 30 units, for a NASA Class B space program. The hardware design and the test plan were done before I got here. I help run it, and it's the same routine every batch.
 
 <Chain
   label="What goes into accepting a batch"
   steps={[
-    { tag: 'scripts', title: 'Performance tests', text: 'Test scripts exercise each unit so there is a measured baseline, and the same scripts run again under stress.' },
-    { tag: 'shake', title: 'Vibration', text: 'Shakes the unit the way launch will, to find anything that was built wrong: a weak joint, a loose fastener, a part that moves.' },
-    { tag: 'heat', title: 'Temperature cycling', text: 'Takes the unit to its hot and cold limits, over and over, with the performance tests run along the way.' },
-    { tag: 'power', title: 'Charge and discharge', text: 'Charge and discharge testing on the flight hardware, done under the flight hardware handling procedures.' },
-    { tag: 'log', title: 'Log and flag', text: 'Every result is logged against the acceptance criteria, and any unit outside specification gets flagged.' },
+    { tag: 'perf', title: 'Performance tests', text: 'Each unit gets a baseline, and partial and full performance tests run again between exposures.' },
+    { tag: 'shake', title: 'Random vibration', text: 'Shakes the unit the way launch will, to find anything that was built wrong.' },
+    { tag: 'heat', title: 'Temperature cycling', text: 'Takes the unit to its hot and cold boundaries, with checks along the way.' },
+    { tag: 'power', title: 'Voltage and charge/discharge', text: 'Voltage checks and charge and discharge testing, with very delicate handling.' },
   ]}
 />
 
 <ThermalProfile />
+
+Because the routine is the same each time, a result that looks wrong stands out. During one vibration test the script aborted. I plotted the data in MATLAB and showed that the cause was a bad sensor reading, not a bad unit, and presented that to the review board.
 
 ## Class B, briefly
 

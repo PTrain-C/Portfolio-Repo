@@ -23,16 +23,17 @@ const keySkills = categories
   .filter((g) => g.skills.length > 0);
 
 const focus = [
-  'analog & mixed-signal circuits',
+  'analog circuits',
   'PCB design',
+  'ASIC validation',
   'quantum hardware',
-  'space hardware test',
+  'flight hardware test',
 ];
 
 // Facts pulled straight from the experience entries.
 const facts = [
   { big: '13', label: 'interns I led defining SWAP-C constraints at Lockheed Martin' },
-  { big: '140+', label: 'participants at Qompute 2026, which I co-organize' },
+  { big: '140+', label: 'participants at Q³ Qompute @ USC in 2025, which I helped organize' },
   { big: 'Class B', label: 'NASA risk classification of the space hardware I test at Draper' },
   { big: String(projects.length), label: 'projects, each with my part spelled out' },
 ];
@@ -58,11 +59,13 @@ const facts = [
             <span class="word">{focus[0]}</span>
           </span>
         </p>
-        {/* TODO(Peter): rewrite in your own words. */}
         <p class="bio rise" style="--d:3">
-          I like the whole path of a circuit: working out what it should do on paper, laying out the
-          board, and seeing what it actually does on the bench. Right now that means integration and
-          test on space hardware.
+          Last summer I was at Lockheed Martin writing and verifying requirements on the Aegis Combat
+          System. This fall I took a semester off from classes to work at Draper, where I help run
+          acceptance testing on flight hardware for a NASA program and do design validation testing on
+          a voltage regulator for an ASIC team. Before that I designed an all-analog safety interlock
+          board for USC Racing and built a notch filter from the transfer function up. I've seen how
+          requirements get written and how hardware gets proven. What I want next is to design it.
         </p>
         <div class="ctas rise" style="--d:4">
           <a class="btn gold" href={href('/projects')}>See projects</a>

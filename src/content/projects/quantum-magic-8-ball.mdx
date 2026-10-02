@@ -1,0 +1,32 @@
+---
+title: Quantum Magic 8-Ball
+fullName: Quantum random number generator, in progress
+summary: A Magic 8-Ball in Qiskit that picks its answers from measurements of qubits in superposition. The plan is to move it to real quantum hardware and then an FPGA pipeline.
+period: Sep 2026 to now
+order: 6
+status: draft
+theme: quantum
+hero: scene
+rail: right
+art: gpio
+team: solo
+mine:
+  - Building from IBM's Qiskit quantum magic 8-ball tutorial
+outcome: In progress. Only the Qiskit starting point exists so far. Nothing has run on real quantum hardware and no FPGA work has started.
+skills: [qiskit, quantum-fundamentals]
+---
+
+{/*
+  Draft on purpose: leave unpublished until there is real progress (Peter, Sept 2026).
+  Never claim: running on IBM Quantum hardware, any FPGA, RTL, or SystemVerilog work, until it is done.
+*/}
+
+## Where it is
+
+I'm starting from IBM's Qiskit quantum magic 8-ball tutorial. It picks answers from measurements of qubits in superposition. Building from October 2026.
+
+## Planned, not built
+
+Real quantum entropy from IBM Quantum hardware through Qiskit Runtime, then an FPGA pipeline on a Digilent Basys 3 (Artix-7): health tests, a Toeplitz randomness extractor, FIFOs, and UART, with an on-chip ring-oscillator generator as a classical baseline. The goal is a real digital design project.
+
+Simulator output is pseudorandom. Only bits from real quantum hardware count as quantum entropy.

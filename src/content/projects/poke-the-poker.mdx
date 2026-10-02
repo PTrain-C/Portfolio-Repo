@@ -4,19 +4,15 @@ fullName: Real-time poker analyzer, EE 250 final project
 summary: A Raspberry Pi that listens to a poker table. It times every player's decision with a sound sensor, turns that into a confidence score, and works out who is pushing whom out of the hand.
 period: Aug 2025 to Dec 2025
 order: 4
-status: draft
+status: published
 theme: felt
 hero: scene
 rail: top
 art: gpio
 team: team
-# TODO(Peter): the write-up says "we" for everything. If you and Christopher
-# split the work, move your parts here and his under `others`.
+# The split with Christopher is not recorded, so this stays a two-person project.
 mine:
-  - System design and block diagram, with Christopher
-  - Sound sensor, MCP3008 ADC over SPI, and the RPi game loop, with Christopher
-  - MQTT control from a laptop, with Christopher
-  - Confidence and influence scoring, with Christopher
+  - Co-designed and co-built the whole system with Christopher (sound sensor, MCP3008 ADC over SPI, the Raspberry Pi game loop, MQTT control, and confidence and influence scoring)
 others:
   - part: Co-built everything listed under my part
     by: Christopher Kim
@@ -33,14 +29,13 @@ import Figure from '../../components/Figure.astro';
 import Pair from '../../components/content/Pair.astro';
 
 {/*
-  RULES (firm):
-  - Say "Raspberry Pi" or "RPi". Never "Embedded Linux".
-  - The write-up credits all work jointly to Peter and Christopher Kim. Don't split it until Peter does.
+  RULES (firm): say "Raspberry Pi" or "RPi", never "Embedded Linux". Plotting is run manually, never "automated".
+  The write-up credits all work jointly to Peter and Christopher Kim, so don't split it until Peter does.
 */}
 
 ## What it is
 
-Christopher Kim and I built this for EE 250. Players make their move out loud, and a sound sensor on the Raspberry Pi picks it up. How fast you commit becomes your confidence score for that turn. Staying silent past the timeout counts as a fold. At the end of the game the Pi prints a table and a matrix that a laptop script turns into per-player graphs of confidence and influence. It's meant for commentators and analysts, not the players.
+Christopher Kim and I built this for EE 250. Players make their move out loud, and a sound sensor on the Raspberry Pi picks it up. How fast you commit becomes your confidence score for that turn. Staying silent past the timeout counts as a fold. At the end of the game the Pi prints a table and a matrix, and a plotting script I run by hand afterward turns them into per-player graphs of confidence and influence. It's meant for commentators and analysts, not the players.
 
 ## One turn, start to finish
 

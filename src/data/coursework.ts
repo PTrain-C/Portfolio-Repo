@@ -18,7 +18,6 @@ export const coursework: { group: string; blurb: string; courses: Course[] }[] =
     courses: [
       { code: 'EE 202L', name: 'Linear Circuits', project: 'notch-filter' },
       { name: 'Semiconductor Devices' },
-      { name: 'Physical Electronics' },
       { code: 'EE 477', name: 'MOS VLSI Circuit Design', note: 'Planned, Spring 2027' },
     ],
   },
@@ -27,7 +26,7 @@ export const coursework: { group: string; blurb: string; courses: Course[] }[] =
     blurb: 'Signals, microcontrollers, and connected hardware.',
     courses: [
       { name: 'Signals and Systems' },
-      { name: 'Embedded Systems' },
+      { name: 'Digital Logic & Embedded Systems' },
       { code: 'EE 250', name: 'Internet of Things', project: 'poke-the-poker' },
     ],
   },
@@ -47,9 +46,9 @@ export const coursework: { group: string; blurb: string; courses: Course[] }[] =
     courses: [
       {
         name: 'IBM Quantum Qiskit Global Summer School',
-        note: '2026. Quantum circuits, error correction, hardware-software interfaces',
+        note: '2026. Quantum Fundamentals certificate, including a dynamic GHZ-state circuit builder and a circuit parameter analysis utility',
       },
-      { name: 'Digital logic self-study (HDLBits)', note: 'Jun 2026 to now. Verilog, simulated in Verilator' },
+      { name: 'Verilog practice (HDLBits)', note: 'Jun 2026 to now. Combinational logic, sequential circuits, and FSMs' },
     ],
   },
 ];

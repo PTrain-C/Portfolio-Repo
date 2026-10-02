@@ -1,10 +1,10 @@
 ---
 title: Hydroponics controller
 fullName: Farms for Thought, Food for Thought Foundation
-summary: A closed-loop controller on an Arduino UNO R4 that keeps a hydroponic grow system's nutrients and pH in range on its own, dosing from 4 peristaltic pumps.
+summary: A closed-loop pH and EC dosing controller in C++ on an Arduino UNO R4 WiFi, driving 4 peristaltic pumps to keep a hydroponic system's nutrients and pH in range on its own.
 period: Dec 2025 to May 2026
 order: 5
-status: draft
+status: published
 theme: hydro
 hero: scene
 rail: right
@@ -12,36 +12,33 @@ experience: food-for-thought
 art: compare
 team: team
 mine:
-  - Built the closed-loop control system in C++ on the Arduino UNO R4 (pH, EC, pumps, lights)
-  - Debugged the I2C NAK errors on the 4 pump drivers and moved the pumps to UART
-  - Verified the custom PCB netlist against the breadboard build
-  - Documented sensor calibration and wiring
+  - All of the control code, in C++ across 7 source files
+  - Fixing every sensor driver after finding the 0xFF idle-byte parsing bug
+  - Isolating undocumented pump protocol limits that were getting dose commands rejected
+  - Verifying the custom PCB netlist against the breadboard build
 others:
-  - part: PCB design and layout
+  - part: Custom PCB design and layout
     by: Another team member
-outcome: Firmware running on the breadboard system. The custom PCB was checked against the breadboard but not fabricated or brought up.
-skills: [arduino, c-cpp, closed-loop-control, i2c, uart, logic-analyzer, design-verification, technical-docs]
+outcome: Control code running on the breadboard system. The PCB was only compared against the breadboard netlist, never fabricated or brought up.
+skills: [arduino, c-cpp, closed-loop-control, i2c, logic-analyzer, design-verification]
 sources:
-  - label: FFT 2026 firmware (farmsforthoughtcode_fft_2026.ino and the pH, EC, pump, dosing, lights, and WiFi modules)
+  - label: FFT 2026 control code (farmsforthoughtcode_fft_2026.ino and the pH, EC, pump, and dosing modules)
   - label: FFT 2026 README (file map, I2C addresses, dosing behavior, Atlas EZO notes)
 ---
 import Chain from '../../components/content/Chain.astro';
 import Excerpt from '../../components/content/Excerpt.astro';
 
 {/*
-  ATTRIBUTION RULES (firm):
-  - PCB work is verification only: confirming the PCB matched the breadboard electrically. No design or layout claims.
-  - Firmware was NOT bare-metal. Do not use that term anywhere on this page. It is Arduino.
-  - The PCB was not fabricated or brought up beyond the comparison.
+  RULES (firm): say "C++" or "control code", never firmware or bare-metal. The final build is all I2C. PCB work is netlist verification only.
 */}
 
 ## What it is
 
-A hydroponic system for the Food For Thought Foundation's Farms for Thought program. An Arduino UNO R4 reads pH and electrical conductivity (EC, which tracks how much nutrient is in the water), and when either drifts out of range it doses small amounts from four peristaltic pumps until it's back. It also runs the grow lights on a schedule, keeps the water and air pumps on, and reads a float switch.
+A hydroponic system for the Food For Thought Foundation's Farms for Thought program. An Arduino UNO R4 WiFi reads pH and electrical conductivity (EC, which tracks how much nutrient is in the water), and when either drifts out of range it doses small amounts from four peristaltic pumps until it's back. I wrote all of the code.
 
 ## The control loop
 
-Every 10 seconds it runs one dosing cycle. EC goes first on purpose: adding nutrients moves the pH, so if pH were corrected first the EC step would just knock it back out. Locking in EC first means the pH loop isn't chasing a moving target.
+Every 10 seconds it runs one dosing cycle. It uses deadband control, so it leaves the water alone while it's in range. The pH and EC loops are independent, so if one probe fails the other keeps regulating. EC goes first on purpose: adding nutrients moves the pH, so if pH were corrected first the EC step would just knock it back out. Locking in EC first means the pH loop isn't chasing a moving target.
 
 <Chain
   loop
@@ -50,7 +47,6 @@ Every 10 seconds it runs one dosing cycle. EC goes first on purpose: adding nutr
     { tag: 'read', title: 'Read pH and EC', text: 'Both Atlas EZO circuits are read over I2C. If both reads fail, the cycle is skipped. If only one fails, the other side still runs.' },
     { tag: 'EC', title: 'Fix EC', text: 'Outside 1500 plus or minus 50 uS/cm, pulse 1 mL from the nutrient pump (or the dilution pump if EC is high), mix for 10 s, and read again. Up to 10 pulses a cycle.' },
     { tag: 'pH', title: 'Then fix pH', text: 'Outside 7.0 plus or minus 0.5, pulse 5 mL of pH up or pH down, mix, re-read. Also capped at 10 pulses.' },
-    { tag: 'mix', title: 'Keep the lights running', text: 'The mixing wait keeps calling the light scheduler, so a long dosing cycle never stalls the grow lights.' },
   ]}
   caption="Setpoints, pulse sizes, and caps all live in config_fft.h, the one file you edit before deploying."
 />
@@ -67,25 +63,23 @@ Small pulses with a mixing wait between them are the whole strategy: dose a litt
 
 ## The bus
 
-Every sensor and pump is an Atlas Scientific EZO board. In the version of the firmware shown here, all seven sat on one I2C bus:
+Every sensor and pump is an Atlas Scientific EZO module. All seven sit on one I2C bus:
 
 | Device | Address | Job |
 | --- | --- | --- |
 | pH sensor | `0x63` | Reads pH, 815 ms per read |
 | EC sensor | `0x64` | Reads EC, TDS, salinity, and specific gravity as CSV, 570 ms per read |
-| Temperature | `0x66` | In the build, not in the control loop yet |
+| Temperature | `0x66` | Initialized, but not part of the control loop |
 | pH down pump | `0x67` | Doses acid |
 | pH up pump | `0x68` | Doses base |
 | EC up pump | `0x69` | Doses nutrient concentrate |
 | EC down pump | `0x6A` | Doses water to dilute. Set to 0 to disable |
 
-A couple of EZO quirks that cost time and are written into the README now: the pumps only accept a lowercase `d,<ml>` dose command over I2C (uppercase comes back as an error), and volumes can have at most two decimal places, so `d,0.20` works and `d,0.200` doesn't.
+The pumps also had undocumented protocol limits that were getting my dose commands rejected. I isolated them and wrote them into the README: the pumps only accept a lowercase `d,<ml>` dose command over I2C (uppercase comes back as an error), and volumes can have at most two decimal places, so `d,0.20` works and `d,0.200` doesn't.
 
-## Moving the pumps to UART
+## Look at the bus first
 
-Seven devices on one bus worked until it didn't. The four pump drivers started throwing NAK errors: the master sends a pump's address and nothing acknowledges it. I watched it two ways, in the serial monitor from the Arduino's side and with a logic analyzer on SDA and SCL to see what was really on the wire. In the end I migrated the pump communication off I2C and onto UART.
-
-The sensor side had its own bug along the way. Readings were occasionally garbage, with no pattern. The driver loops read bytes until the EZO's end-of-data byte, `0x00`, but once a device has nothing left to send, the I2C bus itself hands back `0xFF`, and the loop was copying those into the buffer. We fixed it with one condition in the pH, EC, and temperature drivers:
+I spent too long assuming the bugs were in my own logic. Readings were occasionally garbage, with no pattern. The vendor sample code read bytes until the EZO's end-of-data byte, `0x00`, but once a device has nothing left to send, the I2C bus itself hands back `0xFF`, and it was copying those into the buffer as data. I fixed it with one condition in every sensor driver:
 
 <Excerpt
   file="fftf/ec_fft.cpp"
@@ -96,7 +90,5 @@ The sensor side had its own bug along the way. Readings were occasionally garbag
 
 ## The PCB
 
-The circuit was first built and validated on a breadboard. Someone else on the team designed a custom PCB for it, and my job there was to check the PCB's netlist against the breadboard build and confirm the two were electrically the same. The board was not fabricated or brought up beyond that comparison.
-
-I also documented the sensor calibration procedures and the wiring specifications, so the setup can be recalibrated and rewired without me there.
+The circuit was first built and validated on a breadboard. Someone else designed a custom PCB for it, and my part was to check the PCB's netlist against the breadboard build and confirm the two matched. The board was not fabricated or brought up beyond that comparison.
 

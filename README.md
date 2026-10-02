@@ -49,7 +49,7 @@ Components for MDX bodies live in `src/components/content/`: `Chain` (clickable 
 
 ## Deploying
 
-`.github/workflows/deploy.yml` builds and deploys on every push to `main`. One-time setup: repo Settings → Pages → Source: **GitHub Actions**. If you move to a custom domain, Vercel, or Netlify, update `site` and remove `base` in `astro.config.mjs`.
+`.github/workflows/deploy.yml` builds and deploys on every push to `main`. The live build sets `HIDE_DRAFTS=true`, so anything marked `status: draft` (currently the Quantum Magic 8-Ball) stays off the site until you flip it to `published`. One-time setup: repo Settings → Pages → Source: **GitHub Actions**. If you move to a custom domain, Vercel, or Netlify, update `site` and remove `base` in `astro.config.mjs`.
 
 ## Updating after a resume change
 
@@ -63,9 +63,8 @@ Set `hubspotPortalId` in `src/config.ts` to turn on the HubSpot tracking code. L
 
 ## Still needed
 
-- [ ] Headshot
+- [ ] A better headshot (the LinkedIn photo is in use for now)
 - [ ] GitHub link, if you want one shown (`src/config.ts`)
-- [ ] Hobbies for the interests section
 - [ ] Circuit Sensei and Poke the Poker demo screenshots
 - [ ] Food For Thought photos
 - [ ] Poke the Poker: confirm the split with Christopher

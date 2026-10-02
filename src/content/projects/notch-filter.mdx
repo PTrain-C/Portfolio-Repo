@@ -1,10 +1,10 @@
 ---
 title: Corrupted Chord
 fullName: Active notch filter in a cigar-box guitar, EE 202L final project
-summary: An active twin-T notch filter, built into a cigar-box electric guitar, that cuts the 196 Hz fundamental of the open G string at Q = 8.5 and leaves the strings next to it alone.
+summary: An active twin-T notch filter, built into a cigar-box electric guitar, that cuts the 196 Hz fundamental of the open G string at Q = 8.5 and leaves the neighboring notes alone.
 period: Aug 2025 to Dec 2025
 order: 3
-status: draft
+status: published
 theme: cigar
 hero: tall
 heroImage: img/notch/box-led.webp
@@ -13,17 +13,16 @@ rail: left
 art: bode
 team: team
 mine:
-  - Hand-soldering the filter PCB
-  - Bench testing and measurements on the oscilloscope and DMM
+  - Transfer function derivation and component selection, shared with John
+  - Hand-soldering the through-hole parts
+  - Testing and bench tuning with potentiometers
   - Wiring the blue box (9 V battery, filter board, and jacks)
-  - Transfer function derivation, with John
-  - Component selection, with John
-  - Tuning the pots against the target, with John
+  - Guitar assembly, stringing, tuning, and the writeup, shared with John
 others:
   - part: KiCAD schematic and PCB layout
-    by: John Peng
-  - part: Hot-plate soldering and the woodwork
-    by: John Peng
+    by: John
+  - part: Hot-plate soldering of the small parts, and the woodwork
+    by: John
 outcome: Built into the guitar and tuned on the bench. Designed for Q = 8.5 at 196 Hz, with over 20 dB of attenuation at the notch in LTSpice.
 # KiCAD is left out on purpose: the schematic and layout were John's.
 skills: [nodal-analysis, transfer-functions, filter-design, op-amps, component-selection, soldering, bench-tuning, oscilloscope, breadboarding]
@@ -47,7 +46,7 @@ import Figure from '../../components/Figure.astro';
 
 ## What it is
 
-John and I built a cigar-box electric guitar and hid an active notch filter inside it. The filter's job is to take out one note, the open G string at 196 Hz, while the D and B strings on either side still come through. It's a twin-T band-stop with positive feedback added, which is what lets the notch be narrow instead of swallowing half the neck.
+John and I built a cigar-box electric guitar and hid an active notch filter inside it. The filter's job is to take out one note, the open G string at 196 Hz, while the neighboring notes, F# and Ab, still come through with little attenuation. It's a twin-T band-stop with positive feedback added, which is what lets the notch be narrow instead of swallowing half the neck.
 
 ## The math
 
@@ -57,7 +56,7 @@ $$
 \frac{V_{out}}{V_{in}} = \frac{s^2 + \frac{1}{(RC)^2}}{s^2 + s\,\frac{4}{RC} + \frac{1}{(RC)^2}}
 $$
 
-Matching that to the standard notch form $K\frac{s^2 + \omega_0^2}{s^2 + s\,\omega_0/Q + \omega_0^2}$ gives $\omega_0 = 1/RC$, $K = 1$, and $Q = 1/4$. A $Q$ of a quarter is a very wide notch. On its own it would cut the D and B strings almost as much as the G.
+Matching that to the standard notch form $K\frac{s^2 + \omega_0^2}{s^2 + s\,\omega_0/Q + \omega_0^2}$ gives $\omega_0 = 1/RC$, $K = 1$, and $Q = 1/4$. A $Q$ of a quarter is a very wide notch. On its own it would cut the neighboring notes almost as much as the G.
 
 The fix is to stop tying the bottom of the T to ground and drive it from a fraction of the output instead, $V_x = \alpha V_{out}$ with $\alpha < 1$. Redoing the same three KCL equations with that one change gives
 
@@ -75,13 +74,13 @@ $$
 \alpha = 1 - \frac{1}{4Q} = 1 - \frac{1}{34} \approx 0.97
 $$
 
-Drag the slider to see what that does to the six strings, or jump straight to our design.
+Drag the slider to see what that does to the notes around the notch, or jump straight to our design.
 
 <NotchExplorer />
 
 ## Building it
 
-Component values had to come from a restricted parts list, so we checked each pick against the hand calculations and the LTSpice model before anything went on the board. John did the schematic and board layout in KiCAD and the hot-plate soldering. I hand-soldered the rest, and wired the blue box: the 9 V battery, the filter board, and the jacks, all sitting in the cigar box around the neck.
+Component values had to come from a restricted parts list, so we checked each pick against the hand calculations and the LTSpice model before anything went on the board. John did the schematic and board layout in KiCAD and the hot-plate soldering of the small parts. I hand-soldered the through-hole parts and wired the blue box: the 9 V battery, the filter board, and the jacks, all sitting in the cigar box around the neck.
 
 <Pair offset>
   <Figure src="img/notch/box-led.webp" ratio="4 / 5" frame="print" tilt={-1.5} caption="The finished box, powered up, with the LED lit." alt="Cigar-box guitar body with wiring and a lit green LED" />
