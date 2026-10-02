@@ -51,6 +51,16 @@ Components for MDX bodies live in `src/components/content/`: `Chain` (clickable 
 
 `.github/workflows/deploy.yml` builds and deploys on every push to `main`. One-time setup: repo Settings → Pages → Source: **GitHub Actions**. If you move to a custom domain, Vercel, or Netlify, update `site` and remove `base` in `astro.config.mjs`.
 
+## Updating after a resume change
+
+1. Edit the file for what changed (see the table above). A new or changed role is `src/content/experience/<id>.mdx`.
+2. Quick edits: use the pencil icon on github.com, or ask Claude. Commit to a branch and open a PR; the build runs on the PR and flags a broken edit.
+3. Merge to `main`. The site redeploys in 1 to 2 minutes at https://ptrain-c.github.io/Portfolio-Repo/.
+
+## Visitor tracking
+
+Set `hubspotPortalId` in `src/config.ts` to turn on the HubSpot tracking code. Leave it `null` to ship without it. Free HubSpot only names visitors who identify themselves (form fill or tracked email link). For resume attribution, link with `?utm_source=resume`.
+
 ## Still needed
 
 - [ ] Headshot

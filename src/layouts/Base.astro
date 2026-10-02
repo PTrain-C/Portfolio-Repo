@@ -8,7 +8,7 @@ import 'katex/dist/katex.min.css';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { site, href } from '../config';
+import { site, href, hubspotPortalId } from '../config';
 
 interface Props {
   title?: string;
@@ -31,6 +31,23 @@ const fullTitle = title ? `${title} | ${site.name}` : `${site.name}, Electrical 
     <meta name="theme-color" content="#1e3d31" />
     <link rel="icon" type="image/svg+xml" href={href('/favicon.svg')} />
     {clientRouter && <ClientRouter />}
+    {
+      hubspotPortalId && (
+        <>
+          <script is:inline src={`https://js.hs-scripts.com/${hubspotPortalId}.js`} async defer />
+          <script is:inline>
+            {`
+              document.addEventListener('astro:page-load', function () {
+                if (window.__hsFirstLoad === undefined) { window.__hsFirstLoad = true; return; }
+                var _hsq = (window._hsq = window._hsq || []);
+                _hsq.push(['setPath', location.pathname + location.search]);
+                _hsq.push(['trackPageView']);
+              });
+            `}
+          </script>
+        </>
+      )
+    }
   </head>
   <body data-theme={theme}>
     <a class="skip" href="#main">Skip to content</a>

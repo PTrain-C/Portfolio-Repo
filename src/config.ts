@@ -22,6 +22,11 @@ export const contact = {
   formEndpoint: 'https://formsubmit.co/ajax/peter.mai.connolly@gmail.com',
 };
 
+// HubSpot tracking code ID (HubSpot > Settings > Tracking & Analytics >
+// Tracking Code; it is the number in js.hs-scripts.com/<id>.js). While null,
+// no tracking script is added to the site.
+export const hubspotPortalId: string | null = null;
+
 // Shown on the home page. The first four come from the brief's focus areas;
 // the last is a placeholder for things outside engineering.
 export const interests: { title: string; text: string; placeholder?: boolean }[] = [
