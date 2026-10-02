@@ -17,7 +17,7 @@ export const coursework: { group: string; blurb: string; courses: Course[] }[] =
     blurb: 'Analog circuits and the physics under them.',
     courses: [
       { code: 'EE 202L', name: 'Linear Circuits', project: 'notch-filter' },
-      { name: 'Semiconductor Devices' },
+      { code: 'EE 338', name: 'Semiconductor Devices' },
       { code: 'EE 477', name: 'MOS VLSI Circuit Design', note: 'Planned, Spring 2027' },
     ],
   },
@@ -25,8 +25,8 @@ export const coursework: { group: string; blurb: string; courses: Course[] }[] =
     group: 'Signals & Embedded',
     blurb: 'Signals, microcontrollers, and connected hardware.',
     courses: [
-      { name: 'Signals and Systems' },
-      { name: 'Digital Logic & Embedded Systems' },
+      { code: 'EE 301', name: 'Signals and Systems' },
+      { code: 'EE 109', name: 'Digital Logic & Embedded Systems' },
       { code: 'EE 250', name: 'Internet of Things', project: 'poke-the-poker' },
     ],
   },
@@ -34,10 +34,10 @@ export const coursework: { group: string; blurb: string; courses: Course[] }[] =
     group: 'Math & Physics',
     blurb: 'The foundations.',
     courses: [
-      { name: 'Applied Linear Algebra' },
-      { name: 'Differential Equations' },
-      { name: 'Physics: Electricity & Magnetism' },
-      { name: 'Physics: Optics & Modern Physics' },
+      { code: 'EE 141', name: 'Applied Linear Algebra' },
+      { code: 'MATH 245', name: 'Differential Equations' },
+      { code: 'PHYS 152', name: 'Physics: Electricity & Magnetism' },
+      { code: 'PHYS 153', name: 'Physics: Optics & Modern Physics' },
     ],
   },
   {
