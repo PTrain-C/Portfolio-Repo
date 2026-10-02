@@ -1,0 +1,31 @@
+---
+// A clearly marked hole in the content. Use this instead of inventing scope.
+interface Props {
+  label?: string;
+}
+const { label = 'Still to write' } = Astro.props;
+---
+
+<aside class="missing" role="note">
+  <span class="todo">{label}</span>
+  <div class="body"><slot /></div>
+</aside>
+
+<style>
+  .missing {
+    margin: 1rem 0 1.75rem;
+    padding: 1rem 1.2rem;
+    border-radius: 0.75rem;
+    border: 1.5px dashed color-mix(in oklab, var(--tone-honey) 55%, transparent);
+    background: color-mix(in oklab, var(--gold) 7%, var(--linen));
+  }
+  .body {
+    margin-top: 0.5rem;
+    color: var(--bark-2);
+    font-size: 0.95rem;
+  }
+  .body :global(p) {
+    margin: 0;
+    color: inherit;
+  }
+</style>

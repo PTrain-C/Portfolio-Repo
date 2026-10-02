@@ -1,0 +1,112 @@
+---
+// Poker table: felt with a racetrack rail, a fanned hand of cards, a few chip
+// stacks, and a sound-level trace (the game reads decisions from a sound
+// sensor) crossing the table.
+const cards = [
+  { rank: 'A', suit: '♠', red: false },
+  { rank: 'K', suit: '♥', red: true },
+  { rank: 'Q', suit: '♣', red: false },
+  { rank: 'J', suit: '♦', red: true },
+  { rank: '10', suit: '♠', red: false },
+];
+const trace = (() => {
+  let d = 'M760 520';
+  for (let x = 760; x <= 1620; x += 10) {
+    const burst = x > 1040 && x < 1120 ? 90 : x > 1330 && x < 1380 ? 60 : 10;
+    d += ` L${x} ${(520 + Math.sin(x * 1.7) * burst * Math.abs(Math.sin(x / 13))).toFixed(1)}`;
+  }
+  return d;
+})();
+---
+
+<svg class="scene" viewBox="0 0 1600 720" preserveAspectRatio="xMaxYMid slice" aria-hidden="true">
+  <defs>
+    <radialGradient id="felt-light" cx="0.72" cy="0.45" r="0.6">
+      <stop offset="0" stop-color="#2c6a4d" />
+      <stop offset="1" stop-color="var(--scene)" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="720" fill="url(#felt-light)" />
+  <rect x="760" y="70" width="1100" height="600" rx="300" fill="none" stroke="var(--accent)" stroke-opacity="0.18" stroke-width="3" />
+  <rect x="790" y="100" width="1040" height="540" rx="270" fill="none" stroke="var(--accent)" stroke-opacity="0.08" stroke-width="2" stroke-dasharray="4 10" />
+
+  <path d={trace} fill="none" stroke="var(--gold)" stroke-opacity="0.55" stroke-width="2" />
+  <line x1="760" x2="1600" y1="440" y2="440" stroke="var(--gold)" stroke-opacity="0.35" stroke-dasharray="6 8" />
+  <text x="1590" y="430" class="thr">threshold</text>
+
+  <g transform="translate(1110 250)">
+    {
+      cards.map((c, i) => (
+        <g transform={`rotate(${(i - 2) * 11} 60 260) translate(${(i - 2) * 26} 0)`} class="card" style={`--i:${i}`}>
+          <rect width="120" height="170" rx="10" fill="#f6f0e0" stroke="#00000030" />
+          <text x="12" y="30" class:list={['rank', { red: c.red }]}>{c.rank}</text>
+          <text x="12" y="52" class:list={['pip', { red: c.red }]}>{c.suit}</text>
+          <text x="60" y="112" class:list={['big', { red: c.red }]}>{c.suit}</text>
+        </g>
+      ))
+    }
+  </g>
+
+  {
+    [
+      [900, 560, 5, '#9b3440'],
+      [960, 590, 3, '#efe5cc'],
+      [1470, 580, 6, '#24483a'],
+    ].map(([x, y, n, col]) => (
+      <g>
+        {Array.from({ length: Number(n) }, (_, k) => (
+          <g transform={`translate(${x} ${Number(y) - k * 9})`}>
+            <ellipse rx="34" ry="12" cy="6" fill="#0006" />
+            <ellipse rx="34" ry="12" fill={String(col)} stroke="#f6f0e0" stroke-width="3" stroke-dasharray="8 7" />
+          </g>
+        ))}
+      </g>
+    ))
+  }
+</svg>
+
+<style>
+  .scene {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .card {
+    animation: deal 0.8s var(--ease) both;
+    animation-delay: calc(var(--i) * 90ms + 200ms);
+  }
+  @keyframes deal {
+    from {
+      opacity: 0;
+      transform: translateY(-40px);
+    }
+  }
+  .rank,
+  .pip,
+  .big {
+    font-family: var(--display);
+    fill: #1d1b18;
+  }
+  .rank {
+    font-size: 28px;
+  }
+  .pip {
+    font-size: 22px;
+  }
+  .big {
+    font-size: 64px;
+    text-anchor: middle;
+  }
+  .red {
+    fill: #a8323a;
+  }
+  .thr {
+    font-family: var(--mono);
+    font-size: 14px;
+    fill: var(--gold);
+    fill-opacity: 0.7;
+    text-anchor: end;
+  }
+</style>

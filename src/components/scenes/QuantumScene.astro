@@ -1,0 +1,74 @@
+---
+// Quantum: a Bloch sphere with a precessing state vector, over faint circuit
+// wires with a few gates.
+const R = 190;
+const wires = [150, 250, 350, 450, 550];
+const gates = [
+  { w: 0, x: 880, g: 'H' },
+  { w: 1, x: 960, g: 'X' },
+  { w: 2, x: 880, g: 'H' },
+  { w: 3, x: 1040, g: 'Z' },
+  { w: 4, x: 960, g: 'H' },
+];
+---
+
+<svg class="scene" viewBox="0 0 1600 720" preserveAspectRatio="xMaxYMid slice" aria-hidden="true">
+  {wires.map((y) => <path d={`M760 ${y} H1600`} stroke="var(--accent)" stroke-opacity="0.14" stroke-width="2" />)}
+  {
+    gates.map((g) => (
+      <g transform={`translate(${g.x} ${wires[g.w]})`}>
+        <rect x="-22" y="-22" width="44" height="44" rx="6" fill="var(--scene-deep)" stroke="var(--accent)" stroke-opacity="0.35" />
+        <text y="8" class="gate">{g.g}</text>
+      </g>
+    ))
+  }
+  <path d="M1120 150 V350" stroke="var(--accent)" stroke-opacity="0.3" stroke-width="2" />
+  <circle cx="1120" cy="150" r="7" fill="var(--accent)" fill-opacity="0.5" />
+  <circle cx="1120" cy="350" r="14" fill="none" stroke="var(--accent)" stroke-opacity="0.5" stroke-width="2" />
+
+  <g transform="translate(1340 350)">
+    <circle r={R} fill="var(--scene-deep)" fill-opacity="0.7" stroke="var(--accent)" stroke-opacity="0.55" stroke-width="2" />
+    <ellipse rx={R} ry={R * 0.28} fill="none" stroke="var(--accent)" stroke-opacity="0.35" stroke-dasharray="4 7" />
+    <path d={`M0 ${-R} V${R}`} stroke="var(--accent)" stroke-opacity="0.3" />
+    <text y={-R - 16} class="ket">|0⟩</text>
+    <text y={R + 36} class="ket">|1⟩</text>
+    <g class="vec">
+      <path d="M0 0 L112 -120" stroke="var(--accent-soft)" stroke-width="4" stroke-linecap="round" />
+      <circle cx="112" cy="-120" r="9" fill="var(--accent-soft)" />
+    </g>
+    <circle r="6" fill="var(--accent)" />
+  </g>
+</svg>
+
+<style>
+  .scene {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .gate,
+  .ket {
+    font-family: var(--mono);
+    font-size: 20px;
+    fill: var(--accent-soft);
+    text-anchor: middle;
+  }
+  .ket {
+    font-size: 24px;
+  }
+  .vec {
+    animation: precess 6s ease-in-out infinite;
+    transform-box: view-box;
+  }
+  @keyframes precess {
+    0%,
+    100% {
+      transform: scaleX(1);
+    }
+    50% {
+      transform: scaleX(-1);
+    }
+  }
+</style>

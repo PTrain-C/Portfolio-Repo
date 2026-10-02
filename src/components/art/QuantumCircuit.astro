@@ -1,0 +1,137 @@
+---
+// A small quantum circuit whose wires line up, row for row, with a list next
+// to it (the interests list on the home page). Each wire ends in a
+// measurement, which "reads out" the row beside it.
+interface Props {
+  rows: number;
+  // Row height in px; must match the row height of the list beside it.
+  rowHeight?: number;
+}
+const { rows, rowHeight = 96 } = Astro.props;
+const W = 560;
+const H = rows * rowHeight;
+const y = (i: number) => rowHeight / 2 + i * rowHeight;
+
+type Gate =
+  | { kind: 'box'; q: number; x: number; t: string }
+  | { kind: 'cx'; c: number; t: number; x: number };
+
+const gates: Gate[] = [
+  { kind: 'box', q: 0, x: 120, t: 'H' },
+  { kind: 'box', q: 2, x: 120, t: 'H' },
+  { kind: 'box', q: 4, x: 160, t: 'X' },
+  { kind: 'cx', c: 0, t: 1, x: 200 },
+  { kind: 'cx', c: 2, t: 3, x: 250 },
+  { kind: 'box', q: 1, x: 300, t: 'S' },
+  { kind: 'cx', c: 3, t: 4, x: 330 },
+  { kind: 'box', q: 0, x: 300, t: 'T' },
+].filter((g) => (g.kind === 'box' ? g.q < rows : g.c < rows && g.t < rows));
+---
+
+<svg
+  class="qc"
+  viewBox={`0 0 ${W} ${H}`}
+  preserveAspectRatio="xMaxYMid meet"
+  style={`height:${H}px`}
+  aria-hidden="true"
+>
+  {
+    Array.from({ length: rows }, (_, i) => (
+      <g>
+        <text x="8" y={y(i) + 6} class="ket">
+          |0⟩
+        </text>
+        <line x1="52" x2="440" y1={y(i)} y2={y(i)} class="wire" />
+        <line x1="476" x2={W} y1={y(i) - 2.5} y2={y(i) - 2.5} class="cwire" />
+        <line x1="476" x2={W} y1={y(i) + 2.5} y2={y(i) + 2.5} class="cwire" />
+      </g>
+    ))
+  }
+  <line x1="400" x2="400" y1="14" y2={H - 14} class="barrier" />
+
+  {
+    gates.map((g) =>
+      g.kind === 'box' ? (
+        <g>
+          <rect x={g.x - 18} y={y(g.q) - 18} width="36" height="36" rx="6" class="gate" />
+          <text x={g.x} y={y(g.q) + 6} text-anchor="middle" class="gate-t">
+            {g.t}
+          </text>
+        </g>
+      ) : (
+        <g>
+          <line x1={g.x} x2={g.x} y1={y(g.c)} y2={y(g.t) + 16} class="link" />
+          <circle cx={g.x} cy={y(g.c)} r="6" class="ctrl" />
+          <circle cx={g.x} cy={y(g.t)} r="16" class="targ" />
+          <line x1={g.x - 16} x2={g.x + 16} y1={y(g.t)} y2={y(g.t)} class="link" />
+        </g>
+      ),
+    )
+  }
+
+  {
+    Array.from({ length: rows }, (_, i) => (
+      <g transform={`translate(458 ${y(i)})`}>
+        <rect x="-20" y="-18" width="40" height="36" rx="6" class="meter" />
+        <path d="M-12 8 A13 13 0 0 1 12 8" class="arc" />
+        <line x1="0" y1="8" x2="10" y2="-9" class="needle" />
+      </g>
+    ))
+  }
+</svg>
+
+<style>
+  .qc {
+    display: block;
+    width: 100%;
+  }
+  .wire {
+    stroke: var(--bark-3);
+    stroke-width: 1.5;
+  }
+  .cwire {
+    stroke: var(--gold);
+    stroke-width: 1.5;
+  }
+  .ket {
+    font-family: var(--mono);
+    font-size: 16px;
+    fill: var(--bark-2);
+  }
+  .barrier {
+    stroke: var(--bark-3);
+    stroke-width: 1;
+    stroke-dasharray: 4 5;
+  }
+  .gate,
+  .meter {
+    fill: var(--linen);
+    stroke: var(--pine);
+    stroke-width: 2;
+  }
+  .gate-t {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 22px;
+    fill: var(--pine);
+  }
+  .link {
+    stroke: var(--pine);
+    stroke-width: 2;
+  }
+  .ctrl {
+    fill: var(--pine);
+  }
+  .targ {
+    fill: var(--linen);
+    stroke: var(--pine);
+    stroke-width: 2;
+  }
+  .arc,
+  .needle {
+    fill: none;
+    stroke: var(--pine);
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+</style>

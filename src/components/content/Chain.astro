@@ -1,0 +1,187 @@
+---
+// A row of blocks joined by a trace: a signal chain, a control loop, or a
+// state machine. `loop` draws a return path from the last block to the first.
+// Click a block to open its detail (all details are also in the markup).
+interface Step {
+  tag?: string;
+  title: string;
+  text: string;
+}
+interface Props {
+  steps: Step[];
+  loop?: boolean;
+  label?: string;
+  caption?: string;
+}
+const { steps, loop = false, label, caption } = Astro.props;
+---
+
+<figure class:list={['chain', { loop }]} style={`--n:${steps.length}`} data-chain>
+  {label && <p class="label small">{label}</p>}
+  <ol>
+    {
+      steps.map((s, i) => (
+        <li>
+          <button type="button" aria-expanded={i === 0 ? 'true' : 'false'} data-step={i}>
+            <span class="tag">{s.tag ?? String(i + 1).padStart(2, '0')}</span>
+            <span class="title">{s.title}</span>
+          </button>
+        </li>
+      ))
+    }
+  </ol>
+  {loop && <div class="return" aria-hidden="true"><span>repeat</span></div>}
+  <div class="details">
+    {
+      steps.map((s, i) => (
+        <p data-detail={i} hidden={i !== 0}>
+          <strong>{s.title}.</strong> {s.text}
+        </p>
+      ))
+    }
+  </div>
+  {caption && <figcaption class="small quiet">{caption}</figcaption>}
+</figure>
+
+<script>
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-chain] [data-step]');
+    if (!btn) return;
+    const root = btn.closest('[data-chain]')!;
+    const i = btn.dataset.step;
+    root.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((b) =>
+      b.setAttribute('aria-expanded', String(b.dataset.step === i)),
+    );
+    root.querySelectorAll<HTMLElement>('[data-detail]').forEach((p) => (p.hidden = p.dataset.detail !== i));
+  });
+</script>
+
+<style>
+  .chain {
+    margin: 2.25rem 0 2.5rem;
+  }
+  .label {
+    margin: 0 0 0.8rem;
+    font-weight: 600;
+    color: var(--ink-accent);
+  }
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+    gap: 1.4rem;
+    position: relative;
+  }
+  ol::before {
+    content: '';
+    position: absolute;
+    left: 2rem;
+    right: 2rem;
+    top: 50%;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, var(--ink-accent) 0 8px, transparent 8px 13px);
+    opacity: 0.55;
+  }
+  li {
+    position: relative;
+  }
+  li:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: -1.05rem;
+    top: 50%;
+    width: 0.55rem;
+    height: 0.55rem;
+    border-top: 2px solid var(--ink-accent);
+    border-right: 2px solid var(--ink-accent);
+    transform: translateY(-50%) rotate(45deg);
+  }
+  button {
+    position: relative;
+    width: 100%;
+    min-height: 5.6rem;
+    display: grid;
+    align-content: center;
+    gap: 0.25rem;
+    padding: 0.8rem 0.9rem;
+    text-align: left;
+    font: inherit;
+    color: var(--bark);
+    background: var(--linen);
+    border: 1.5px solid var(--line);
+    border-radius: 0.9rem;
+    cursor: pointer;
+    transition:
+      border-color 0.2s,
+      background-color 0.2s,
+      transform 0.2s var(--ease);
+  }
+  button:hover {
+    border-color: var(--ink-accent);
+    transform: translateY(-2px);
+  }
+  button[aria-expanded='true'] {
+    background: var(--scene);
+    border-color: var(--scene);
+    color: var(--silk);
+  }
+  .tag {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--ink-accent);
+  }
+  button[aria-expanded='true'] .tag {
+    color: var(--accent);
+  }
+  .title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    line-height: 1.25;
+  }
+  .return {
+    margin: 0.7rem 2rem 0;
+    height: 1.4rem;
+    border: 2px dashed color-mix(in oklab, var(--ink-accent) 55%, transparent);
+    border-top: 0;
+    border-radius: 0 0 1rem 1rem;
+    display: grid;
+    place-items: end center;
+  }
+  .return span {
+    transform: translateY(0.75rem);
+    padding: 0 0.6rem;
+    background: var(--linen);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--ink-accent);
+  }
+  .details {
+    margin-top: 1.4rem;
+    padding: 1rem 1.2rem;
+    border-radius: 0.8rem;
+    background: var(--linen-2);
+    min-height: 4.5rem;
+  }
+  .details p {
+    margin: 0;
+    color: var(--bark-2);
+  }
+  .details strong {
+    color: var(--bark);
+  }
+  figcaption {
+    margin-top: 0.6rem;
+  }
+  @media (max-width: 44rem) {
+    ol {
+      grid-template-columns: 1fr 1fr;
+    }
+    ol::before,
+    li::after,
+    .return {
+      display: none;
+    }
+  }
+</style>

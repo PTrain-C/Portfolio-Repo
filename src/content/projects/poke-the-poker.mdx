@@ -1,0 +1,88 @@
+---
+title: Poke the Poker
+fullName: Real-time poker analyzer, EE 250 final project
+summary: A Raspberry Pi that listens to a poker table. It times every player's decision with a sound sensor, turns that into a confidence score, and works out who is pushing whom out of the hand.
+period: Aug 2025 to Dec 2025
+order: 4
+status: published
+theme: felt
+hero: scene
+rail: top
+art: gpio
+team: team
+# The split of work with Christopher Kim is not recorded, so this stays a two-person project.
+mine:
+  - Co-designed and co-built the whole system with Christopher (sound sensor, MCP3008 ADC over SPI, the Raspberry Pi game loop, MQTT control, and confidence and influence scoring)
+others:
+  - part: Co-built everything listed under my part
+    by: Christopher Kim
+outcome: Working system, demoed and documented for the class.
+skills: [raspberry-pi, python, data-acquisition, spi, adc, mqtt, gpio, data-analysis]
+sources:
+  - label: EE 250 final project documentation (Dec 7, 2025), with block diagram and limitations
+  - label: poke_the_poker.py, the RPi program (excerpted below with line numbers)
+  - label: Setup README and project outline notes
+---
+import Chain from '../../components/content/Chain.astro';
+import Excerpt from '../../components/content/Excerpt.astro';
+import Figure from '../../components/Figure.astro';
+import Pair from '../../components/content/Pair.astro';
+
+{/*
+  RULES (firm): say "Raspberry Pi" or "RPi", never "Embedded Linux". Plotting is run manually, never "automated".
+  The write-up credits all work jointly to Peter and Christopher Kim, so don't split it until Peter does.
+*/}
+
+## What it is
+
+Christopher Kim and I built this for EE 250. Players make their move out loud, and a sound sensor on the Raspberry Pi picks it up. How fast you commit becomes your confidence score for that turn. Staying silent past the timeout counts as a fold. At the end of the game the Pi prints a table and a matrix, and a plotting script I run by hand afterward turns them into per-player graphs of confidence and influence. It's meant for commentators and analysts, not the players.
+
+## One turn, start to finish
+
+<Chain
+  loop
+  label="The game loop on the Raspberry Pi"
+  steps={[
+    { tag: 'MQTT', title: 'Laptop starts the game', text: 'The Pi subscribes to a control topic. A laptop publishes the player count to start, and can send "end" to stop early. Nothing else goes over MQTT, so the game keeps running if the laptop drops off.' },
+    { tag: 'SPI', title: 'Listen', text: 'The GrovePi sound sensor is analog, so an MCP3008 converts it and the Pi reads it over SPI every 10 ms.' },
+    { tag: 'debounce', title: 'Detect a decision', text: 'A decision only counts after three readings in a row above the threshold. One loud spike from across the room is not enough.' },
+    { tag: 'score', title: 'Score it', text: 'Time from the start of the turn to detection becomes a 0 to 100 confidence score. If 10 s pass with nothing, the player has folded and scores 0.' },
+    { tag: 'GPIO', title: 'Cool down', text: 'An LED on the Pi stays on for a 5 s countdown between players so the next person knows to wait.' },
+  ]}
+  caption="The loop ends by itself when only one player is left, or when the laptop sends end."
+/>
+
+The confidence score is just linear in reaction time, with $T = 10$ s as the timeout:
+
+$$
+\text{confidence} = \frac{T - t}{T} \times 100\%, \qquad t \le T
+$$
+
+Influence is the more interesting number. Every time someone acts without folding they become the aggressor. For each later decision by somebody else, that counts as a chance for the aggressor to push them out, and a fold counts as a hit. A player's influence per round is hits over chances. If player 1 has already folded and player 4 raises, then player 2 folding gets pinned on player 4, not player 1.
+
+<Excerpt
+  file="poke-the-poker/poke_the_poker.py"
+  lang="python"
+  from={83}
+  to={106}
+  note="The decision detector. Three consecutive samples over the threshold, 10 ms apart, or it keeps listening until the timeout."
+/>
+
+## How it's put together
+
+<Pair cols="1fr 1.1fr">
+  <Figure src="img/poker/block-diagram.webp" ratio="1270 / 1656" fit="contain" frame="print" tilt={-1} caption="Our block diagram from the write-up." alt="Hand-drawn block diagram: sound sensor to MCP3008 to Raspberry Pi, with LED, MQTT broker, laptop, and plotting script" />
+  <div>
+    <p>All of the processing stays on the Pi: timestamps, confidence, fold state, and a log of every decision with player, round, and score. MQTT only carries the two control messages. That split was on purpose. It kept the game loop stable and meant we didn't need to build a UI; any device that can publish MQTT can run a game.</p>
+    <p>After the game the Pi prints the confidence summary, the per-round influence table, a target-based influence coverage score (how many different players each person managed to push out), and a matrix of consecutive decisions for the plotting script.</p>
+  </div>
+</Pair>
+
+## What didn't work well
+
+- **The sound sensor can't tell a player from the room.** We cut false triggers by raising the threshold, but a mic with frequency filtering would be the real fix.
+- **The sensor connector kept cutting out,** which gave us partial or inconsistent readings. We ended up replacing the connectors more than once. Soldered joints or better jumpers would have saved a lot of time.
+- **One LED doesn't say much.** It only tells people to wait. A multi-color LED or a small display would show whose turn it is.
+
+We were upfront in the write-up about using ChatGPT: getting Mosquitto running on the Windows laptop, researching scoring models, and debugging the scoring logic and the output matrix.
+

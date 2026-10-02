@@ -1,0 +1,130 @@
+---
+// Contact band + footer, on every page except the contact page itself.
+import VlsiField from './art/VlsiField.astro';
+import ContactButtons from './ContactButtons.astro';
+import { site, href } from '../config';
+import { getExperience } from '../lib/content';
+
+const current = (await getExperience()).find((e) => e.data.current);
+const onContact = /\/contact(\.html)?\/?$/.test(Astro.url.pathname);
+const year = new Date().getFullYear();
+const pages = [
+  { label: 'Home', path: '/' },
+  { label: 'Projects', path: '/projects' },
+  { label: 'Experience', path: '/experience' },
+  { label: 'Skills', path: '/skills' },
+  { label: 'Coursework', path: '/coursework' },
+  { label: 'Contact', path: '/contact' },
+];
+---
+
+<footer id="contact" class:list={{ slim: onContact }}>
+  <VlsiField opacity={0.11} />
+  <div class="wrap inner">
+    {!onContact && <div class="cta">
+      <h2 class="display">Let's talk.</h2>
+      <p>
+        Hiring for analog circuit design, PCB design, ASIC or hardware validation, or quantum hardware?
+        Email is the fastest way to reach me.
+      </p>
+      <ContactButtons />
+    </div>}
+
+    <div class="bar">
+      <p class="status">
+        {
+          current ? (
+            <>
+              <span class="live" aria-hidden="true" />
+              {current.data.role} at {current.data.org}
+              {current.data.end && <> through {current.data.end}</>}
+            </>
+          ) : (
+            <>{site.identity}</>
+          )
+        }
+      </p>
+      <nav aria-label="Footer">
+        <ul>
+          {
+            pages.map((p) => (
+              <li>
+                <a href={href(p.path)}>{p.label}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <p class="copy">© {year} {site.name}</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  footer {
+    position: relative;
+    overflow: hidden;
+    margin-top: 8rem;
+    background: var(--mask-deep);
+    color: var(--silk);
+    scroll-margin-top: 0;
+  }
+  .inner {
+    position: relative;
+    padding-top: 6rem;
+    padding-bottom: 2rem;
+  }
+  .slim {
+    margin-top: 5rem;
+  }
+  .slim .inner {
+    padding-top: 1rem;
+  }
+  .cta {
+    max-width: 44rem;
+  }
+  h2 {
+    font-size: clamp(4rem, 9vw, 7.5rem);
+    color: var(--silk);
+  }
+  .cta p {
+    margin: 1.5rem 0 2rem;
+    font-size: 1.15rem;
+    color: var(--silk-2);
+    max-width: 36rem;
+  }
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-top: 6rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid color-mix(in oklab, var(--silk) 14%, transparent);
+    font-size: 0.9rem;
+  }
+  .bar p {
+    margin: 0;
+    color: var(--silk-2);
+  }
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  ul {
+    display: flex;
+    gap: 1.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  ul a {
+    color: var(--silk);
+    text-decoration: none;
+  }
+  ul a:hover {
+    color: var(--gold);
+  }
+</style>

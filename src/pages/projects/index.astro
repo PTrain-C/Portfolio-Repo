@@ -1,0 +1,28 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import ProjectGrid from '../../components/ProjectGrid.astro';
+import { getProjects } from '../../lib/content';
+
+const projects = await getProjects();
+---
+
+<Base title="Projects" description="Circuit, PCB, and hardware projects.">
+  <PageHero seed={5}>
+    <h1>Projects</h1>
+    <p class="lede">
+      Each page covers the whole project, then spells out which parts were mine, which were a
+      teammate's, and the skills I used.
+    </p>
+  </PageHero>
+
+  <section class="wrap list">
+    <ProjectGrid projects={projects} showMine />
+  </section>
+</Base>
+
+<style>
+  .list {
+    padding-top: 4rem;
+  }
+</style>

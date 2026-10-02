@@ -1,0 +1,122 @@
+---
+// Image viewer with tabs (schematic sections, board views). Every panel's
+// caption explains what that part of the design does.
+import { href } from '../../config';
+
+interface Item {
+  label: string;
+  src: string;
+  alt?: string;
+  caption?: string;
+}
+interface Props {
+  items: Item[];
+  // 'light' for schematics/screenshots on white, 'dark' for renders.
+  tone?: 'light' | 'dark';
+  ratio?: string;
+  fit?: 'contain' | 'cover';
+}
+const { items, tone = 'light', ratio = '16 / 10', fit = 'contain' } = Astro.props;
+---
+
+<figure class:list={['tabs', tone]} data-tabs style={`--ratio:${ratio};--fit:${fit}`}>
+  <div class="bar" role="tablist">
+    {
+      items.map((it, i) => (
+        <button type="button" role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-tab={i}>
+          {it.label}
+        </button>
+      ))
+    }
+  </div>
+  <div class="stage">
+    {
+      items.map((it, i) => (
+        <div class="panel" data-panel={i} hidden={i !== 0}>
+          <a href={href(`/${it.src}`)} target="_blank" rel="noopener" title="Open full size">
+            <img src={href(`/${it.src}`)} alt={it.alt ?? it.label} loading={i === 0 ? 'eager' : 'lazy'} />
+          </a>
+          {it.caption && <figcaption>{it.caption}</figcaption>}
+        </div>
+      ))
+    }
+  </div>
+</figure>
+
+<script>
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-tabs] [data-tab]');
+    if (!btn) return;
+    const root = btn.closest('[data-tabs]')!;
+    const i = btn.dataset.tab;
+    root.querySelectorAll('[data-tab]').forEach((b) =>
+      b.setAttribute('aria-selected', String((b as HTMLElement).dataset.tab === i)),
+    );
+    root.querySelectorAll<HTMLElement>('[data-panel]').forEach((p) => (p.hidden = p.dataset.panel !== i));
+  });
+</script>
+
+<style>
+  .tabs {
+    margin: 2rem 0 2.5rem;
+  }
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 0.8rem;
+  }
+  button {
+    font: inherit;
+    font-size: 0.86rem;
+    font-weight: 550;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--bark-2);
+    cursor: pointer;
+    transition:
+      background-color 0.2s,
+      color 0.2s,
+      border-color 0.2s;
+  }
+  button:hover {
+    border-color: var(--ink-accent);
+    color: var(--ink-accent);
+  }
+  button[aria-selected='true'] {
+    background: var(--scene);
+    border-color: var(--scene);
+    color: var(--silk);
+  }
+  .panel a {
+    display: block;
+    border-radius: 1rem;
+    overflow: hidden;
+    aspect-ratio: var(--ratio);
+    cursor: zoom-in;
+  }
+  .light .panel a {
+    background: #fff;
+    border: 1px solid var(--line);
+  }
+  .dark .panel a {
+    background: var(--scene-deep);
+  }
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: var(--fit);
+    padding: var(--pad, 0.75rem);
+  }
+  .dark img {
+    padding: 0;
+  }
+  figcaption {
+    margin-top: 0.75rem;
+    font-size: 0.93rem;
+    color: var(--bark-2);
+    max-width: 44rem;
+  }
+</style>

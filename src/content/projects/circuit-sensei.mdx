@@ -1,0 +1,92 @@
+---
+title: Circuit Sensei
+fullName: LA Hacks 2026, Aramco "Light the Way" track
+summary: An AI tutor that watches your breadboard through a webcam, shows you exactly which holes to use next, checks your placement with Gemini Vision, and then tests the finished circuit with an Arduino.
+period: Apr 25 to 27, 2026
+order: 2
+status: published
+theme: bench
+hero: poster
+heroImage: img/circuit-sensei/overlay-step3.webp
+cover: img/circuit-sensei/overlay-step3.webp
+rail: left
+art: gpio
+team: team
+mine:
+  - Hardware integration and circuit testing
+  - Designing and testing the breadboard circuits and the electrical verification path
+  - Project documentation and the Devpost submission
+  - Judge Q&A prep
+others:
+  - part: The agent loop, vision checks, overlays, and web app, built as a team of 4
+    by: Teammates
+outcome: Working prototype demoed at LA Hacks, with a live demo site and open-source repo. We did not place, and MLH interviewed me afterward.
+skills: [test-circuits, breadboarding, arduino, uart, technical-docs]
+links:
+  - label: Live demo
+    url: https://circuit-sensei.vercel.app/
+  - label: GitHub
+    url: https://github.com/SeunghoCuber/CircuitSensei
+  - label: Devpost
+    url: https://devpost.com/software/circuit-sensei
+sources:
+  - label: CircuitSensei repository README, source, and tests (MIT licensed)
+  - label: LA Hacks 2026 pitch deck in the repository
+  - label: Devpost write-up
+---
+import Chain from '../../components/content/Chain.astro';
+import Figure from '../../components/Figure.astro';
+
+## What it is
+
+Learning to breadboard is mostly learning where things go, and a wiring mistake on a first circuit can kill a part before you know what you did. Circuit Sensei sits next to you like a lab TA. You tell it what you want to build and what parts you have. It plans the build as a list of placements with breadboard coordinates like `A10`, draws each step over the live webcam image, checks your work with Gemini Vision before moving on, and once everything is placed it drives an Arduino over USB to actually test the circuit.
+
+## My part
+
+We were a team of 4. I did the hardware integration and circuit testing: I designed and tested the breadboard circuits it walks you through, and the electrical verification path that checks the physical build against the intended schematic. I also wrote the project documentation and the Devpost submission, and prepped for judge Q&A. The software was a team effort, so anything below about how it's built is "we".
+
+## Five states
+
+We built the agent as a small state machine, not a free-form chat, so it can't skip ahead of the hardware. Build steps go through Instruct and Verify; test steps go to the Arduino. Plans can interleave the two.
+
+<Chain
+  loop
+  label="The agent's workflow"
+  steps={[
+    { tag: 'INTAKE', title: 'Goal and parts', text: 'You describe the circuit in plain English, typed or spoken, along with your parts. Speech-to-text uses the browser Web Speech API.' },
+    { tag: 'PLAN', title: 'Placement plan', text: 'Gemini turns the goal into ordered steps with hole coordinates. Each step is either a build step or an Arduino test.' },
+    { tag: 'INSTRUCT', title: 'Show the step', text: 'Coordinates are mapped to pixel positions in the webcam frame, and the target holes, arrows, and labels are drawn on the image. Dark frames get brightened first.' },
+    { tag: 'VERIFY', title: 'Check the placement', text: 'Gemini Vision looks at the new frame and decides if the part is in the right place. You can ask questions here, retry, or confirm manually.' },
+    { tag: 'TEST', title: 'Test it for real', text: 'After the visual check passes, the Arduino runs electrical tests over USB serial: driving an LED, measuring a voltage divider, reading a button.' },
+  ]}
+  caption="It also watches for emergency keywords like smoke or heat."
+/>
+
+<Figure src="img/circuit-sensei/overlay-step3.webp" ratio="1600 / 1098" caption="An overlay the app generated for step 3 of a voltage divider build: wire D9 to B10, A0 to C20, and GND to C30." alt="Arduino Uno and breadboard with colored arrows from Arduino pins D9, A0, and GND to breadboard holes B10, C20, and C30" />
+
+## The test circuits
+
+The circuits had to be simple enough for someone's first build, and each one had to leave something the Arduino could actually measure. Otherwise "test it for real" would just be the camera again.
+
+| Circuit | How the Arduino checks it |
+| --- | --- |
+| LED with a current-limiting resistor | Drives the LED from D9 and reads the voltage back on A0 |
+| Voltage divider | Reads the midpoint on A0 and compares it to the expected voltage within a tolerance |
+| Push button | Reads a digital pin to confirm the button changes state |
+
+The voltage divider in the picture above is the same build: D9, A0, and ground wired into the breadboard at B10, C20, and C30.
+
+## How it's built
+
+| Layer | What it does |
+| --- | --- |
+| Gemini | Plans the build and does the vision check |
+| Python, FastAPI | Hosts the agent loop and state machine; streams messages to the UI over a WebSocket |
+| OpenCV | Webcam capture and drawing the overlays |
+| Arduino over USB serial | Runs the electrical tests once a build passes |
+| React | The workbench UI: live camera, annotated image, step list, chat, and voice |
+| ElevenLabs | Reads the agent's replies out loud |
+| pytest | Tests for the state machine, the tools, and the Arduino tester |
+
+We also gave it a mock mode that runs end to end with no webcam, no API keys, and no Arduino. The idea is that a classroom can try it before it has any hardware.
+

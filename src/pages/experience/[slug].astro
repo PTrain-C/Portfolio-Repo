@@ -1,0 +1,206 @@
+---
+import { render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import DetailLayout from '../../components/DetailLayout.astro';
+import SkillPills from '../../components/SkillPills.astro';
+import Sources from '../../components/Sources.astro';
+import RelatedCard from '../../components/RelatedCard.astro';
+import { href } from '../../config';
+import { getExperience, getProjects } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const experience = await getExperience();
+  return experience.map((e, i) => ({
+    params: { slug: e.id },
+    props: { entry: e, prev: experience[i - 1], next: experience[i + 1] },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'experience'>;
+  prev?: CollectionEntry<'experience'>;
+  next?: CollectionEntry<'experience'>;
+}
+
+const { entry, prev, next } = Astro.props;
+const { data } = entry;
+const { Content } = await render(entry);
+
+const allProjects = await getProjects();
+const related = data.projects
+  .map((id) => allProjects.find((p) => p.id === id))
+  .filter((p): p is CollectionEntry<'projects'> => !!p);
+
+const dates = !data.start ? null : data.start === data.end ? data.start : `${data.start} to ${data.end}`;
+const neighbor = (e?: CollectionEntry<'experience'>) => e && { label: e.data.org, path: `/experience/${e.id}` };
+---
+
+<Base title={`${data.role}, ${data.org}`} description={data.summary} theme={data.theme}>
+  <PageHero
+    back={{ label: 'experience', path: '/experience' }}
+    seed={17}
+    theme={data.theme}
+    layout={data.heroImage ? data.hero : 'scene'}
+    image={data.heroImage}
+  >
+    {
+      data.current && (
+        <p class="now">
+          <span class="live" aria-hidden="true" /> Current role
+        </p>
+      )
+    }
+    <h1>{data.org}</h1>
+    <p class="role">
+      {data.role}
+      {data.unit && <span>, {data.unit}</span>}
+    </p>
+    <p class="lede">{data.summary}</p>
+    <dl class="meta">
+      <div>
+        <dt>When</dt>
+        <dd>{dates ?? 'Dates to come'}</dd>
+      </div>
+      {
+        data.location && (
+          <div>
+            <dt>Where</dt>
+            <dd>{data.location}</dd>
+          </div>
+        )
+      }
+    </dl>
+    {
+      data.links.length > 0 && (
+        <p class="links">
+          {data.links.map((l) => (
+            <a class="btn ghost-dark" href={l.url.startsWith('/') ? href(l.url) : l.url} target="_blank" rel="noopener">
+              {l.label}
+            </a>
+          ))}
+        </p>
+      )
+    }
+  </PageHero>
+
+  <DetailLayout prev={neighbor(prev)} next={neighbor(next)} rail={data.rail}>
+    {
+      data.highlights.length > 0 && (
+        <section class="highlights">
+          <h2 class="display">What I did</h2>
+          <ul>
+            {data.highlights.map((h) => (
+              <li>{h}</li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      related.length > 0 && (
+        <div class="related">
+          {related.map((p) => (
+            <RelatedCard
+              path={`/projects/${p.id}`}
+              kicker="Project from this role"
+              title={p.data.title}
+              text={p.data.summary}
+              theme={p.data.theme}
+              image={p.data.cover}
+            />
+          ))}
+        </div>
+      )
+    }
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    <Fragment slot="side">
+      <div>
+        <h2>Skills I used</h2>
+        {data.skills.length ? <SkillPills ids={data.skills} grouped /> : <span class="todo">Still to write</span>}
+      </div>
+    </Fragment>
+
+    <Sources slot="after" items={data.sources} />
+  </DetailLayout>
+</Base>
+
+<style>
+  .now {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 1rem;
+    color: var(--accent);
+    font-size: 0.9rem;
+  }
+  .role {
+    margin: 0.9rem 0 0;
+    font-size: 1.3rem;
+    color: var(--silk);
+  }
+  .role span {
+    color: var(--silk-2);
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2.5rem;
+    margin: 2rem 0 0;
+  }
+  .meta dt {
+    font-size: 0.8rem;
+    color: var(--silk-2);
+  }
+  .meta dd {
+    margin: 0.1rem 0 0;
+    color: var(--silk);
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 2rem 0 0;
+  }
+  .highlights {
+    margin-bottom: 3rem;
+  }
+  .highlights h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  .highlights ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--line);
+  }
+  .highlights li {
+    position: relative;
+    padding: 0.85rem 0 0.85rem 1.6rem;
+    border-bottom: 1px solid var(--line);
+    font-size: 1.05rem;
+  }
+  .highlights li::before {
+    content: '';
+    position: absolute;
+    left: 0.2rem;
+    top: 1.35rem;
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: var(--scene);
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+  .related {
+    display: grid;
+    gap: 0.8rem;
+    margin: -1rem 0 3rem;
+  }
+</style>

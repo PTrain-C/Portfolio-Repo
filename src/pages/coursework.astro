@@ -1,0 +1,126 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import { coursework, degree } from '../data/coursework';
+import { href } from '../config';
+---
+
+<Base title="Coursework" description="Relevant coursework at USC.">
+  <PageHero seed={31}>
+    <h1>Coursework</h1>
+    <p class="lede">Classes at USC, grouped by area. Where a class turned into a project, it links there.</p>
+    <dl class="degree">
+      <div>
+        <dt>Degree</dt>
+        <dd>{degree.title}</dd>
+      </div>
+      <div>
+        <dt>School</dt>
+        <dd>{degree.school}</dd>
+      </div>
+      <div>
+        <dt>When</dt>
+        <dd>{degree.dates}</dd>
+      </div>
+      <div>
+        <dt>GPA</dt>
+        <dd>{degree.gpa}</dd>
+      </div>
+    </dl>
+  </PageHero>
+
+  <section class="wrap body">
+    <div class="groups">
+      {
+        coursework.map((g) => (
+          <section class="group">
+            <h2 class="display">{g.group}</h2>
+            <p class="quiet small">{g.blurb}</p>
+            <ul class:list={{ coded: g.courses.some((c) => c.code) }}>
+              {g.courses.map((c) => (
+                <li>
+                  <span class="code">{c.code ?? ''}</span>
+                  <span>
+                    {c.project ? <a href={href(`/projects/${c.project}`)}>{c.name}</a> : c.name}
+                    {c.note && <span class="note small">{c.note}</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+    </div>
+  </section>
+</Base>
+
+<style>
+  .body {
+    padding-top: 3rem;
+  }
+  .groups {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3rem;
+  }
+  .group {
+    padding-top: 1rem;
+    border-top: 2px solid var(--gold);
+  }
+  h2 {
+    font-size: 1.9rem;
+  }
+  .group > p {
+    margin: 0.4rem 0 1.25rem;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.55rem;
+  }
+  .coded li {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr;
+    gap: 0.5rem;
+  }
+  ul:not(.coded) .code {
+    display: none;
+  }
+  .code {
+    font-weight: 600;
+    color: var(--pine);
+  }
+  .note {
+    display: block;
+    color: var(--bark-3);
+    margin-top: 0.1rem;
+  }
+  .degree {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2.5rem;
+    margin: 2rem 0 0;
+  }
+  .degree dt {
+    font-size: 0.8rem;
+    color: var(--silk-2);
+  }
+  .degree dd {
+    margin: 0.1rem 0 0;
+    color: var(--silk);
+  }
+  @media (max-width: 60rem) {
+    .groups {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 40rem) {
+    .groups {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2rem;
+    }
+  }
+</style>

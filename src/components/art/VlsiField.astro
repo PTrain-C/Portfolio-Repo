@@ -1,0 +1,93 @@
+---
+// Standard-cell layout texture: rows of cells between power rails, poly
+// gates, contacts, and a few metal-2 straps crossing rows. Decorative.
+import { rng } from '../../lib/art';
+
+interface Props {
+  seed?: number;
+  opacity?: number;
+}
+const { seed = 11, opacity = 0.2 } = Astro.props;
+const rand = rng(seed);
+
+const rowH = 70;
+const rows = Array.from({ length: 9 }, (_, r) => r * (rowH + 14) + 10);
+const cells: { x: number; y: number; w: number; poly: number[]; contacts: [number, number][] }[] = [];
+for (const y of rows) {
+  let x = -20 + Math.round(rand() * 40);
+  while (x < 1460) {
+    const w = 40 + Math.round(rand() * 5) * 24;
+    const poly: number[] = [];
+    for (let px = x + 16; px < x + w - 10; px += 24) poly.push(px);
+    const contacts: [number, number][] = poly.map((px) => [
+      px + 8,
+      y + (rand() > 0.5 ? 18 : rowH - 26),
+    ]);
+    cells.push({ x, y, w, poly, contacts });
+    x += w + 4;
+  }
+}
+const straps = Array.from({ length: 14 }, () => Math.round(rand() * 1440));
+---
+
+<svg class="vlsi" viewBox="0 0 1440 760" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style={`--o:${opacity}`}>
+  {
+    rows.map((y) => (
+      <g>
+        <rect x="0" y={y - 3} width="1440" height="6" class="rail" />
+        <rect x="0" y={y + rowH - 3} width="1440" height="6" class="rail" />
+      </g>
+    ))
+  }
+  {
+    cells.map((c) => (
+      <g>
+        <rect x={c.x} y={c.y + 8} width={c.w} height={rowH - 16} rx="2" class="cell" />
+        <rect x={c.x + 6} y={c.y + 12} width={c.w - 12} height="16" class="diff" />
+        <rect x={c.x + 6} y={c.y + rowH - 28} width={c.w - 12} height="16" class="diff" />
+        {c.poly.map((px) => (
+          <rect x={px} y={c.y + 4} width="5" height={rowH - 8} class="poly" />
+        ))}
+        {c.contacts.map(([cx, cy]) => (
+          <rect x={cx} y={cy} width="7" height="7" class="ct" />
+        ))}
+      </g>
+    ))
+  }
+  {straps.map((x) => <rect x={x} y="0" width="8" height="760" class="m2" />)}
+</svg>
+
+<style>
+  .vlsi {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: var(--o);
+    pointer-events: none;
+  }
+  .rail {
+    fill: var(--gold);
+  }
+  .cell {
+    fill: none;
+    stroke: var(--silk-2);
+    stroke-width: 1;
+    opacity: 0.6;
+  }
+  .diff {
+    fill: #7aa38a;
+    opacity: 0.55;
+  }
+  .poly {
+    fill: #c8566a;
+    opacity: 0.8;
+  }
+  .ct {
+    fill: var(--silk);
+  }
+  .m2 {
+    fill: #8fb3d0;
+    opacity: 0.45;
+  }
+</style>

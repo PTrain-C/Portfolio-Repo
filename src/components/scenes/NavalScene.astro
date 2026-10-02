@@ -1,0 +1,105 @@
+---
+// Naval radar: a plan-position display with a rotating sweep and contacts,
+// and a destroyer silhouette on the waterline below it.
+const blips = [
+  [0.42, 40],
+  [0.7, 130],
+  [0.28, 215],
+  [0.85, 290],
+  [0.58, 330],
+];
+const R = 215;
+---
+
+<svg class="scene" viewBox="0 0 1600 720" preserveAspectRatio="xMaxYMid slice" aria-hidden="true">
+  <defs>
+    <radialGradient id="scope" r="0.5">
+      <stop offset="0" stop-color="var(--accent)" stop-opacity="0.12" />
+      <stop offset="1" stop-color="var(--accent)" stop-opacity="0.02" />
+    </radialGradient>
+    <linearGradient id="sweep" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="var(--accent)" stop-opacity="0" />
+      <stop offset="1" stop-color="var(--accent)" stop-opacity="0.45" />
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(1260 330)">
+    <circle r={R} fill="url(#scope)" stroke="var(--accent)" stroke-opacity="0.5" stroke-width="2" />
+    {[0.25, 0.5, 0.75].map((f) => <circle r={R * f} fill="none" stroke="var(--accent)" stroke-opacity="0.2" />)}
+    <path d={`M${-R} 0 H${R} M0 ${-R} V${R}`} stroke="var(--accent)" stroke-opacity="0.18" />
+    {
+      Array.from({ length: 36 }, (_, i) => (
+        <path
+          d={`M0 ${-R} v${i % 3 === 0 ? 14 : 7}`}
+          stroke="var(--accent)"
+          stroke-opacity="0.5"
+          transform={`rotate(${i * 10})`}
+        />
+      ))
+    }
+    <g class="sweep">
+      <path d={`M0 0 L${R} 0 A${R} ${R} 0 0 0 ${(R * Math.cos(-0.7)).toFixed(1)} ${(R * Math.sin(-0.7)).toFixed(1)} Z`} fill="url(#sweep)" />
+      <path d={`M0 0 H${R}`} stroke="var(--accent)" stroke-width="2" />
+    </g>
+    {
+      blips.map(([f, a], i) => (
+        <circle
+          class="blip"
+          cx={(R * Number(f) * Math.cos((Number(a) * Math.PI) / 180)).toFixed(1)}
+          cy={(R * Number(f) * Math.sin((Number(a) * Math.PI) / 180)).toFixed(1)}
+          r="5"
+          fill="var(--accent-soft)"
+          style={`animation-delay:${(Number(a) / 360) * 5}s`}
+        />
+      ))
+    }
+  </g>
+
+  <g transform="translate(860 600)">
+    <path d="M-60 60 C 200 50, 500 70, 820 58" stroke="var(--accent)" stroke-opacity="0.25" fill="none" stroke-width="2" />
+    <path
+      d="M0 40 L30 58 H560 L600 34 H540 L520 20 H430 L410 -6 H372 L360 -44 H330 L318 -6 H250 L236 16 H150 L140 30 H40 Z"
+      fill="var(--scene-deep)"
+      stroke="var(--silk)"
+      stroke-opacity="0.45"
+      stroke-width="2"
+      stroke-linejoin="round"
+    />
+    <path d="M342 -44 V-86 M326 -72 H358" stroke="var(--silk)" stroke-opacity="0.45" stroke-width="3" />
+    <path d="M318 -6 L330 -32 H350" fill="none" stroke="var(--accent)" stroke-width="3" />
+    <path d="M100 30 L140 22" stroke="var(--silk)" stroke-opacity="0.45" stroke-width="4" stroke-linecap="round" />
+  </g>
+</svg>
+
+<style>
+  .scene {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .sweep {
+    animation: sweep 5s linear infinite;
+  }
+  @keyframes sweep {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .blip {
+    opacity: 0;
+    animation: ping 5s linear infinite;
+  }
+  @keyframes ping {
+    0% {
+      opacity: 1;
+    }
+    60% {
+      opacity: 0.1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+</style>

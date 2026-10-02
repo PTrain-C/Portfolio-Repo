@@ -1,0 +1,428 @@
+---
+import Base from '../layouts/Base.astro';
+import BoardField from '../components/art/BoardField.astro';
+import HeadshotPad from '../components/art/HeadshotPad.astro';
+import QuantumCircuit from '../components/art/QuantumCircuit.astro';
+import ProjectGrid from '../components/ProjectGrid.astro';
+import ExperienceRows from '../components/ExperienceRows.astro';
+import { site, contact, interests, href } from '../config';
+import { categories } from '../data/skills';
+import { getProjects, getExperience, getCredentials } from '../lib/content';
+
+const projects = await getProjects();
+const experience = await getExperience();
+const credentials = await getCredentials();
+const current = experience.find((e) => e.data.current);
+
+// Categories shown in the hero's key skills strip (all featured skills are
+// still on the Skills page).
+const heroCategories = ['pcb', 'analog', 'test', 'systems', 'programming', 'quantum'];
+const keySkills = categories
+  .filter((c) => heroCategories.includes(c.id))
+  .map((c) => ({ category: c, skills: c.skills.filter((s) => s.featured) }))
+  .filter((g) => g.skills.length > 0);
+
+const focus = [
+  'analog circuits',
+  'PCB design',
+  'ASIC validation',
+  'quantum hardware',
+  'flight hardware test',
+];
+
+// Facts pulled straight from the experience entries.
+const facts = [
+  { big: '13', label: 'interns I led defining SWAP-C constraints at Lockheed Martin' },
+  { big: '140+', label: 'participants at Q³ Qompute @ USC in 2025, which I helped organize' },
+  { big: 'Class B', label: 'NASA risk classification of the space hardware I test at Draper' },
+  { big: String(projects.length), label: 'projects, each with my part spelled out' },
+];
+---
+
+<Base>
+  <section class="hero">
+    <BoardField seed={21} opacity={0.2} />
+    <div class="wrap hero-grid">
+      <div class="intro">
+        {
+          current && (
+            <a class="status rise" href={href(`/experience/${current.id}`)}>
+              <span class="live" aria-hidden="true" />
+              Now: {current.data.role} at {current.data.org}
+            </a>
+          )
+        }
+        <h1 class="display name rise" style="--d:1">{site.name}</h1>
+        <p class="focus rise" style="--d:2">
+          Electrical engineering at USC, working on
+          <span class="rotator" data-rotator={JSON.stringify(focus)}>
+            <span class="word">{focus[0]}</span>
+          </span>
+        </p>
+        <p class="bio rise" style="--d:3">
+          Last summer I was at Lockheed Martin writing and verifying requirements on the Aegis Combat
+          System. This fall I took a semester off from classes to work at Draper, where I help run
+          acceptance testing on flight hardware for a NASA program and do design validation testing on
+          a voltage regulator for an ASIC team. Before that I designed an all-analog safety interlock
+          board for USC Racing and built a notch filter from the transfer function up. I've seen how
+          requirements get written and how hardware gets proven. What I want next is to design it.
+        </p>
+        <div class="ctas rise" style="--d:4">
+          <a class="btn gold" href={href('/projects')}>See projects</a>
+          <a class="btn ghost-dark" href={href('/contact')}>Email me</a>
+          <a class="btn ghost-dark" href={contact.linkedin} target="_blank" rel="noopener">LinkedIn</a>
+        </div>
+      </div>
+      <div class="pad rise" style="--d:2">
+        <HeadshotPad />
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="keys rise" style="--d:5">
+        <div class="keys-head">
+          <h2>Key skills</h2>
+          <a href={href('/skills')}>Full skill map</a>
+        </div>
+        <ul class="key-cols">
+          {
+            keySkills.map((g) => (
+              <li>
+                <span class="k-cat">{g.category.name}</span>
+                <ul>
+                  {g.skills.map((s) => (
+                    <li>
+                      <a href={href(`/skills#${s.id}`)}>{s.name}</a>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap sec" id="projects">
+    <div class="sec-head">
+      <div>
+        <h2 class="display">Projects</h2>
+        <p>Hardware I've designed, built, or verified, with my part spelled out on each one.</p>
+      </div>
+      <a class="btn" href={href('/projects')}>All projects</a>
+    </div>
+    <ProjectGrid projects={projects} />
+  </section>
+
+  <section class="wrap sec" id="experience">
+    <div class="sec-head">
+      <div>
+        <h2 class="display">Experience</h2>
+        <p>Most recent first. Each role lists what I did and the skills it used.</p>
+      </div>
+      <a class="btn" href={href('/experience')}>All experience</a>
+    </div>
+    <ExperienceRows entries={experience} />
+    {
+      credentials.length > 0 && (
+        <p class="creds small">
+          Also:{' '}
+          {credentials.map((c, i) => (
+            <>
+              {i > 0 && ', '}
+              {c.data.title}, {c.data.issuer} {c.data.date}
+            </>
+          ))}
+        </p>
+      )
+    }
+  </section>
+
+  <section class="wrap facts" aria-label="Highlights">
+    {
+      facts.map((f) => (
+        <div>
+          <p class="display big">{f.big}</p>
+          <p class="label">{f.label}</p>
+        </div>
+      ))
+    }
+  </section>
+
+  <section class="wrap sec" id="interests">
+    <div class="sec-head">
+      <div>
+        <h2 class="display">What I'm into</h2>
+        <p>The areas I keep coming back to, in class and out of it.</p>
+      </div>
+    </div>
+    <div class="interests">
+      <QuantumCircuit rows={interests.length} rowHeight={96} />
+      <ul>
+        {
+          interests.map((i) => (
+            <li>
+              <h3>{i.title}</h3>
+              <p>
+                {i.text} {i.placeholder && <span class="todo">Still to write</span>}
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<script>
+  // Cycle the focus word in the hero. Re-runs after client-side navigation.
+  let timer: number | undefined;
+  function start() {
+    clearInterval(timer);
+    const el = document.querySelector<HTMLElement>('[data-rotator]');
+    if (!el || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const words: string[] = JSON.parse(el.dataset.rotator ?? '[]');
+    let i = 0;
+    timer = window.setInterval(() => {
+      i = (i + 1) % words.length;
+      const span = document.createElement('span');
+      span.className = 'word';
+      span.textContent = words[i];
+      el.replaceChildren(span);
+    }, 2400);
+  }
+  start();
+  document.addEventListener('astro:page-load', start);
+</script>
+
+<style>
+  /* ---- Hero (the board) ---------------------------------------------- */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    background: var(--mask);
+    color: var(--silk);
+    padding-top: 6.5rem;
+  }
+  .hero-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.4rem 0.9rem 0.4rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--silk) 16%, transparent);
+    color: var(--silk-2);
+    font-size: 0.88rem;
+    text-decoration: none;
+  }
+  .status:hover {
+    color: var(--silk);
+    border-color: var(--gold);
+  }
+  .name {
+    margin: 1.5rem 0 1.25rem;
+    font-size: clamp(6rem, 13vw, 11rem);
+    line-height: 0.85;
+    color: var(--silk);
+  }
+  .focus {
+    margin: 0;
+    font-size: clamp(1.3rem, 2.1vw, 1.7rem);
+    line-height: 1.35;
+    color: var(--silk-2);
+    min-height: 2.7em;
+  }
+  .rotator {
+    color: var(--gold);
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 1.15em;
+  }
+  .rotator :global(.word) {
+    display: inline-block;
+    animation: word-in 0.45s var(--ease);
+  }
+  @keyframes word-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+  .bio {
+    max-width: 34rem;
+    margin: 1.25rem 0 2rem;
+    color: var(--silk-2);
+  }
+  .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+  }
+  .pad {
+    max-width: 30rem;
+    justify-self: end;
+    width: 100%;
+  }
+
+  .keys {
+    position: relative;
+    margin-top: 2.5rem;
+    padding: 1.5rem 0 2.5rem;
+    border-top: 2px solid color-mix(in oklab, var(--gold) 55%, transparent);
+  }
+  .keys-head {
+    display: flex;
+    align-items: baseline;
+    gap: 1.25rem;
+    margin-bottom: 1.1rem;
+  }
+  .keys-head h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--silk);
+  }
+  .keys-head a {
+    font-size: 0.88rem;
+    color: var(--gold);
+  }
+  .key-cols {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+  }
+  .key-cols > li {
+    position: relative;
+    padding: 0 1.1rem;
+    border-left: 1px solid color-mix(in oklab, var(--gold) 35%, transparent);
+  }
+  .key-cols > li:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .k-cat {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--silk-2);
+    margin-bottom: 0.4rem;
+  }
+  .key-cols ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.15rem;
+  }
+  .key-cols ul a {
+    color: var(--silk);
+    text-decoration: none;
+    font-size: 0.95rem;
+  }
+  .key-cols ul a:hover {
+    color: var(--gold);
+    text-decoration: underline;
+  }
+
+  /* ---- Sections ------------------------------------------------------- */
+  .sec {
+    margin-top: 7rem;
+  }
+  .creds {
+    margin: 1.25rem 0 0 1rem;
+    color: var(--bark-2);
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    margin-top: 7rem;
+  }
+  .facts > div {
+    padding: 0.5rem 2rem 0.5rem 1.5rem;
+    border-left: 1px solid var(--line);
+  }
+  .facts > div:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .facts p {
+    margin: 0;
+  }
+  .big {
+    font-size: clamp(3rem, 5vw, 4.5rem);
+    color: var(--pine);
+  }
+  .label {
+    margin-top: 0.6rem !important;
+    color: var(--bark-2);
+    font-size: 0.95rem;
+    max-width: 15rem;
+  }
+
+  .interests {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 2.5rem;
+    align-items: start;
+  }
+  .interests ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .interests li {
+    height: 96px;
+    display: grid;
+    align-content: center;
+  }
+  .interests h3 {
+    font-size: 1.1rem;
+  }
+  .interests li p {
+    margin: 0.15rem 0 0;
+    color: var(--bark-2);
+    font-size: 0.95rem;
+  }
+
+  @media (max-width: 60rem) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+    }
+    .pad {
+      justify-self: start;
+      max-width: 20rem;
+      grid-row: 1;
+    }
+    .key-cols {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem 0;
+    }
+    .key-cols > li:nth-child(3n + 1) {
+      padding-left: 0;
+      border-left: 0;
+    }
+    .facts {
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem 0;
+    }
+    .interests {
+      grid-template-columns: 1fr;
+    }
+    .interests :global(.qc) {
+      display: none;
+    }
+    .interests li {
+      height: auto;
+      padding: 0.75rem 0;
+    }
+  }
+</style>

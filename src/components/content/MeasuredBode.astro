@@ -1,0 +1,136 @@
+---
+// Measured frequency sweep of the Rauch band-pass filter from EE 202L Lab 6
+// (100 mV input). Points are the logged readings; the -3 dB crossings are the
+// linear interpolations from the lab report.
+const data: [number, number][] = [
+  [100, 4.14],
+  [300, 13.29],
+  [500, 26.38],
+  [800, 78.79],
+  [900, 130.51],
+  [950, 168.72],
+  [1000, 196.55],
+  [1050, 186.65],
+  [1100, 153.84],
+  [1200, 102.18],
+  [1500, 48.91],
+  [2000, 27.56],
+  [3000, 15.62],
+  [5000, 8.51],
+  [10000, 4.24],
+];
+const VIN = 100;
+const W = 680;
+const H = 260;
+const PAD = { l: 44, r: 16, t: 20, b: 34 };
+const xOf = (f: number) => PAD.l + ((Math.log10(f) - 2) / 2) * (W - PAD.l - PAD.r);
+const yOf = (k: number) => PAD.t + (1 - k / 2.2) * (H - PAD.t - PAD.b);
+const pts = data.map(([f, v]) => [xOf(f), yOf(v / VIN)] as const);
+const line = pts.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`).join('');
+const k3 = (196.55 * 0.707) / VIN;
+const fL = 911.1;
+const fH = 1128.8;
+---
+
+<figure class="measured">
+  <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Measured gain versus frequency, peaking at 1 kHz">
+    {
+      [0, 0.5, 1, 1.5, 2].map((k) => (
+        <g>
+          <line x1={PAD.l} x2={W - PAD.r} y1={yOf(k)} y2={yOf(k)} class="grid" />
+          <text x={PAD.l - 8} y={yOf(k) + 4} class="axis end">
+            {k}
+          </text>
+        </g>
+      ))
+    }
+    {
+      [
+        [100, '100'],
+        [1000, '1k'],
+        ].map(([f, l]) => (
+        <text x={xOf(Number(f))} y={H - 10} class="axis mid">
+          {l}
+        </text>
+      ))
+    }
+    <text x={W - PAD.r} y={H - 10} class="axis end">10 kHz</text>
+    <rect x={xOf(fL)} y={PAD.t} width={xOf(fH) - xOf(fL)} height={H - PAD.t - PAD.b} class="band" />
+    <line x1={PAD.l} x2={W - PAD.r} y1={yOf(k3)} y2={yOf(k3)} class="k3" />
+    <text x={W - PAD.r} y={yOf(k3) - 6} class="axis end hi">-3 dB</text>
+    <path d={line} class="trace" />
+    {pts.map(([x, y]) => <circle cx={x} cy={y} r="3.5" class="pt" />)}
+    <text x={xOf(1000) + 10} y={yOf(1.97) + 4} class="axis hi">1.97 at 1 kHz</text>
+  </svg>
+  <table>
+    <thead>
+      <tr><th></th><th>Target</th><th>Measured</th><th>Error</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Center frequency</td><td>1 kHz</td><td>1 kHz</td><td>0%</td></tr>
+      <tr><td>Midband gain |K|</td><td>2.0</td><td>1.97</td><td>-1.5%</td></tr>
+      <tr><td>Bandwidth</td><td>200 Hz</td><td>217.7 Hz</td><td>+8.9%</td></tr>
+      <tr><td>Q</td><td>5.0</td><td>4.59</td><td>-8.2%</td></tr>
+    </tbody>
+  </table>
+  <figcaption class="small quiet">
+    Gain |V<sub>out</sub>/V<sub>in</sub>| from 15 logged readings at 100 mV in. Shaded band: measured -3 dB
+    points, 911 Hz to 1129 Hz.
+  </figcaption>
+</figure>
+
+<style>
+  .measured {
+    margin: 2rem 0 2.5rem;
+  }
+  svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 1rem;
+  }
+  .grid {
+    stroke: var(--line);
+  }
+  .axis {
+    font-family: var(--mono);
+    font-size: 11px;
+    fill: var(--bark-3);
+  }
+  .end {
+    text-anchor: end;
+  }
+  .mid {
+    text-anchor: middle;
+  }
+  .hi {
+    fill: var(--ink-accent);
+  }
+  .band {
+    fill: var(--accent);
+    fill-opacity: 0.16;
+  }
+  .k3 {
+    stroke: var(--ink-accent);
+    stroke-dasharray: 4 5;
+    stroke-opacity: 0.7;
+  }
+  .trace {
+    fill: none;
+    stroke: var(--bark);
+    stroke-width: 1.8;
+  }
+  .pt {
+    fill: var(--ink-accent);
+    stroke: #fff;
+    stroke-width: 1.5;
+  }
+  table {
+    margin: 1rem 0 0 !important;
+  }
+  figcaption {
+    margin-top: 0.4rem;
+  }
+</style>

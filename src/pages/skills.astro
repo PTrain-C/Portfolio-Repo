@@ -1,0 +1,178 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import { href } from '../config';
+import { categories } from '../data/skills';
+import { getSkillUsage } from '../lib/content';
+
+const usage = await getSkillUsage();
+---
+
+<Base title="Skills" description="Every skill, grouped, with where each one was used.">
+  <PageHero seed={29}>
+    <h1>Skill map</h1>
+    <p class="lede">Grouped by area. Each skill links to the roles and projects where I used it.</p>
+    <nav class="jump" aria-label="Skill areas">
+      {
+        categories.map((c) => (
+          <a href={`#${c.id}`} data-tone={c.tone}>
+            {c.name}
+          </a>
+        ))
+      }
+    </nav>
+  </PageHero>
+
+  <div class="wrap cats">
+    {
+      categories.map((c) => (
+        <section class="cat" id={c.id} data-tone={c.tone}>
+          <div class="cat-head">
+            <h2 class="display">{c.name}</h2>
+            <p class="quiet small">{c.blurb}</p>
+          </div>
+          <ul class="rows">
+            {c.skills.map((s) => {
+              const used = usage.get(s.id) ?? [];
+              return (
+                <li id={s.id}>
+                  <span class="name">
+                    {s.name}
+                    {s.note && <span class="quiet small"> ({s.note})</span>}
+                  </span>
+                  <span class="used">
+                    {used.length ? (
+                      used.map((u) =>
+                        u.path ? (
+                          <a href={href(u.path)}>
+                            {u.label}
+                            <span class="kind">{u.kind}</span>
+                          </a>
+                        ) : (
+                          <span class="plain">
+                            {u.label}
+                            <span class="kind">{u.kind}</span>
+                          </span>
+                        ),
+                      )
+                    ) : (
+                      <span class="quiet small">Not linked to a project yet</span>
+                    )}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+</Base>
+
+<style>
+  .jump {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 2rem;
+  }
+  .jump a {
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--silk) 20%, transparent);
+    color: var(--silk);
+    font-size: 0.85rem;
+    text-decoration: none;
+  }
+  .jump a:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+  .cats {
+    padding-top: 2rem;
+  }
+  .cat {
+    display: grid;
+    grid-template-columns: 18rem 1fr;
+    gap: 3rem;
+    padding: 3rem 0;
+    border-bottom: 1px solid var(--line);
+    scroll-margin-top: 5.5rem;
+  }
+  .cat-head {
+    position: relative;
+    padding-left: 1.25rem;
+  }
+  .cat-head::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.4rem;
+    bottom: 0.2rem;
+    width: 3px;
+    border-radius: 3px;
+    background: var(--tone);
+  }
+  .cat-head h2 {
+    font-size: 2.1rem;
+    color: var(--tone);
+  }
+  .cat-head p {
+    margin: 0.6rem 0 0;
+  }
+  .rows {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .rows li {
+    display: grid;
+    grid-template-columns: 16rem 1fr;
+    gap: 1.5rem;
+    align-items: baseline;
+    padding: 0.7rem 0.75rem;
+    border-radius: 0.5rem;
+    scroll-margin-top: 7rem;
+  }
+  .rows li + li {
+    border-top: 1px dashed var(--line);
+  }
+  .rows li:target {
+    background: color-mix(in oklab, var(--gold) 22%, var(--linen));
+    animation: found 1.8s ease-out;
+  }
+  @keyframes found {
+    from {
+      background: color-mix(in oklab, var(--gold) 60%, var(--linen));
+    }
+  }
+  .name {
+    font-weight: 600;
+  }
+  .used {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.25rem;
+  }
+  .used a,
+  .plain {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4rem;
+  }
+  .plain {
+    color: var(--bark-2);
+  }
+  .kind {
+    display: inline-block;
+    font-size: 0.75rem;
+    color: var(--bark-3);
+  }
+  @media (max-width: 56rem) {
+    .cat,
+    .rows li {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+  }
+</style>

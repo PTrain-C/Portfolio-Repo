@@ -1,0 +1,63 @@
+---
+// A slice of a real source file from docs/source, highlighted, with the file
+// name and line numbers shown so the excerpt can be checked against the code.
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { Code } from 'astro:components';
+
+interface Props {
+  file: string;
+  from: number;
+  to: number;
+  lang: string;
+  note?: string;
+}
+const { file, from, to, lang, note } = Astro.props;
+const lines = readFileSync(join(process.cwd(), 'docs/source', file), 'utf8').split('\n');
+const code = lines.slice(from - 1, to).join('\n');
+const name = file.split('/').pop();
+---
+
+<figure class="excerpt">
+  <figcaption>
+    <span class="file">{name}</span>
+    <span class="lines">lines {from} to {to}</span>
+  </figcaption>
+  <Code code={code} lang={lang as any} theme="github-dark-dimmed" />
+  {note && <p class="note small">{note}</p>}
+</figure>
+
+<style>
+  .excerpt {
+    margin: 2rem 0 2.5rem;
+  }
+  figcaption {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.55rem 1.1rem;
+    border-radius: 0.8rem 0.8rem 0 0;
+    background: var(--scene-deep);
+    color: var(--silk-2);
+    font-family: var(--mono);
+    font-size: 0.78rem;
+  }
+  .file {
+    color: var(--accent);
+  }
+  .excerpt :global(pre) {
+    margin: 0 !important;
+    padding: 1rem 1.2rem;
+    border-radius: 0 0 0.8rem 0.8rem;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    overflow-x: auto;
+  }
+  .excerpt :global(code) {
+    font-family: var(--mono);
+  }
+  .note {
+    margin: 0.6rem 0 0;
+    color: var(--bark-2);
+  }
+</style>

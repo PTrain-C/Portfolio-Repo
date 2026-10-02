@@ -1,0 +1,36 @@
+---
+// Two (or three) figures side by side. `offset` staggers the second one down.
+interface Props {
+  cols?: string;
+  offset?: boolean;
+}
+const { cols = '1fr 1fr', offset = false } = Astro.props;
+---
+
+<div class:list={['pair', { offset }]} style={`--cols:${cols}`}>
+  <slot />
+</div>
+
+<style>
+  .pair {
+    display: grid;
+    grid-template-columns: var(--cols);
+    gap: 1.5rem;
+    align-items: start;
+    margin: 2rem 0;
+  }
+  .pair > :global(figure) {
+    margin: 0;
+  }
+  .offset > :global(figure:nth-child(2)) {
+    margin-top: 3rem;
+  }
+  @media (max-width: 44rem) {
+    .pair {
+      grid-template-columns: 1fr;
+    }
+    .offset > :global(figure:nth-child(2)) {
+      margin-top: 0;
+    }
+  }
+</style>

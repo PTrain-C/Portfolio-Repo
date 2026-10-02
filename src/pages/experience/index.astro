@@ -1,0 +1,75 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import ExperienceRows from '../../components/ExperienceRows.astro';
+import SkillPills from '../../components/SkillPills.astro';
+import { getExperience, getCredentials } from '../../lib/content';
+
+const experience = await getExperience();
+const credentials = await getCredentials();
+---
+
+<Base title="Experience" description="Engineering roles and leadership.">
+  <PageHero seed={13}>
+    <h1>Experience</h1>
+    <p class="lede">Most recent first. Open any role for what I did and the skills it used.</p>
+  </PageHero>
+
+  <section class="wrap list">
+    <ExperienceRows entries={experience} showSummary />
+
+    {
+      credentials.length > 0 && (
+        <div class="creds">
+          <h2 class="display">Credentials</h2>
+          <ul>
+            {credentials.map((c) => (
+              <li>
+                <div>
+                  <p class="c-title">{c.data.title}</p>
+                  <p class="quiet small">
+                    {c.data.issuer}, {c.data.date}
+                  </p>
+                </div>
+                <SkillPills ids={c.data.skills} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+  </section>
+</Base>
+
+<style>
+  .list {
+    padding-top: 4rem;
+  }
+  .creds {
+    margin-top: 5rem;
+  }
+  .creds h2 {
+    font-size: 2.4rem;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .creds ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .creds li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .creds p {
+    margin: 0;
+  }
+  .c-title {
+    font-weight: 600;
+  }
+</style>

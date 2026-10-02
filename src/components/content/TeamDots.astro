@@ -1,0 +1,58 @@
+---
+// A team drawn as dots, with the lead marked.
+interface Props {
+  count: number;
+  label: string;
+}
+const { count, label } = Astro.props;
+---
+
+<figure class="team">
+  <div class="dots" aria-hidden="true">
+    <span class="lead">You</span>
+    {Array.from({ length: count - 1 }, (_, i) => <span style={`--i:${i}`} />)}
+  </div>
+  <figcaption>{label}</figcaption>
+</figure>
+
+<style>
+  .team {
+    margin: 2rem 0 2.5rem;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.5rem;
+    align-items: center;
+  }
+  .dots {
+    display: grid;
+    grid-template-columns: repeat(7, 2.2rem);
+    gap: 0.5rem;
+  }
+  .dots span {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    border: 2px solid var(--ink-accent);
+    opacity: 0.55;
+  }
+  .dots .lead {
+    display: grid;
+    place-items: center;
+    background: var(--scene);
+    border-color: var(--accent);
+    color: var(--accent);
+    font-size: 0.62rem;
+    font-weight: 700;
+    opacity: 1;
+  }
+  figcaption {
+    color: var(--bark-2);
+    font-size: 0.95rem;
+    max-width: 18rem;
+  }
+  @media (max-width: 44rem) {
+    .team {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

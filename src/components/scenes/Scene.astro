@@ -1,0 +1,30 @@
+---
+import BoardField from '../art/BoardField.astro';
+import TrackScene from './TrackScene.astro';
+import CigarScene from './CigarScene.astro';
+import FeltScene from './FeltScene.astro';
+import HydroScene from './HydroScene.astro';
+import BenchScene from './BenchScene.astro';
+import SpaceScene from './SpaceScene.astro';
+import NavalScene from './NavalScene.astro';
+import QuantumScene from './QuantumScene.astro';
+
+interface Props {
+  theme?: string;
+  seed?: number;
+}
+const { theme = 'board', seed = 3 } = Astro.props;
+const scenes: Record<string, any> = {
+  track: TrackScene,
+  cigar: CigarScene,
+  felt: FeltScene,
+  hydro: HydroScene,
+  bench: BenchScene,
+  space: SpaceScene,
+  naval: NavalScene,
+  quantum: QuantumScene,
+};
+const Cmp = scenes[theme];
+---
+
+{Cmp ? <Cmp /> : <BoardField seed={seed} opacity={0.16} />}
